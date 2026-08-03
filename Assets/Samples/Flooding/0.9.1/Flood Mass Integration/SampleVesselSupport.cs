@@ -3,39 +3,43 @@ using UnityEngine;
 namespace Kyle.Flooding.Samples
 {
     /// <summary>
-    /// Sample-only spring support that makes flood COM shifts visible.
-    /// This is not a production buoyancy model.
+    /// SAMPLE ONLY.
+    /// Provides artificial restoring forces so changes to Rigidbody center of
+    /// mass produce an easily visible roll/pitch response.
+    /// This is NOT a buoyancy, hydrodynamics, or vessel-stability simulation.
+    /// Do not copy this into production ship physics.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class FloodMassDemoBuoyancy : MonoBehaviour
+    [AddComponentMenu("Flooding/Samples/Sample Vessel Support")]
+    public sealed class SampleVesselSupport : MonoBehaviour
     {
         [SerializeField]
-        [Tooltip("World-space support height in meters.")]
+        [Tooltip("SAMPLE ONLY. World-space support plane height in meters. Not a waterline or buoyancy draft.")]
         private float supportHeight = 1f;
 
         [SerializeField]
-        [Tooltip("Upward spring stiffness per support point in newtons per meter.")]
+        [Tooltip("SAMPLE ONLY. Upward spring stiffness per support point in newtons per meter.")]
         [Min(0f)]
-        private float springStiffness = 12000f;
+        private float springStiffness = 14000f;
 
         [SerializeField]
-        [Tooltip("Vertical damping per support point in newton-seconds per meter.")]
+        [Tooltip("SAMPLE ONLY. Vertical damping per support point in newton-seconds per meter.")]
         [Min(0f)]
-        private float damping = 2500f;
+        private float damping = 2800f;
 
         [SerializeField]
-        [Tooltip("Half-width of the four support points in local meters.")]
+        [Tooltip("SAMPLE ONLY. Half-width of the four support points in local meters.")]
         [Min(0.01f)]
         private float halfWidth = 2f;
 
         [SerializeField]
-        [Tooltip("Half-length of the four support points in local meters.")]
+        [Tooltip("SAMPLE ONLY. Half-length of the four support points in local meters.")]
         [Min(0.01f)]
         private float halfLength = 3f;
 
         [SerializeField]
-        [Tooltip("Local Y position of each support point in meters.")]
-        private float supportPointY = -0.5f;
+        [Tooltip("SAMPLE ONLY. Local Y position of each support point in meters.")]
+        private float supportPointY = -0.55f;
 
         private Rigidbody targetRigidbody;
 

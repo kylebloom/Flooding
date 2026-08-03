@@ -182,21 +182,22 @@ transient simulation or presentation state.
 
 - **Flood Mass Integration** imports to
   `Assets/Samples/Flooding/0.9.1/Flood Mass Integration`. Open
-  `FloodMassRollPitch.unity` there and enter Play Mode. Asymmetric compartment
-  water shifts the Rigidbody center of mass and the sample-only spring support
-  makes the resulting roll response visible. This sample demonstrates
-  center-of-mass response; it intentionally does not render visible water and
-  does not provide production buoyancy. Tune dry mass and dry center of mass on
-  `RigidbodyFloodMassAdapter`, geometry and initial cubic meters on each
-  `FloodVolume`, and the sample-only spring response on
-  `FloodMassDemoBuoyancy`.
+  `FloodMassRollPitch.unity` there and enter Play Mode. A cutaway
+  four-compartment barge renders visible water with
+  `FloodCubeSurfaceRenderer`, shifts Rigidbody center of mass through
+  `FloodMassAggregator` + `RigidbodyFloodMassAdapter`, and uses sample-only
+  `SampleVesselSupport` springs so roll/pitch is obvious. An auto-demo and
+  keyboard presets (port/starboard/bow/stern) drive asymmetric loads. Game-view
+  COM markers and a HUD show dry, flood, and combined centers. This is not
+  production buoyancy.
 - **Baked Geometry** imports to
   `Assets/Samples/Flooding/0.9.1/Baked Geometry`. Open `BakedGeometry.unity`
-  there and enter Play Mode. The authored retained-shape objects and material
-  remain in the scene; the sample script provides only optional fill and roll
-  behavior. Disable **Animate Fill** or **Animate Roll** independently. The
-  `FloodBakedSurfaceRenderer` runtime free-surface mesh remains generated from
-  immutable baked data and aligned to gravity.
+  there and enter Play Mode. A curved hull-section compartment ships its
+  authoring source mesh and bake asset; optional fill/roll, a HUD, and **B**
+  baked-cell visualization show why Baked Data is needed versus prism/extruded
+  modes. Disable **Animate Fill** or **Animate Roll** independently. The
+  `FloodBakedSurfaceRenderer` free-surface mesh is generated from immutable
+  baked data and aligned to gravity.
 - **Connected Compartments** imports to
   `Assets/Samples/Flooding/0.9.1/Connected Compartments`. Open
   `ConnectedCompartments.unity` there and enter Play Mode to see conserved,
@@ -208,9 +209,12 @@ transient simulation or presentation state.
 - **Hull Breach** imports to `Assets/Samples/Flooding/0.9.1/Hull Breach`. Open
   `HullBreach.unity` there and enter Play Mode to watch ocean head drive
   inflow into an empty compartment, approach equalization, reverse to outflow
-  when the interior is higher, and stop when the connection is closed. Tune the
-  ocean Transform waterline on `ExternalFluidBoundary`, compartment state on
-  `FloodVolume`, and opening fields on `FloodConnection`.
+  when the interior is higher, and stop when the connection is closed.
+  `FloodCubeSurfaceRenderer` keeps compartment water gravity-aligned when the
+  hull rotates; `HullBreachBootstrap` only updates the ocean visual and
+  Game-view readout. Tune the ocean Transform waterline on
+  `ExternalFluidBoundary`, compartment state on `FloodVolume`, and opening
+  fields on `FloodConnection`.
 
 The package folders under `Samples~` are the authoritative sample sources.
 Package Manager copies them into `Assets/Samples` rather than synchronizing

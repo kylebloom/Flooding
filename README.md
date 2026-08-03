@@ -104,8 +104,8 @@ In **Window > Package Management > Package Manager**, select **Flooding**, open
 | --- | --- |
 | **Hull Breach** | Ocean waterline driving bidirectional flow through a hull opening |
 | **Connected Compartments** | Pressure-driven equalization between two finite compartments |
-| **Baked Geometry** | Editor-baked complex interior with gravity-aligned free surface |
-| **Flood Mass Integration** | Flood mass shifting Rigidbody center of mass (no water rendering) |
+| **Baked Geometry** | Curved hull-section bake, cell viz, gravity-aligned free surface |
+| **Flood Mass Integration** | Cutaway barge: visible water, COM markers, roll/pitch from flood mass |
 
 Imported samples copy to `Assets/Samples/Flooding/0.9.1/`. The `Samples~`
 folders in the package are the authoritative sources.

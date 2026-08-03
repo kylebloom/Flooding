@@ -288,6 +288,8 @@ Vessel (Rigidbody)
   FloodSimulationManager (or shared parent manager)
   Compartment A / B / ...
     FloodVolume
+    FloodCubeSurfaceRenderer (optional presentation)
+    Water Visual
 ```
 
 **Steps:**
@@ -298,13 +300,17 @@ Vessel (Rigidbody)
 3. **Add Component > Rigidbody Flood Mass Adapter**. Set **Dry Mass** and
    **Dry Center Of Mass Local** for the empty vessel.
 4. Ensure child `FloodVolume` components share one manager and have water.
-5. Enter Play Mode and move water between asymmetric compartments.
+5. Optionally attach `FloodCubeSurfaceRenderer` so flood water is visible while
+   the adapter owns mass/COM only.
+6. Enter Play Mode and move water between asymmetric compartments.
 
 **Expected:** Rigidbody mass and center of mass update from dry baseline +
 water. The vessel does not automatically float or right itself—add your own
-buoyancy if needed.
+buoyancy if needed. Presentation components observe `FloodState`; they do not
+cause the COM shift.
 
-**Sample shortcut:** import **Flood Mass Integration**.
+**Sample shortcut:** import **Flood Mass Integration** (cutaway barge with
+visible water, COM markers, presets, and sample-only `SampleVesselSupport`).
 
 ### Scenario 7 — Flow visuals and audio
 
@@ -398,22 +404,24 @@ regenerate the authored hierarchy.
 
 - **Flood Mass Integration**: Unity copies it to
   `Assets/Samples/Flooding/0.9.1/Flood Mass Integration`. Open
-  `FloodMassRollPitch.unity` there and enter Play Mode. The sample applies
-  aggregate flood mass and center of mass to a Rigidbody, then uses sample-only
-  spring supports to make its roll response visible. It intentionally does not
-  render visible water. On **Flood Mass Demo Vessel**, tune **Dry Mass** and
-  **Dry Center Of Mass Local** on `RigidbodyFloodMassAdapter`, and tune the
-  support response on `FloodMassDemoBuoyancy`. Tune geometry, fluid density,
-  and **Initial Volume** on the child `FloodVolume` components.
+  `FloodMassRollPitch.unity` there and enter Play Mode. A cutaway
+  four-compartment barge renders gravity-aligned water with
+  `FloodCubeSurfaceRenderer`, aggregates flood mass into a Rigidbody COM, and
+  uses sample-only `SampleVesselSupport` springs for visible roll/pitch. An
+  auto-demo plus keyboard presets show port/starboard/bow/stern loads; Game-view
+  markers and a HUD display dry/flood/combined COM. On **Flood Mass Demo
+  Vessel**, tune **Dry Mass** and **Dry Center Of Mass Local** on
+  `RigidbodyFloodMassAdapter`, support response on `SampleVesselSupport`, and
+  compartment geometry on each child `FloodVolume`.
 - **Baked Geometry**: Unity copies it to
   `Assets/Samples/Flooding/0.9.1/Baked Geometry`. Open `BakedGeometry.unity`
-  there and enter Play Mode. The stepped retained-shape GameObjects and
-  structure material are authored presentation. `BakedGeometrySampleBootstrap`
-  supplies only optional fill and roll behavior: clear **Animate Fill** or
-  **Animate Roll** to disable either animation independently. The
-  `FloodBakedSurfaceRenderer` still generates only the transient free-surface
-  mesh at runtime from immutable baked data; runtime does not inspect a source
-  mesh.
+  there and enter Play Mode. The sample shows a closed curved hull-section
+  interior with its authored source mesh, `FloodVolumeAuthoring`, and
+  `HullSectionFloodVolumeData`. `BakedGeometrySampleBootstrap` supplies optional
+  fill/roll, a Game-view HUD, **Space** pause, **B** baked-cell toggle, and
+  **R** roll toggle. Clear **Animate Fill** or **Animate Roll** independently.
+  `FloodBakedSurfaceRenderer` generates only the transient free-surface mesh at
+  runtime from immutable baked data; runtime does not analyze the source mesh.
 - **Connected Compartments**: Unity copies it to
   `Assets/Samples/Flooding/0.9.1/Connected Compartments`. Open
   `ConnectedCompartments.unity` there and enter Play Mode. Water moves from the
@@ -427,9 +435,12 @@ regenerate the authored hierarchy.
 - **Hull Breach**: Unity copies it to
   `Assets/Samples/Flooding/0.9.1/Hull Breach`. Open `HullBreach.unity` there
   and enter Play Mode. An `ExternalFluidBoundary` waterline exchanges water
-  with one finite compartment through a `FloodConnection`. Move the ocean
-  Transform on world Y, close the connection, or raise interior water to see
-  inflow, equalization, outflow, and closure.
+  with one finite compartment through a `FloodConnection`.
+  `FloodCubeSurfaceRenderer` presents gravity-aligned compartment water;
+  `HullBreachBootstrap` only updates the ocean visual and Game-view readout.
+  Move the ocean Transform on world Y, close the connection, raise interior
+  water, or rotate the compartment to see inflow, equalization, outflow,
+  closure, and gravity-aligned surfaces.
 
 The package's `Samples~` folders are authoritative. Package Manager import
 creates a writable copy under `Assets/Samples` but does not synchronize that
@@ -1051,10 +1062,10 @@ enabled. The adapter does not provide buoyancy or restoring forces.
 To inspect a working setup, import **Flood Mass Integration** from **Window >
 Package Management > Package Manager > Flooding > Samples**, then open
 `Assets/Samples/Flooding/0.9.1/Flood Mass Integration/FloodMassRollPitch.unity`
-and enter Play Mode. Its `FloodMassDemoBuoyancy` component is sample-only
-spring support, not production vessel physics. The sample demonstrates the
-Rigidbody response to aggregate flood mass and center of mass; it intentionally
-does not render visible water.
+and enter Play Mode. Its `SampleVesselSupport` component is sample-only
+spring scaffolding, not production buoyancy or vessel stability. The sample
+renders visible compartment water and Game-view COM markers so the chain from
+flood location → COM shift → roll/pitch is obvious.
 
 Runtime-created volumes can configure density before adding water:
 

@@ -24,12 +24,13 @@ materials are authored and editable before Play Mode.
 Hull Breach Demo
   FloodSimulationManager
   FloodDiagnostics
-  HullBreachBootstrap (sample-only presentation/readout)
+  HullBreachBootstrap (sample-only ocean visual + readout)
   External Ocean
     ExternalFluidBoundary
     Ocean Surface Visual
   Breached Compartment
     FloodVolume
+    FloodCubeSurfaceRenderer
     Floor / walls
     Water Visual
   Hull Breach Connection
@@ -46,6 +47,11 @@ front wall near the floor and connects **External Ocean** (side A) to
 **Breached Compartment** (side B). `FloodConnectionVisual` enables the green
 opening mesh while flow is active.
 
+Compartment water is presented by `FloodCubeSurfaceRenderer`, which builds a
+submerged mesh from the solved gravity-aligned `SurfacePlane`. Rotating the
+compartment keeps the free surface level with gravity. `HullBreachBootstrap`
+does not own compartment water rendering.
+
 ## Edit and tune before Play Mode
 
 - Select **External Ocean** and move its Transform on world Y to change exterior
@@ -54,8 +60,8 @@ opening mesh while flow is active.
   rectangular dimensions on `FloodVolume`.
 - Select **Hull Breach Connection** and edit opening width/height, discharge
   coefficient, or **Is Open**.
-- Rotate the compartment to change interior surface orientation relative to the
-  fixed ocean plane and opening.
+- Rotate the compartment to change interior geometry relative to gravity and
+  the fixed ocean plane; the water surface should remain gravity-aligned.
 
 ## Expected Play Mode behavior
 
@@ -67,7 +73,13 @@ With the default empty compartment and ocean waterline above the breach:
 4. Raising the compartment above the ocean waterline (or lowering the ocean)
    reverses flow to outflow.
 5. Closing the connection stops transfer immediately.
+6. Rotating the compartment on X or Z keeps the compartment water surface
+   gravity-aligned while walls and opening rotate with the hull.
 
 `FloodSource` is intentionally absent. Configured sources inject volume without
 pressure equilibrium; this sample uses an `ExternalFluidBoundary` plus
 `FloodConnection` so flow depends on breach depth and heads.
+
+The Game-view readout reports ocean waterline elevation along gravity, compartment
+volume and equivalent level-fill height, applied flow, and the connection's
+signed pressure-head difference (side A minus side B).

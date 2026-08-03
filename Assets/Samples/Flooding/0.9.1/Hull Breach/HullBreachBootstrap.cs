@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 
 namespace Kyle.Flooding.Samples
 {
     /// <summary>
-    /// Updates authored hull-breach sample visuals and Game-view readout.
+    /// Updates authored hull-breach sample ocean presentation and Game-view
+    /// readout. Compartment water presentation is owned by
+    /// <see cref="FloodCubeSurfaceRenderer"/>.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class HullBreachBootstrap : MonoBehaviour
@@ -25,26 +28,16 @@ namespace Kyle.Flooding.Samples
         [Header("Presentation")]
 
         [SerializeField]
-        [Tooltip("Persistent cube Transform scaled to show compartment water fill.")]
-        private Transform compartmentWaterVisual;
-
-        [SerializeField]
         [Tooltip("Optional ocean surface visual aligned to the external waterline.")]
         private Transform oceanSurfaceVisual;
 
         [SerializeField]
-        [Tooltip("Inset in meters removed from each side of the compartment water visual.")]
+        [Tooltip("Absolute pressure-head difference in meters at or below which the readout reports Equalized.")]
         [Min(0f)]
-        private float waterVisualInset = 0.08f;
-
-        [SerializeField]
-        [Tooltip("Height difference in meters at or below which the readout reports Equalized.")]
-        [Min(0f)]
-        private float equalizedHeightTolerance = 0.02f;
+        private float equalizedHeadTolerance = 0.02f;
 
         private void LateUpdate()
         {
-            RefreshCompartmentWater();
             RefreshOceanVisual();
         }
 
@@ -53,53 +46,38 @@ namespace Kyle.Flooding.Samples
             if (ocean == null || compartment == null || breach == null)
                 return;
 
-            var oceanHeight = ocean.transform.position.y;
-            var heightDifference = Mathf.Abs(compartment.CurrentHeight - oceanHeight);
+            var oceanElevation = GetElevationAlongGravity(ocean.SurfacePlane);
+            var headDifference = breach.PressureHeadDifference;
+            var absoluteHeadDifference = Math.Abs(headDifference);
             var status = !breach.IsOpen
                 ? "Closed"
-                : heightDifference <= equalizedHeightTolerance
+                : absoluteHeadDifference <= equalizedHeadTolerance
                     ? "Equalized"
-                    : compartment.CurrentHeight < oceanHeight
+                    : headDifference > 0d
                         ? "Inflow"
                         : "Outflow";
 
-            const float boxWidth = 460f;
+            const float boxWidth = 480f;
             var boxX = Mathf.Max(16f, (Screen.width - boxWidth) * 0.5f);
 
             GUI.Box(new Rect(boxX, 16f, boxWidth, 160f), "Hull Breach");
             GUI.Label(
                 new Rect(boxX + 14f, 44f, boxWidth - 28f, 20f),
-                $"Ocean waterline: {oceanHeight:F3} m");
+                $"Ocean waterline elevation: {oceanElevation:F3} m");
             GUI.Label(
                 new Rect(boxX + 14f, 66f, boxWidth - 28f, 20f),
                 $"Compartment: {compartment.CurrentVolume:F3} m³  "
-                + $"({compartment.CurrentHeight:F3} m high)");
+                + $"(equiv. height {compartment.CurrentHeight:F3} m)");
             GUI.Label(
                 new Rect(boxX + 14f, 88f, boxWidth - 28f, 20f),
                 $"Requested / applied: {breach.RequestedFlowRate:F3} / "
                 + $"{breach.CurrentFlowRate:F3} m³/s");
             GUI.Label(
                 new Rect(boxX + 14f, 110f, boxWidth - 28f, 20f),
-                $"{status}; |interior - ocean|: {heightDifference:F3} m");
+                $"{status}; |pressure head A-B|: {absoluteHeadDifference:F3} m");
             GUI.Label(
                 new Rect(boxX + 14f, 132f, boxWidth - 28f, 20f),
-                "Tune ocean Y, breach Y, Is Open, or rotate the compartment.");
-        }
-
-        private void RefreshCompartmentWater()
-        {
-            if (compartment == null || compartmentWaterVisual == null)
-                return;
-
-            var height = Mathf.Max(0.001f, compartment.CurrentHeight);
-            var width = Mathf.Max(
-                0.001f,
-                compartment.Width - (waterVisualInset * 2f));
-            var length = Mathf.Max(
-                0.001f,
-                compartment.Length - (waterVisualInset * 2f));
-            compartmentWaterVisual.localPosition = new Vector3(0f, height * 0.5f, 0f);
-            compartmentWaterVisual.localScale = new Vector3(width, height, length);
+                "Tune ocean Y, breach, Is Open, or rotate the compartment.");
         }
 
         private void RefreshOceanVisual()
@@ -118,10 +96,23 @@ namespace Kyle.Flooding.Samples
 
         private void OnValidate()
         {
-            waterVisualInset = SanitizeNonNegative(waterVisualInset, 0.08f);
-            equalizedHeightTolerance = SanitizeNonNegative(
-                equalizedHeightTolerance,
+            equalizedHeadTolerance = SanitizeNonNegative(
+                equalizedHeadTolerance,
                 0.02f);
+        }
+
+        private float GetElevationAlongGravity(Plane surfacePlane)
+        {
+            var gravity = Physics.gravity;
+            var up = gravity.sqrMagnitude
+                >= FloodGeometryTolerances.MinimumGravityMagnitude
+                    * FloodGeometryTolerances.MinimumGravityMagnitude
+                ? -gravity.normalized
+                : Vector3.up;
+
+            // A point on the plane projected onto the gravity-up axis.
+            var pointOnPlane = surfacePlane.normal * -surfacePlane.distance;
+            return Vector3.Dot(pointOnPlane, up);
         }
 
         private static float SanitizeNonNegative(float value, float fallback)

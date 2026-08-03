@@ -3,6 +3,6 @@
   <Project Path="Kyle.Flooding.Runtime.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Kyle.Flooding.Tests.PlayMode.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Kyle.Flooding.Editor.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
 </Solution>

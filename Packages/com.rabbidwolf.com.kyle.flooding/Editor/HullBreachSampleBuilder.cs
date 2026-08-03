@@ -113,9 +113,13 @@ namespace Kyle.Flooding.Editor
             var waterVisual = CreateCube(
                 "Water Visual",
                 compartmentObject.transform,
-                new Vector3(0f, 0.05f, 0f),
-                new Vector3(3.84f, 0.1f, 2.84f),
+                Vector3.zero,
+                Vector3.one,
                 waterMaterial);
+            var surfaceRenderer =
+                compartmentObject.AddComponent<FloodCubeSurfaceRenderer>();
+            surfaceRenderer.SourceVolume = volume;
+            surfaceRenderer.WaterVisual = waterVisual.transform;
 
             var breachObject = new GameObject("Hull Breach Connection");
             breachObject.transform.SetParent(root.transform, false);
@@ -142,8 +146,6 @@ namespace Kyle.Flooding.Editor
                 volume;
             serializedBootstrap.FindProperty("breach").objectReferenceValue =
                 connection;
-            serializedBootstrap.FindProperty("compartmentWaterVisual")
-                .objectReferenceValue = waterVisual.transform;
             serializedBootstrap.FindProperty("oceanSurfaceVisual")
                 .objectReferenceValue = oceanVisual.transform;
             serializedBootstrap.ApplyModifiedPropertiesWithoutUndo();

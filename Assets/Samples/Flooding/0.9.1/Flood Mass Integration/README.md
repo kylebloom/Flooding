@@ -7,54 +7,75 @@ Manager > Flooding > Samples**. Unity copies it to:
 
 Open `FloodMassRollPitch.unity` from that imported folder, then enter Play Mode.
 
+## What this demonstrates
+
+```text
+Visible compartment water
+        ↓
+FloodVolume mass + centroid
+        ↓
+FloodMassAggregator
+        ↓
+RigidbodyFloodMassAdapter moves Rigidbody COM
+        ↓
+Vessel rolls / pitches on sample-only spring supports
+```
+
+The sample is a cutaway four-compartment barge. Water is rendered with
+`FloodCubeSurfaceRenderer` (presentation only). Mass shift comes from the
+package adapter, not from the renderer.
+
 ## Authored hierarchy
 
-The scene is fully serialized and editable before Play Mode:
+- **Main Camera** / **Directional Light** / **Ground Plane**
+- **Flood Mass Demo Vessel**
+  - `BoxCollider`, `Rigidbody`
+  - `FloodSimulationManager`
+  - `FloodMassAggregator`
+  - `RigidbodyFloodMassAdapter`
+  - `SampleVesselSupport` (**sample only** — artificial restoring forces, **not**
+    buoyancy or vessel stability)
+  - `FloodMassDemoBootstrap` (presets, auto-demo, HUD, COM markers)
+  - **Hull Cutaway** — translucent low walls so interiors stay visible
+  - **Dry / Flood / Combined Com Marker** spheres and **COM Shift Line**
+  - **Port Bow / Starboard Bow / Port Stern / Starboard Stern** compartments
+    each with `FloodVolume`, `FloodCubeSurfaceRenderer`, and **Water Visual**
 
-- **Main Camera**: the scene camera and audio listener.
-- **Directional Light**: lights the demonstration.
-- **Flood Mass Demo Vessel**: owns the `BoxCollider`, `Rigidbody`,
-  `FloodSimulationManager`, `FloodMassAggregator`,
-  `RigidbodyFloodMassAdapter`, and sample-only `FloodMassDemoBuoyancy`
-  components.
-  - **Vessel Visual**: a cube mesh rendered with the editable `Vessel`
-    material asset. The parent `BoxCollider`, not this visual child, defines
-    vessel collision.
-  - **Port Compartment**: a `FloodVolume` with a 1.5 m by 4 m by 1 m
-    rectangular interior and an initial volume of 1 m³.
-  - **Starboard Compartment**: a matching `FloodVolume` with an initial
-    volume of 0 m³.
+All compartments start dry (`Initial Volume = 0`). An auto-demo floods
+starboard, then bow, then starboard-bow so Play Mode shows the feature without
+any input.
 
-The adapter's **Flood Mass** reference is assigned to the vessel's
-`FloodMassAggregator`. The aggregator discovers both child `FloodVolume`
-components, then the adapter applies the combined dry-plus-flood mass and local
-center of mass to the vessel `Rigidbody`.
+## Controls
 
-`FloodMassDemoBuoyancy` supplies four simple world-up spring supports so the
-shifted center of mass produces a visible roll response. It is sample-only
-behavior, not a production buoyancy or vessel-stability implementation.
-The demonstration intentionally does not render visible water; it shows the
-physical response to the reported aggregate flood mass and center of mass.
+| Key | Action |
+| --- | --- |
+| `1` | Empty all compartments |
+| `2` | Flood port |
+| `3` | Flood starboard |
+| `4` | Flood bow |
+| `5` | Flood stern |
+| `6` | Flood starboard bow |
+| `R` | Reset pose, empty water, restart auto-demo |
+| `A` / `D` | Transfer water port ↔ starboard |
+| `W` / `S` | Transfer water fore ↔ aft |
 
-## Tuning the sample
+Any control key except `R` cancels the auto-demo. `R` restarts it.
 
-1. Stop Play Mode.
-2. Select **Flood Mass Demo Vessel**.
-3. On `RigidbodyFloodMassAdapter`, change **Dry Mass** in kilograms or **Dry
-   Center Of Mass Local** in vessel-local meters.
-4. On `FloodMassDemoBuoyancy`, tune **Support Height** in world-space meters,
-   spring stiffness in N/m, damping in N·s/m, and the local support-point
-   positions. These values control only the sample's visible support response.
-5. Select **Port Compartment** or **Starboard Compartment**.
-6. On `FloodVolume`, change **Initial Volume** in cubic meters. For the default
-   1.5 m × 4 m × 1 m geometry, valid values are 0–6 m³.
-7. To resize a compartment, keep **Geometry Mode** set to **Rectangular Prism**
-   and edit **Width**, **Length**, and **Maximum Height**, all in meters.
-8. Enter Play Mode. The port-heavy default rolls the vessel toward port.
+## Tuning
 
-The runtime adapter owns its configured dry mass and dry local center of mass.
-Do not have another component write the same Rigidbody properties while the
-adapter is enabled.
+1. Stop Play Mode and select **Flood Mass Demo Vessel**.
+2. On `RigidbodyFloodMassAdapter`, edit **Dry Mass** (kg) or **Dry Center Of
+   Mass Local** (meters).
+3. On `SampleVesselSupport`, tune support height, stiffness, damping, and
+   support-point extents. These values affect only the sample scaffolding.
+4. On `FloodMassDemoBootstrap`, edit preset volume (m³ per compartment) and
+   transfer rate (m³/s).
+5. On each compartment `FloodVolume`, edit rectangular dimensions. Default
+   capacity is 1.8 × 2.8 × 1.0 = 5.04 m³.
+
+The runtime adapter owns dry mass and dry local center of mass. Do not have
+another component write the same Rigidbody properties while the adapter is
+enabled.
 
 ## Reimporting after package changes
 
@@ -64,4 +85,8 @@ Back up any edits made under `Assets/Samples` before refreshing the sample.
 Then delete only the imported
 `Assets/Samples/Flooding/0.9.1/Flood Mass Integration` folder and click
 **Import** for **Flood Mass Integration** again in the package's **Samples**
-list. Do not replace other imported sample folders.
+list.
+
+Editor authors can rebuild the authored package scene with
+**Flooding > Internal > Build Flood Mass Integration Sample** after the sample
+scripts are imported or present under `Assets/Samples`.

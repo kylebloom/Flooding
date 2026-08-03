@@ -7,6 +7,14 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Hull Breach sample now presents compartment water with
+  `FloodCubeSurfaceRenderer` so rotated compartments keep a gravity-aligned
+  free surface. `HullBreachBootstrap` no longer scales a local-Y fill cube and
+  reports connection pressure-head difference instead of comparing equivalent
+  height to ocean world Y.
+
 ### Added
 
 - `FloodConnectionVisual` for optional Transform/particle/mesh presentation
@@ -30,6 +38,15 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Replaced the Baked Geometry stepped chamber with a closed curved hull-section
+  source mesh, shipped `FloodVolumeAuthoring` bake path,
+  `HullSectionFloodVolumeData`, Play Mode baked-cell toggle (**B**), pause/roll
+  keys, and a Game-view HUD for capacity, fill, resolution, and retained cells.
+- Redesigned Flood Mass Integration into a cutaway four-compartment barge with
+  visible `FloodCubeSurfaceRenderer` water, Game-view dry/flood/combined COM
+  markers, keyboard presets and auto-demo, and HUD mass/attitude readout.
+  Renamed sample-only `FloodMassDemoBuoyancy` to `SampleVesselSupport` and
+  documented that it is artificial restoring force scaffolding, not buoyancy.
 - Expanded package documentation with Getting Started paths and eight
   step-by-step scenario guides (leak, doorway, hull breach, polygon, baked
   geometry, vessel mass, visuals/audio, diagnostics) in the Editor workflow,
@@ -39,10 +56,10 @@ and this project follows [Semantic Versioning](https://semver.org/).
   editable before Play Mode.
 - Moved Flood Mass Integration tuning to
   `RigidbodyFloodMassAdapter`, the child `FloodVolume` components, and the
-  sample-only `FloodMassDemoBuoyancy`.
-- Reduced Baked Geometry sample behavior to independently optional fill and
-  roll animation. Its retained-shape presentation is authored; only the
-  gravity-aligned free-surface mesh is generated at runtime.
+  sample-only `SampleVesselSupport`.
+- Baked Geometry sample fill/roll remain independently optional; presentation
+  now uses the authored hull source mesh plus optional retained-cell mesh, while
+  only the gravity-aligned free-surface mesh is generated at runtime.
 - Limited Connected Compartments sample scripts to state-driven water and
   readout updates. Flow-direction presentation now uses package
   `FloodConnectionVisual` on the authored connection.

@@ -3,13 +3,14 @@ using UnityEngine;
 namespace Kyle.Flooding
 {
     /// <summary>
-    /// Presents rectangular flood state by scaling and positioning a child
-    /// transform along the compartment's local Y axis.
+    /// Presents rectangular flood state as a gravity-aligned submerged mesh
+    /// generated from the solved <see cref="FloodState.SurfacePlane"/>. Falls
+    /// back to a local-Y scaled cube when no Mesh Filter is available.
     /// </summary>
     public class FloodCubeSurfaceRenderer : FloodSurfaceRenderer
     {
         [SerializeField]
-        [Tooltip("Child transform scaled and positioned to represent the rectangular water body.")]
+        [Tooltip("Child transform that receives the submerged water mesh (Mesh Filter required for gravity-aligned presentation).")]
         private Transform waterVisual;
 
         [SerializeField]

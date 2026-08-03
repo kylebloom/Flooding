@@ -98,8 +98,8 @@ In **Window > Package Management > Package Manager**, select **Flooding**, open
 
 | Sample | Import path | Demonstrates |
 | --- | --- | --- |
-| Flood Mass Integration | `Assets/Samples/Flooding/0.9.1/Flood Mass Integration` | Rigidbody COM shift from asymmetric flood mass |
-| Baked Geometry | `Assets/Samples/Flooding/0.9.1/Baked Geometry` | Baked complex interior + free surface |
+| Flood Mass Integration | `Assets/Samples/Flooding/0.9.1/Flood Mass Integration` | Cutaway barge: visible water, COM markers, roll/pitch from flood mass |
+| Baked Geometry | `Assets/Samples/Flooding/0.9.1/Baked Geometry` | Curved hull bake, cell viz, free surface |
 | Connected Compartments | `Assets/Samples/Flooding/0.9.1/Connected Compartments` | Conserved doorway equalization |
 | Hull Breach | `Assets/Samples/Flooding/0.9.1/Hull Breach` | Ocean waterline ↔ compartment exchange |
 

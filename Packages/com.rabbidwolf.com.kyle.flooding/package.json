@@ -11,12 +11,12 @@
   "samples": [
     {
       "displayName": "Flood Mass Integration",
-      "description": "Demonstrates aggregate flood mass changing a Rigidbody center of mass and producing a visible roll response without rendering water.",
+      "description": "Cutaway four-compartment barge with visible water, Game-view COM markers, keyboard presets, and sample-only spring support showing Rigidbody roll/pitch from flood mass.",
       "path": "Samples~/Mass Integration"
     },
     {
       "displayName": "Baked Geometry",
-      "description": "Demonstrates immutable pre-baked complex compartment data and a gravity-aligned free surface over stepped geometry.",
+      "description": "Demonstrates immutable pre-baked curved hull-section occupancy, authored source mesh, baked-cell visualization, and a gravity-aligned free surface.",
       "path": "Samples~/Baked Geometry"
     },
     {
