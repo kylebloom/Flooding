@@ -32,5 +32,5 @@ alwaysApply: true
 - Link detailed workflow documentation from the package README and
   `Documentation/index.md`.
 
-- Update `IMPLEMENTATION_PLAN.md` documentation and verification status before
-  marking a phase complete.
+- Update `docs/IMPLEMENTATION_PLAN.md` documentation and verification status
+  before marking a phase complete.

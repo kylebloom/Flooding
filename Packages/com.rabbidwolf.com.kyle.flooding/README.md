@@ -226,9 +226,5 @@ See:
   troubleshooting.
 - [Package model and technical overview](https://github.com/kylebloom/Flooding/blob/main/Packages/com.rabbidwolf.com.kyle.flooding/Documentation/index.md).
 - Repository-level
-  [SPEC.md](https://github.com/kylebloom/Flooding/blob/main/SPEC.md),
-  [ARCHITECTURE.md](https://github.com/kylebloom/Flooding/blob/main/ARCHITECTURE.md),
-  [IMPLEMENTATION_PLAN.md](https://github.com/kylebloom/Flooding/blob/main/IMPLEMENTATION_PLAN.md),
-  and
-  [ALTERATIONS_IMPLEMENTATION_PLAN.md](https://github.com/kylebloom/Flooding/blob/main/ALTERATIONS_IMPLEMENTATION_PLAN.md)
+  [specification, architecture, and implementation plans](https://github.com/kylebloom/Flooding/tree/main/docs)
   for behavior, boundaries, delivery status, and refinement verification.
