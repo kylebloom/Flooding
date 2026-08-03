@@ -1,0 +1,10 @@
+{
+  "name": "Kyle.Flooding.Tests.PlayMode",
+  "rootNamespace": "Kyle.Flooding.Tests",
+  "references": [
+    "Kyle.Flooding.Runtime"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

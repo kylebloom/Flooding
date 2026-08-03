@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+
+- Use Unity Test Framework.
+
+- Prefer Edit Mode tests for pure gameplay and simulation logic.
+
+- Use Play Mode tests only when behavior requires actual Unity GameObjects,
+  Components, physics, navigation, scene lifecycle, or frame execution.
+
+- Do not force MonoBehaviours into unit-testable abstractions purely for test coverage.
+  Prioritize tests around deterministic domain rules and state transitions.

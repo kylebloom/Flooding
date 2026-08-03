@@ -1,0 +1,36 @@
+{
+  "name": "com.rabbidwolf.com.kyle.flooding",
+  "displayName": "Flooding",
+  "version": "0.9.1",
+  "unity": "6000.5",
+  "unityRelease": "6f1",
+  "description": "Gameplay-focused, volume-based flooding simulation for Unity.",
+  "dependencies": {
+    "com.unity.test-framework": "1.6.0"
+  },
+  "samples": [
+    {
+      "displayName": "Flood Mass Integration",
+      "description": "Demonstrates aggregate flood mass changing a Rigidbody center of mass and producing a visible roll response without rendering water.",
+      "path": "Samples~/Mass Integration"
+    },
+    {
+      "displayName": "Baked Geometry",
+      "description": "Demonstrates immutable pre-baked complex compartment data and a gravity-aligned free surface over stepped geometry.",
+      "path": "Samples~/Baked Geometry"
+    },
+    {
+      "displayName": "Connected Compartments",
+      "description": "Demonstrates conserved bidirectional pressure-driven flow and diagnostics between two finite rectangular compartments.",
+      "path": "Samples~/Connected Compartments"
+    },
+    {
+      "displayName": "Hull Breach",
+      "description": "Demonstrates pressure-driven bidirectional flow between an infinite external fluid boundary and one finite compartment.",
+      "path": "Samples~/Hull Breach"
+    }
+  ],
+  "author": {
+    "name": "Kyle Bloom"
+  }
+}

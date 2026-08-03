@@ -1,0 +1,22 @@
+---
+alwaysApply: true
+---
+
+- This project targets Unity Editor 6.5 (6000.5.6f1).
+
+- Use APIs, packages, syntax, and workflows appropriate for Unity 6.5.
+
+- Do not use deprecated or legacy Unity approaches merely because older tutorials
+  use them. If an implementation choice depends on Unity-version-specific behavior,
+  explicitly identify the dependency and prefer the current Unity 6.5 approach.
+
+- Keep gameplay/simulation logic separated from presentation where practical.
+
+- Avoid placing expensive simulation logic in Update() unless frame-by-frame
+  execution is genuinely required.
+
+- Prefer small focused components and composition over large "god" MonoBehaviours.
+
+- When a code change requires manual Unity Editor configuration, always provide a
+  "Unity Editor Setup" section explaining exactly what I must create, attach,
+  assign, bake, or configure.

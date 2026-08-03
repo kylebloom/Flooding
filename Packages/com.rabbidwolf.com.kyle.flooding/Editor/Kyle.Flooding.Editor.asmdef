@@ -1,0 +1,10 @@
+{
+  "name": "Kyle.Flooding.Editor",
+  "rootNamespace": "Kyle.Flooding.Editor",
+  "references": [
+    "Kyle.Flooding.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}

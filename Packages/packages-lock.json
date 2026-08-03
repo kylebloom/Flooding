@@ -1,5 +1,13 @@
 {
   "dependencies": {
+    "com.rabbidwolf.com.kyle.flooding": {
+      "version": "file:com.rabbidwolf.com.kyle.flooding",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.test-framework": "1.6.0"
+      }
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 1,

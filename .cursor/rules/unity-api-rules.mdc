@@ -1,0 +1,105 @@
+---
+description: Unity 6.5 Object find / EntityId APIs — avoid deprecated Find* and InstanceID
+globs: "**/*.cs"
+alwaysApply: true
+---
+
+# Unity Object lookup APIs (Unity 6.5)
+
+## Prefer
+
+```csharp
+// Single instance when order does not matter (usual case)
+EventSystem es = Object.FindAnyObjectByType<EventSystem>();
+
+// Multiple instances — no sort-mode argument
+Camera[] cameras = Object.FindObjectsByType<Camera>();
+```
+
+If the file has `using System;`, qualify as `UnityEngine.Object.FindAnyObjectByType<T>()` / `UnityEngine.Object.FindObjectsByType<T>()` to avoid CS0104 (`Object` ambiguous with `System.Object`).
+
+## Avoid (CS0618 / legacy)
+
+```csharp
+// ❌ Obsolete — relies on instance ID ordering
+Object.FindFirstObjectByType<EventSystem>();
+
+// ❌ Obsolete — FindObjectsSortMode parameter deprecated in Unity 6.5
+Object.FindObjectsByType<Camera>(FindObjectsSortMode.None);
+Object.FindObjectsByType<Camera>(FindObjectsSortMode.InstanceID);
+
+// ❌ Legacy — do not use
+Object.FindObjectOfType<EventSystem>();
+Object.FindObjectsOfType<Camera>();
+```
+
+| Need | Use |
+|------|-----|
+| One object, order irrelevant | `FindAnyObjectByType<T>()` |
+| All objects | `FindObjectsByType<T>()` with **no** `FindObjectsSortMode` argument |
+
+# Object identity: EntityId (Unity 6.5)
+
+Unity 6.5 replaces 32-bit `InstanceID` with the 64-bit `EntityId` struct. Obsolete InstanceID APIs are **compile errors** (CS0619).
+
+## Prefer
+
+```csharp
+EntityId id = someObject.GetEntityId();
+UnityEngine.Object obj = Resources.EntityIdToObject(id);
+bool valid = Resources.EntityIdIsValid(id);
+```
+
+Store and pass `EntityId` as `EntityId` — including dictionary keys and method parameters.
+
+## Avoid (CS0619 / unsafe)
+
+```csharp
+// ❌ Obsolete — compile error in Unity 6.5
+int id = someObject.GetInstanceID();
+Object obj = Resources.InstanceIDToObject(id);
+
+// ❌ Do not truncate or fake an int identity from EntityId
+int truncated = (int)someObject.GetEntityId();           // loses data
+int hashAsId = someObject.GetEntityId().GetHashCode(); // not a unique object id
+
+// ❌ Do not serialize EntityId via ToString / parse back as an int
+```
+
+| Need | Use |
+|------|-----|
+| Object identity handle | `GetEntityId()` → store as `EntityId` |
+| Id → object | `Resources.EntityIdToObject(EntityId)` |
+| Validity | `Resources.EntityIdIsValid(EntityId)` |
+| Non-identity int (e.g. NavMesh `avoidancePriority` 0–99) | Stable hash from **name** / designer index — **not** from `EntityId` |
+
+# TextMesh Pro Essentials (UI text)
+
+Creating `TextMeshProUGUI` / TMP text **requires** TMP Essential Resources under `Assets/TextMesh Pro/`. The package alone is not enough.
+
+Before Editor setup scripts create TMP UI:
+
+1. Check for `Assets/TextMesh Pro/Resources/TMP Settings.asset` (and a default font such as LiberationSans SDF).
+2. If missing, import essentials via `TMP_PackageResourceImporter.ImportResources(true, false, false)` **or** stop with a beginner dialog telling the user to click **Import TMP Essentials** (skip Examples & Extras).
+3. Never assume `TMP_Settings.defaultFontAsset` is non-null on a fresh project.
+
+# TextMesh Pro wrapping (Unity 6 / current TMP)
+
+## Prefer
+
+```csharp
+using TMPro;
+
+tmp.textWrappingMode = TextWrappingModes.Normal;   // wrap (old enableWordWrapping = true)
+tmp.textWrappingMode = TextWrappingModes.NoWrap;   // single line (old enableWordWrapping = false)
+```
+
+Other modes when needed: `PreserveWhitespace`, `PreserveWhitespaceNoWrap`.
+
+## Avoid (CS0618)
+
+```csharp
+// ❌ Obsolete — use textWrappingMode instead
+tmp.enableWordWrapping = true;
+tmp.enableWordWrapping = false;
+```

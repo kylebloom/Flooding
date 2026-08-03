@@ -1,0 +1,14 @@
+{
+  "name": "Kyle.Flooding.Tests.Editor",
+  "rootNamespace": "Kyle.Flooding.Tests",
+  "references": [
+    "Kyle.Flooding.Runtime",
+    "Kyle.Flooding.Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}

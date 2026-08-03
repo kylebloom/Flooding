@@ -1,0 +1,36 @@
+---
+description: Keep practical Unity package documentation synchronized with changes
+alwaysApply: true
+---
+
+# Practical Documentation
+
+- Update package documentation in the same change as every user-facing feature,
+  workflow, serialized field, component, asset, migration, or limitation.
+
+- Documentation must explain practical Unity Editor use, including:
+  - where to find the relevant prefab, asset, menu, or component,
+  - what to create and which components to attach,
+  - each required Inspector assignment and important field unit,
+  - expected Scene and Play Mode behavior,
+  - migration or upgrade steps,
+  - relevant limitations and troubleshooting.
+
+- Clearly distinguish prefab/material assets, scene GameObjects, child
+  GameObjects, built-in components, and package script components. For every
+  setup step, name the GameObject being created or selected separately from the
+  component being attached or configured.
+
+- Every Inspector-facing field on a `MonoBehaviour`, including private
+  `[SerializeField]` fields, must have a concise `[Tooltip]` explaining its
+  purpose. Include units, valid interpretation, or important side effects where
+  relevant. Hidden migration-only fields do not require tooltips.
+
+- Include concise scripting examples when a public API, event, or return value
+  is intended for gameplay code.
+
+- Link detailed workflow documentation from the package README and
+  `Documentation/index.md`.
+
+- Update `IMPLEMENTATION_PLAN.md` documentation and verification status before
+  marking a phase complete.
