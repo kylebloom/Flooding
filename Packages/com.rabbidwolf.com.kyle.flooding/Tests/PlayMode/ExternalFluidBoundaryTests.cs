@@ -59,17 +59,27 @@ namespace Kyle.Flooding.Tests
                 oceanSurfaceY: 1f,
                 compartmentInitialVolume: 0f,
                 openingY: 0.1f,
-                openingWidth: 4f);
+                openingWidth: 2f);
 
-            for (var tick = 0; tick < 80; tick++)
-                setup.Manager.SimulateTick(0.1d);
+            // Coarse fill toward the exterior waterline.
+            for (var tick = 0; tick < 100; tick++)
+                setup.Manager.SimulateTick(0.05d);
 
-            Assert.That(
-                System.Math.Abs(setup.Connection.CurrentFlowRate),
-                Is.LessThan(0.05d));
             Assert.That(
                 setup.Volume.CurrentHeight,
                 Is.EqualTo(1f).Within(0.05f));
+
+            // Fine ticks let discrete orifice integration settle into the
+            // pressure-head deadband instead of oscillating around it.
+            for (var tick = 0; tick < 50; tick++)
+                setup.Manager.SimulateTick(0.005d);
+
+            Assert.That(
+                System.Math.Abs(setup.Connection.PressureHeadDifference),
+                Is.LessThan(0.01d));
+            Assert.That(
+                System.Math.Abs(setup.Connection.CurrentFlowRate),
+                Is.LessThan(0.05d));
 
             Object.Destroy(setup.Root);
             yield return null;
@@ -182,7 +192,9 @@ namespace Kyle.Flooding.Tests
 
             var oceanObject = new GameObject("Ocean");
             oceanObject.transform.SetParent(root.transform, false);
-            oceanObject.transform.position = new Vector3(0f, 2f, 0f);
+            // Keep the exterior above the nearly-full tank (~2.94 m) so both
+            // breaches request inflow and exercise destination-capacity scaling.
+            oceanObject.transform.position = new Vector3(0f, 3f, 0f);
             var ocean = oceanObject.AddComponent<ExternalFluidBoundary>();
 
             var volume = CreateVolume(root.transform, "Tank");

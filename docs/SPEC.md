@@ -245,9 +245,9 @@ equilibrium.
 - `VolumeChanged(double)` when volume changes,
 - the existing `WaterHeightChanged(float)` compatibility event.
 
-Events are published after all changes in one manager tick have committed. No
-event is emitted merely because a listener subscribes; listeners read
-`CurrentState` for the initial value.
+Events are **post-commit/publish notifications**. They fire after all changes
+in one manager tick have committed. No event is emitted merely because a
+listener subscribes; listeners read `CurrentState` for the initial value.
 
 Transform movement or rotation can change the surface plane and center of mass,
 so it emits `StateChanged` without emitting `VolumeChanged`.
@@ -255,12 +255,46 @@ so it emits `StateChanged` without emitting `VolumeChanged`.
 Direct public volume mutations change stored state immediately but publish on
 the next manager tick.
 
+## Gameplay point queries
+
+`FloodVolume` exposes read-only world-space queries:
+
+- `ContainsPoint(Vector3 worldPoint)`
+- `IsPointSubmerged(Vector3 worldPoint)`
+- `QueryPoint(Vector3 worldPoint)` → `FloodQueryResult`
+
+`FloodQueryResult` contains:
+
+- `IsInsideVolume`
+- `IsSubmerged` (inside volume and below the current surface plane)
+- `SubmersionDepthMeters` (`max(0, -SurfacePlane.GetDistanceToPoint)`; zero
+  when not submerged)
+- `SurfacePoint` (closest point on the current surface plane)
+- `SurfaceNormal`
+
+Query contract:
+
+- Values are derived from the volume's current authoritative state at the
+  moment of the call (same family as `CurrentVolume` / `CurrentState`).
+- Queries never advance, reconcile, or publish simulation state.
+- Direct property reads remain live; events remain published notifications.
+  There is no separate published read model for queries.
+
+Containment precision is reported by
+`IFloodVolumeGeometry.ContainmentPrecision`:
+
+- `Exact` for rectangular prism and extruded polygon footprints
+- `BakeApproximation` for baked occupancy cells (resolution-dependent)
+
+Floor-to-surface water-column depth is not part of this contract.
+
 ## Container geometry
 
 `IFloodVolumeGeometry` is expressed in `FloodVolume` local space and provides:
 
 - total capacity,
 - axis-aligned local bounds,
+- containment precision and local-point containment,
 - submerged volume in a plane's negative half-space,
 - submerged centroid,
 - ordered free-surface contours.

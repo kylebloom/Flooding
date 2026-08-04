@@ -988,8 +988,17 @@ executes exactly one tick with the supplied duration.
 
 ## Read state from gameplay code
 
-`CurrentState` returns an immutable snapshot. It is safe for consumers to keep
-the snapshot without gaining mutation access to the compartment.
+`CurrentState` returns an immutable snapshot of the volume's current
+authoritative state. Direct reads such as `CurrentVolume`, `FillPercentage`,
+`SurfacePlane`, and `CurrentState` always reflect that live state. It is safe
+for consumers to keep a `FloodState` snapshot without gaining mutation access
+to the compartment.
+
+`StateChanged`, `VolumeChanged`, and `WaterHeightChanged` are
+**post-commit/publish notifications**. Direct public mutations update stored
+state immediately but raise events on the next manager publish, not at
+mutation time. Subscribing does not emit an initial event; read `CurrentState`
+once during initialization.
 
 ```csharp
 using Kyle.Flooding;
@@ -1028,8 +1037,46 @@ public sealed class FloodStateDisplay : MonoBehaviour
 }
 ```
 
-Read `CurrentState` once during initialization because subscribing does not
-immediately emit an initial event.
+## Query points for gameplay
+
+Use `FloodVolume` point queries when other systems need to know whether a
+world-space sample is inside a compartment or underwater:
+
+```csharp
+FloodQueryResult result = volume.QueryPoint(player.transform.position);
+
+if (result.IsSubmerged)
+{
+    Debug.Log($"Submersion depth: {result.SubmersionDepthMeters:F2} m");
+}
+```
+
+| API | Meaning |
+| --- | --- |
+| `ContainsPoint(worldPoint)` | Inside floodable geometry |
+| `IsPointSubmerged(worldPoint)` | Inside geometry and below the current surface plane |
+| `QueryPoint(worldPoint)` | Combined result: inside, submerged, submersion depth (m), closest surface point, surface normal |
+| `CurrentVolume` | Authoritative water volume (m³) |
+| `FillPercentage` | Normalized fill from 0 to 1 |
+| `SurfacePlane` / `LocalSurfacePlane` | Current solved free surface |
+
+Contract:
+
+- Queries derive values from the volume's **current authoritative state** at
+  the call moment.
+- Queries are **read-only**: they never advance, reconcile, or publish
+  simulation state.
+- `IsSubmerged` requires both containment and a positive plane depth
+  (`max(0, -SurfacePlane.GetDistanceToPoint(point))`). A point outside the
+  compartment is never submerged, even if it lies below the infinite surface
+  plane.
+- `SubmersionDepthMeters` is zero when the point is not submerged.
+- Rectangular prism and extruded polygon containment is exact
+  (`FloodContainmentPrecision.Exact`).
+- Baked geometry containment uses occupied bake cells
+  (`FloodContainmentPrecision.BakeApproximation`) and depends on
+  `FloodVolumeData.SampleResolution`. Inspect precision via
+  `volume.Geometry.ContainmentPrecision`.
 
 ## Integrate flood mass with a Rigidbody
 
@@ -1173,6 +1220,8 @@ callback.
 
 The manager publishes after all changes for a fixed tick have committed. Do not
 depend on event callbacks occurring immediately inside a direct mutation call.
+For immediate gameplay decisions, read `CurrentState` / `QueryPoint` (live
+authoritative state) rather than waiting for `StateChanged`.
 
 ## Upgrade from initial height
 
@@ -1323,12 +1372,13 @@ serialized assets and scenes:
 4. Confirm the example room still rises visually in normal Play Mode.
 
 Edit Mode tests validate deterministic volume, flow, polygon validation,
-triangulation, arbitrary-plane clipping, solver tolerance, capacity, and
-centroid and diagnostic-derivation rules. Play Mode tests validate GameObject
-lifecycle, gravity policy, rotation, state snapshots, fixed-step orchestration,
-repeated-tick bounds and internal-network conservation, transfer
-reconciliation, diagnostic read-only behavior, clipped rendering, and
-post-commit publication.
+triangulation, arbitrary-plane clipping, solver tolerance, capacity,
+centroid and diagnostic-derivation rules, and geometry point containment
+(exact prism/polygon and bake-cell approximation). Play Mode tests validate
+GameObject lifecycle, gravity policy, rotation, state snapshots, fixed-step
+orchestration, repeated-tick bounds and internal-network conservation,
+transfer reconciliation, diagnostic read-only behavior, clipped rendering,
+post-commit publication, and gameplay `QueryPoint` / submersion semantics.
 
 Baked-geometry Edit Mode coverage also exercises immutable data, arbitrary-plane
 cell clipping, open-mesh rejection, and a deterministic 512-cell solver guard.

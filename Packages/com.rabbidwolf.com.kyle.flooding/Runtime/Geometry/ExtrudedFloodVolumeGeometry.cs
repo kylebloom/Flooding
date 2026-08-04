@@ -60,6 +60,10 @@ namespace Kyle.Flooding
         public Bounds LocalBounds { get; }
 
         /// <inheritdoc />
+        public FloodContainmentPrecision ContainmentPrecision =>
+            FloodContainmentPrecision.Exact;
+
+        /// <inheritdoc />
         public bool SupportsPlane(Plane localSurfacePlane)
         {
             var normal = localSurfacePlane.normal;
@@ -94,6 +98,66 @@ namespace Kyle.Flooding
                 this,
                 localSurfacePlane,
                 includeSurfaceIntersection: true);
+        }
+
+        /// <inheritdoc />
+        public bool ContainsLocalPoint(Vector3 localPoint)
+        {
+            if (!IsFinite(localPoint))
+                return false;
+
+            var tolerance = (float)FloodGeometryTolerances.Position;
+            if (localPoint.y < -tolerance
+                || localPoint.y > (float)MaximumHeight + tolerance)
+            {
+                return false;
+            }
+
+            var point = new Vector2(localPoint.x, localPoint.z);
+            for (var index = 0; index < surfaceTriangles.Count; index += 3)
+            {
+                if (IsPointInTriangle(
+                        point,
+                        footprint[surfaceTriangles[index]],
+                        footprint[surfaceTriangles[index + 1]],
+                        footprint[surfaceTriangles[index + 2]]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsPointInTriangle(
+            Vector2 point,
+            Vector2 first,
+            Vector2 second,
+            Vector2 third)
+        {
+            var tolerance = -FloodGeometryTolerances.Position;
+
+            return Cross(first, second, point) >= tolerance
+                && Cross(second, third, point) >= tolerance
+                && Cross(third, first, point) >= tolerance;
+        }
+
+        private static double Cross(
+            Vector2 first,
+            Vector2 second,
+            Vector2 third)
+        {
+            return ((double)second.x - first.x)
+                    * ((double)third.y - first.y)
+                - ((double)second.y - first.y)
+                    * ((double)third.x - first.x);
+        }
+
+        private static bool IsFinite(Vector3 value)
+        {
+            return float.IsFinite(value.x)
+                && float.IsFinite(value.y)
+                && float.IsFinite(value.z);
         }
     }
 }

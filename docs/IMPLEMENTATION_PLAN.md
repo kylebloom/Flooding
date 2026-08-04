@@ -44,11 +44,12 @@ This document remains authoritative for feature-phase delivery.
 
 ## Current status
 
-- Current milestone: **Phase 10 implemented; Unity regression verification pending**
-- Overall package status: **Optional flow presentation prototype**
+- Current milestone: **Phase 12 gameplay query API implemented; Unity regression verification pending**
+- Overall package status: **Gameplay-consumable simulation prototype**
 - Current supported geometry: **Rotated prism or Editor-baked data**
 - Current presentation: **Clipped prism volume, baked free-surface patches, connection visuals, and optional flow/fill audio**
 - Current flow model: **Configured inflow, finite connections, and external boundaries**
+- Current query surface: **Live read-only point queries over authoritative state**
 
 Implementation status and verification status are tracked separately. Phases 7
 through 10 are implemented but are not marked Unity-regression-verified until the
@@ -360,6 +361,29 @@ Goal: make the package suitable for reuse in future Unity projects.
 The documentation-onboarding subset is tracked as Refinement F in
 `ALTERATIONS_IMPLEMENTATION_PLAN.md`. Persistent, Inspector-editable sample
 authoring is tracked as Refinement G in the same companion plan.
+
+## Phase 12 — Gameplay query API
+
+Goal: make existing simulation state consumable by other game systems without
+new simulation behavior.
+
+- [x] Add `FloodQueryResult` and `FloodContainmentPrecision`.
+- [x] Add `IFloodVolumeGeometry.ContainsLocalPoint` with exact prism/polygon
+  containment and bake-cell approximation for baked geometry.
+- [x] Add `FloodVolume.ContainsPoint`, `IsPointSubmerged`, and `QueryPoint`
+  over live authoritative state and the cached surface plane.
+- [x] Document live-read vs post-publish event contract and baked containment
+  precision.
+- [x] Add Edit Mode containment tests and Play Mode query tests.
+- [ ] Verify the new suites in Unity Editor regression.
+
+Acceptance criteria:
+
+- Point queries never advance, reconcile, or publish simulation.
+- `IsSubmerged` requires both containment and plane depth.
+- Baked containment precision is explicit on the geometry contract.
+- Existing fill/volume/state properties remain the canonical state reads
+  (`FillPercentage`, `CurrentVolume`, `CurrentState`, `StateChanged`).
 
 ## Documentation roadmap
 

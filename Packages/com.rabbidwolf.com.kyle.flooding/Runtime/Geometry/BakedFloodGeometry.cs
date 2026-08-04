@@ -36,6 +36,7 @@ namespace Kyle.Flooding
         };
 
         private readonly FloodVolumeData data;
+        private readonly HashSet<int> occupiedCells;
 
         /// <summary>
         /// Creates runtime geometry from a valid baked asset.
@@ -50,6 +51,7 @@ namespace Kyle.Flooding
                     nameof(data));
 
             this.data = data;
+            occupiedCells = new HashSet<int>(data.OccupiedCellIndices);
         }
 
         /// <inheritdoc />
@@ -57,6 +59,10 @@ namespace Kyle.Flooding
 
         /// <inheritdoc />
         public Bounds LocalBounds => data.LocalBounds;
+
+        /// <inheritdoc />
+        public FloodContainmentPrecision ContainmentPrecision =>
+            FloodContainmentPrecision.BakeApproximation;
 
         /// <inheritdoc />
         public bool SupportsPlane(Plane localSurfacePlane)
@@ -67,6 +73,46 @@ namespace Kyle.Flooding
                     > FloodGeometryTolerances.PlaneNormal
                         * FloodGeometryTolerances.PlaneNormal
                 && float.IsFinite(localSurfacePlane.distance);
+        }
+
+        /// <inheritdoc />
+        public bool ContainsLocalPoint(Vector3 localPoint)
+        {
+            if (!IsFinite(localPoint)
+                || !TryGetCellIndex(localPoint, out var cellIndex))
+            {
+                return false;
+            }
+
+            return occupiedCells.Contains(cellIndex);
+        }
+
+        private bool TryGetCellIndex(Vector3 localPoint, out int flattenedIndex)
+        {
+            flattenedIndex = -1;
+            var bounds = data.LocalBounds;
+            if (!bounds.Contains(localPoint))
+                return false;
+
+            var cellSize = data.CellSize;
+            var gridSize = data.GridSize;
+            var relative = localPoint - bounds.min;
+            var x = Mathf.Clamp(
+                Mathf.FloorToInt(relative.x / cellSize.x),
+                0,
+                gridSize.x - 1);
+            var y = Mathf.Clamp(
+                Mathf.FloorToInt(relative.y / cellSize.y),
+                0,
+                gridSize.y - 1);
+            var z = Mathf.Clamp(
+                Mathf.FloorToInt(relative.z / cellSize.z),
+                0,
+                gridSize.z - 1);
+
+            flattenedIndex =
+                x + (y * gridSize.x) + (z * gridSize.x * gridSize.y);
+            return true;
         }
 
         /// <inheritdoc />

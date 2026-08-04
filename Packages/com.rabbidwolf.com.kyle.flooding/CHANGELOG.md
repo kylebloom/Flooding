@@ -9,6 +9,10 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Play Mode `ExternalFluidBoundaryTests`: equalization uses a coarse fill then
+  fine settle so orifice flow can reach the head deadband; multiple-breach
+  capacity scaling keeps the exterior waterline above the nearly-full tank so
+  both openings request inflow.
 - Hull Breach sample now presents compartment water with
   `FloodCubeSurfaceRenderer` so rotated compartments keep a gravity-aligned
   free surface. `HullBreachBootstrap` no longer scales a local-Y fill cube and
@@ -17,6 +21,14 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Gameplay query API on `FloodVolume`: `ContainsPoint`, `IsPointSubmerged`,
+  and `QueryPoint` returning `FloodQueryResult` (inside/submerged flags,
+  submersion depth, surface point/normal). Queries read live authoritative
+  state and never advance, reconcile, or publish simulation.
+- `IFloodVolumeGeometry.ContainsLocalPoint` and
+  `FloodContainmentPrecision` (`Exact` for prism/polygon,
+  `BakeApproximation` for occupancy-cell baked geometry).
+- Edit Mode containment coverage and Play Mode `QueryPoint` coverage.
 - `FloodConnectionVisual` for optional Transform/particle/mesh presentation
   driven by applied connection flow, submerged area, and direction.
 - `FloodConnectionAudio`, `FloodSourceAudio`, and `FloodVolumeAudio` for

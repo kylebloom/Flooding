@@ -15,6 +15,8 @@ rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
 - Gravity-aligned surfaces solved from authoritative volume.
 - Global or manager-specific gravity with documented zero-gravity fallback.
 - Immutable state snapshots with surface, mass, and center-of-mass data.
+- Read-only gameplay point queries (`ContainsPoint`, `IsPointSubmerged`,
+  `QueryPoint`) over live authoritative volume and surface state.
 - Aggregate child-compartment flood mass and optional owned-baseline Rigidbody
   mass and center-of-mass integration.
 - Infinite exterior exchange through `ExternalFluidBoundary` (**External Fluid
@@ -150,6 +152,9 @@ Inspector field, and troubleshooting, follow the
   source mesh. Features below the selected resolution can disappear. The
   Inspector reports sample count, actual sample resolution, and an approximation
   volume indicator; that indicator is not a certified error bound.
+- Baked `ContainsPoint` / `QueryPoint.IsInsideVolume` use occupied-cell
+  approximation (`FloodContainmentPrecision.BakeApproximation`), not exact
+  source-mesh winding.
 - Baked arbitrary-plane queries scale linearly with occupied cell count. Use
   the coarsest resolution that preserves gameplay-relevant features.
 - Simulation defaults to 10 fixed ticks per game second.

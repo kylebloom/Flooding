@@ -265,7 +265,57 @@ namespace Kyle.Flooding
         public FloodState CurrentState => CaptureState();
 
         /// <summary>
-        /// Raised after a published flood state changes.
+        /// Returns whether a world-space point lies inside this compartment's
+        /// floodable geometry. Uses the current authoritative geometry and never
+        /// advances simulation. Baked volumes use occupancy-cell approximation;
+        /// see <see cref="IFloodVolumeGeometry.ContainmentPrecision"/>.
+        /// </summary>
+        public bool ContainsPoint(Vector3 worldPoint)
+        {
+            return QueryPoint(worldPoint).IsInsideVolume;
+        }
+
+        /// <summary>
+        /// Returns whether a world-space point is inside this compartment and
+        /// below the current water surface plane. Uses live authoritative state
+        /// and never advances simulation.
+        /// </summary>
+        public bool IsPointSubmerged(Vector3 worldPoint)
+        {
+            return QueryPoint(worldPoint).IsSubmerged;
+        }
+
+        /// <summary>
+        /// Queries submersion and surface data for a world-space sample point.
+        /// Values are derived from this volume's current authoritative state at
+        /// the moment of the call. The query is read-only and never advances,
+        /// reconciles, or publishes simulation state.
+        /// </summary>
+        public FloodQueryResult QueryPoint(Vector3 worldPoint)
+        {
+            var activeGeometry = Geometry;
+            var isInsideVolume = activeGeometry != null
+                && activeGeometry.ContainsLocalPoint(
+                    transform.InverseTransformPoint(worldPoint));
+
+            var surfacePlane = SurfacePlane;
+            var submersionDepth = Mathf.Max(
+                0f,
+                -surfacePlane.GetDistanceToPoint(worldPoint));
+            var isSubmerged = isInsideVolume && submersionDepth > 0f;
+
+            return new FloodQueryResult(
+                isInsideVolume,
+                isSubmerged,
+                isSubmerged ? submersionDepth : 0f,
+                surfacePlane.ClosestPointOnPlane(worldPoint),
+                surfacePlane.normal);
+        }
+
+        /// <summary>
+        /// Raised after the manager publishes a flood state change.
+        /// Direct volume mutations update authoritative state immediately but
+        /// raise this event on the next publish, not at mutation time.
         /// </summary>
         public event Action<FloodState> StateChanged;
 

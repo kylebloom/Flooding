@@ -20,6 +20,12 @@ namespace Kyle.Flooding
         Bounds LocalBounds { get; }
 
         /// <summary>
+        /// Gets whether point containment matches the analytic shape exactly
+        /// or uses a bake-resolution approximation.
+        /// </summary>
+        FloodContainmentPrecision ContainmentPrecision { get; }
+
+        /// <summary>
         /// Gets whether this implementation can evaluate the supplied local-space plane.
         /// The submerged region is the plane's negative half-space.
         /// </summary>
@@ -34,6 +40,12 @@ namespace Kyle.Flooding
         /// Calculates volume, centroid, and free-surface intersection data.
         /// </summary>
         FloodSubmersionResult EvaluateSubmersion(Plane localSurfacePlane);
+
+        /// <summary>
+        /// Returns whether a compartment-local point lies inside the floodable
+        /// space. Precision is described by <see cref="ContainmentPrecision"/>.
+        /// </summary>
+        bool ContainsLocalPoint(Vector3 localPoint);
     }
 
     /// <summary>

@@ -82,7 +82,9 @@ external boundaries at a fixed rate. Each tick captures immutable boundary
 snapshots, evaluates requests, reconciles finite supply/capacity, commits only
 finite volume deltas, then publishes state.
 
-- `FloodVolume` — finite compartment (`IFluidBoundary`).
+- `FloodVolume` — finite compartment (`IFluidBoundary`) with live state reads
+  and read-only point queries (`ContainsPoint`, `IsPointSubmerged`,
+  `QueryPoint`).
 - `ExternalFluidBoundary` — infinite exterior (**External Fluid Body**).
 - `FloodConnection` — pressure-driven opening between two boundaries.
 - `FloodSource` — configured injection (not pressure equilibrium).
@@ -118,6 +120,7 @@ setup fails.
 
 - `Runtime/Simulation` — deterministic rules and boundary contracts.
 - `Runtime/Geometry` — container contracts and implementations.
+- `Runtime/Query` — gameplay query result and containment precision types.
 - `Runtime/State` — immutable snapshots.
 - `Runtime/Presentation` — shared presentation helpers.
 - `Runtime/Components` — scene adapters and optional presentation/debug.

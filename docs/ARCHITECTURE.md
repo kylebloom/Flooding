@@ -51,6 +51,13 @@ possible while still producing updated world-space state.
 
 Consumers receive snapshots. They must not mutate simulation internals.
 
+Gameplay point queries (`ContainsPoint`, `IsPointSubmerged`, `QueryPoint`) are
+read-only compositions over the same live authoritative volume, geometry
+containment, and cached surface plane. They never enter the manager tick path
+and never publish events. Containment for analytic prisms is exact; baked
+geometry containment uses occupancy cells and exposes
+`FloodContainmentPrecision.BakeApproximation` on the geometry contract.
+
 ## Mutation contract
 
 Every core volume mutation returns `VolumeChangeResult`. The result uses signed
