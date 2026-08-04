@@ -29,6 +29,11 @@
       "displayName": "Hull Breach",
       "description": "Demonstrates pressure-driven bidirectional flow between an infinite external fluid boundary and one finite compartment.",
       "path": "Samples~/Hull Breach"
+    },
+    {
+      "displayName": "First Person Flooding",
+      "description": "First-person rising flood with waterline crossing, optional URP underwater effects, audio muffling, and telemetry.",
+      "path": "Samples~/First Person Flooding"
     }
   ],
   "author": {

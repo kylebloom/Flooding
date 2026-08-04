@@ -68,6 +68,7 @@ Best when you want a complete authored hierarchy to inspect and edit.
 | Baked Geometry | Editor-baked complex interior + gravity-aligned free surface |
 | Connected Compartments | Conserved doorway flow between two finite rooms |
 | Hull Breach | Ocean waterline exchanging water with one compartment |
+| First Person Flooding | Rising flood from first person with waterline / URP FX; see [Scenario 9](#scenario-9--first-person-camera-through-a-rising-flood) |
 
 Re-importing a sample can overwrite your copy under `Assets/Samples`. Duplicate
 customized copies first.
@@ -352,6 +353,34 @@ ship clips or particle assets.
 **Expected:** Labels and gizmos update from public state. Diagnostics never
 advance a tick or write Rigidbody/simulation data.
 
+### Scenario 9 — First-person camera through a rising flood
+
+**Goal:** Walk through a rising free surface with waterline crossing and
+optional underwater tint/fog.
+
+**Fastest path:** import the **First Person Flooding** sample (see
+[Sample import](#sample-import)), complete the one-time URP renderer-feature
+setup, then enter Play Mode.
+
+**From components:**
+
+1. Build a closed room with `FloodSimulationManager`, `FloodVolume`,
+   `FloodSource`, and a surface renderer
+   ([Scenario 1](#scenario-1--single-room-filling-from-a-leak)).
+2. On the player camera, add **Flood Camera Tracker**
+   ([camera tracking](#track-a-camera-or-viewpoint-against-flood-volumes)).
+3. Create a **Flood Underwater Profile** and assign it through
+   **Flood Underwater Camera Effect**
+   ([URP underwater](#urp-underwater-camera-effects)).
+4. Enable **Depth Texture** on the URP Asset and add **Flood Underwater
+   Renderer Feature** to the URP Renderer.
+5. Optionally add **Flood Underwater Audio** and camera/volume telemetry.
+
+**Expected:** Water rises; the waterline moves through the view; fully
+submerged views tint. Press **T** in the sample to tilt the room — the
+waterline follows `SurfacePlane`, not world Y. Tune look settings with the
+[underwater look cheat sheet](#tune-underwater-look-symptom--where-to-click).
+
 ## Quick references
 
 ### Prefab chooser
@@ -391,13 +420,14 @@ Built-in, HDRP, or a custom pipeline.
 | Rigidbody mass response | [Scenario 6](#scenario-6--flood-mass-affecting-a-vessel-rigidbody) |
 | Flow VFX / SFX | [Scenario 7](#scenario-7--flow-visuals-and-audio) |
 | Debug overlays | [Scenario 8](#scenario-8--scene-view-diagnostics-while-tuning) |
+| First-person waterline / underwater FX | [Scenario 9](#scenario-9--first-person-camera-through-a-rising-flood) |
 
 ### Sample import
 
 In **Window > Package Management > Package Manager**, select **Flooding**, open
 **Samples**, and import one or more of these samples:
 
-All four imported scenes expose their useful GameObjects, components,
+All imported scenes expose their useful GameObjects, components,
 references, cameras, lights, and local material assets before Play Mode. Play
 Mode starts simulation and transient presentation updates; it does not
 regenerate the authored hierarchy.
@@ -444,6 +474,12 @@ regenerate the authored hierarchy.
   Move the ocean Transform on world Y, close the connection, raise interior
   water, or rotate the compartment to see inflow, equalization, outflow,
   closure, and gravity-aligned surfaces.
+- **First Person Flooding**: Unity copies it to
+  `Assets/Samples/Flooding/0.9.1/First Person Flooding`. Open
+  `FirstPersonFlooding.unity` there. A `FloodSource` fills a closed room while
+  a first-person camera uses `FloodCameraTracker`, optional URP underwater
+  effects, audio, and telemetry. Enable Depth Texture and the Flood Underwater
+  Renderer Feature for waterline crossing. Press **T** to tilt the room.
 
 The package's `Samples~` folders are authoritative. Package Manager import
 creates a writable copy under `Assets/Samples` but does not synchronize that
@@ -864,8 +900,11 @@ optional infinite exterior endpoints. The opening itself remains rectangular.
 8. Configure the `FloodConnection` component:
    - **Simulation Manager**: the shared `FloodSimulationManager` component.
    - **Side A** and **Side B**: each must reference a `FloodVolume` or
-     **External Fluid Body**. Densities must match. Connecting two external
-     bodies is unsupported.
+     **External Fluid Body**. Assign either the boundary GameObject from the
+     Hierarchy/object picker or drag the **Flood Volume** / **External Fluid
+     Body** component header from the Inspector; the package resolves
+     GameObjects to their boundary component automatically. Densities must
+     match. Connecting two external bodies is unsupported.
    - **Opening Width**: horizontal opening width in meters.
    - **Opening Height**: vertical opening height in meters above the Transform.
    - **Discharge Coefficient**: dimensionless restriction from `0` to `1`.
@@ -1055,7 +1094,7 @@ if (result.IsSubmerged)
 | --- | --- |
 | `ContainsPoint(worldPoint)` | Inside floodable geometry |
 | `IsPointSubmerged(worldPoint)` | Inside geometry and below the current surface plane |
-| `QueryPoint(worldPoint)` | Combined result: inside, submerged, submersion depth (m), closest surface point, surface normal |
+| `QueryPoint(worldPoint)` | Combined result: inside, submerged, submersion depth (m), signed surface distance (m), closest surface point, surface normal |
 | `CurrentVolume` | Authoritative water volume (m³) |
 | `FillPercentage` | Normalized fill from 0 to 1 |
 | `SurfacePlane` / `LocalSurfacePlane` | Current solved free surface |
@@ -1070,13 +1109,251 @@ Contract:
   (`max(0, -SurfacePlane.GetDistanceToPoint(point))`). A point outside the
   compartment is never submerged, even if it lies below the infinite surface
   plane.
-- `SubmersionDepthMeters` is zero when the point is not submerged.
+- `SubmersionDepthMeters` is zero when the point is not submerged. Its
+  meaning is unchanged when signed distance is also present.
+- `SurfaceSignedDistanceMeters` uses the same authoritative world-space
+  surface plane: **positive = above water**, **zero = on the surface**,
+  **negative = below water**. It is reported for outside points as well
+  (so a point outside the compartment but below the infinite plane has
+  negative signed distance and zero submersion depth).
 - Rectangular prism and extruded polygon containment is exact
   (`FloodContainmentPrecision.Exact`).
 - Baked geometry containment uses occupied bake cells
   (`FloodContainmentPrecision.BakeApproximation`) and depends on
   `FloodVolumeData.SampleResolution`. Inspect precision via
   `volume.Geometry.ContainmentPrecision`.
+
+## Track a camera or viewpoint against flood volumes
+
+Use **Flood Camera Tracker** when gameplay or presentation needs the
+relationship between a viewpoint and nearby compartments. The tracker is
+presentation-only: it never advances simulation and does not render.
+
+### Setup
+
+1. Select the player camera GameObject (or any GameObject whose transform is
+   the sample point).
+2. Add the package script component **Flood Camera Tracker**.
+3. Leave **Viewpoint** empty to use that GameObject's transform (or the Main
+   Camera when the component is not on a camera).
+4. Choose **Volume Selection Mode**:
+   - **Explicit** — assign **Explicit Volume** to one `FloodVolume`.
+   - **Auto Discover Registered** — assign **Manager** to the scene's
+     `FloodSimulationManager` (or leave empty to resolve a parent manager /
+     `FindAnyObjectByType` once). The tracker reads
+     `manager.RegisteredVolumes` and does not search the scene every frame.
+5. Keep the default underwater hysteresis unless you need a wider band:
+   - **Enter Water Threshold Meters** = `-0.02` (must cross slightly below)
+   - **Exit Water Threshold Meters** = `+0.02` (must cross slightly above)
+
+### Public state
+
+| Property | Meaning |
+| --- | --- |
+| `ActiveVolume` | Volume currently driving tracker state |
+| `IsInsideFloodVolume` | Viewpoint inside `ActiveVolume` geometry |
+| `IsUnderwater` | Latched underwater state after hysteresis |
+| `SurfaceSignedDistanceMeters` | Positive above, zero on, negative below |
+| `SubmersionDepthMeters` | Non-negative depth when submerged |
+| `CurrentQuery` | Latest `FloodQueryResult` against `ActiveVolume` |
+
+Events (C#): `EnteredFloodVolume`, `ExitedFloodVolume`, `EnteredWater`,
+`ExitedWater`, `ActiveVolumeChanged`.
+
+### Auto-discover selection (sticky)
+
+When **Auto Discover Registered** is enabled:
+
+1. If the current `ActiveVolume` still contains the viewpoint, keep it — even
+   when the camera is dry inside that compartment.
+2. Otherwise collect registered volumes that contain the viewpoint.
+3. If exactly one contains it, select that volume.
+4. If several contain it, prefer candidates where the viewpoint is submerged.
+5. If several submerged candidates remain, prefer the greatest submersion
+   depth (most-negative signed distance).
+6. Tie-break by manager registration order.
+
+Overlapping `FloodVolume` compartments are **ambiguous and not physically
+merged**. Sticky selection avoids presentation flicker when the camera sits
+near overlapping boundaries. `ActiveVolume` selection is independent of
+`IsUnderwater`.
+
+```csharp
+var tracker = camera.GetComponent<FloodCameraTracker>();
+if (tracker.IsUnderwater)
+{
+    float depth = tracker.SubmersionDepthMeters;
+    float signed = tracker.SurfaceSignedDistanceMeters;
+}
+```
+
+Call `Refresh()` manually when **Update Automatically** is disabled (for
+example from tests or a custom update loop).
+
+## Create an underwater presentation profile
+
+Use **Flood Underwater Profile** assets for shared camera-effect settings.
+The asset stores presentation data only — no runtime state — and can be reused
+across cameras and scenes.
+
+1. In the Project window, open the **Create** menu and choose
+   **Flooding > Flood Underwater Profile**.
+2. Name the asset (for example `DefaultUnderwaterProfile`).
+3. Select the asset and tune Inspector fields:
+
+| Field | Unit / notes |
+| --- | --- |
+| Shallow Tint Color | Near-surface underwater tint (RGBA) |
+| Deep Tint Color | Tint at full effect depth and deeper |
+| Full Effect Depth | Meters of submersion for full strength |
+| Fog Density | Dimensionless fog build-up scale |
+| Maximum Fog Strength | 0–1 fog cap |
+| Saturation / Contrast | Color grading multipliers (`1` = unchanged) |
+| Distortion Strength / Speed | Subtle UV distortion amplitude and Hz |
+| Transition Duration | Seconds for enter/exit smoothing |
+
+Defaults are restrained for playable underwater looks. Assign the asset to URP
+or audio consumers when those modules are present. Helper methods
+`EvaluateDepthStrength`, `EvaluateTintColor`, and `EvaluateFogStrength` map
+submersion depth without storing state on the asset.
+
+## URP underwater camera effects
+
+Camera effects are **presentation consumers** of Flooding state and do not
+participate in simulation. They live in the optional `Kyle.Flooding.URP`
+assembly and require Universal Render Pipeline in the project.
+
+### 1. Enable the depth texture
+
+World-position reconstruction for the waterline uses the camera depth texture.
+
+1. Open your **URP Asset** (Project window; often under `Settings` /
+   `Assets/Settings`).
+2. Enable **Depth Texture**.
+3. Optionally confirm the active camera can use depth textures (URP cameras
+   inherit the asset setting unless overridden).
+
+### 2. Add the renderer feature
+
+1. Select your **URP Renderer** asset (referenced by the URP Asset, often named
+   like `PC_Renderer` or `Universal Renderer`).
+2. In the Inspector, click **Add Renderer Feature**.
+3. Choose **Flood Underwater Renderer Feature**.
+4. Assign **Material** to the package material
+   `Packages/com.rabbidwolf.com.kyle.flooding/Materials/FloodUnderwater`
+   (shader `Kyle/Flooding/Underwater`).
+5. Leave **Render Pass Event** at **Before Rendering Post Processing** unless
+   you need a different injection point.
+6. Adjust **Waterline Softness Meters** if the surface band looks too hard or
+   soft (default `0.03`).
+
+### 3. Wire the camera
+
+1. Select the player / main camera GameObject.
+2. Add **Flood Camera Tracker** and configure explicit or auto volume selection.
+3. Add **Flood Underwater Camera Effect** (Flooding/URP menu).
+4. Assign the **Flood Underwater Profile** asset created earlier.
+5. Leave **Tracker** empty to use the tracker on the same GameObject.
+
+### 4. Verify
+
+1. Enter Play Mode with a rising `FloodVolume` and visible water surface.
+2. Keep the camera inside the compartment above water: the lower part of the
+   view should receive underwater tint where geometry is below the flood
+   surface plane (waterline crossing).
+3. Submerge the camera: the full view tints; fog/tint strengthen with depth.
+4. Rotate the `FloodVolume` modestly: the waterline should follow the solved
+   surface plane normal, not world Y.
+
+### Limitations
+
+- Not CFD, waves, or slosh simulation.
+- Does not change equilibrium flooding behavior.
+- Sky / far-plane pixels use the tracker's latched underwater state because
+  depth reconstruction has no scene geometry there.
+- Requires URP; the core `Kyle.Flooding.Runtime` assembly stays URP-free.
+
+## Tune underwater look (symptom → where to click)
+
+Hover any Inspector **field label** (not only the value box) to read the
+`[Tooltip]` after a short delay. Fields below are the usual look controls.
+
+### First Person Flooding sample
+
+1. Select **Main Camera** (child of **Player**).
+2. On **Flood Underwater Camera Effect**, click the **Profile** object
+   (`FirstPersonUnderwaterProfile`), or open
+   `Assets/Samples/Flooding/0.9.1/First Person Flooding/FirstPersonUnderwaterProfile`
+   in the Project window.
+3. Edit that ScriptableObject while Play Mode is running to preview changes.
+
+### Symptom → asset → field
+
+| If it looks… | Select | Field | Typical fix |
+| --- | --- | --- | --- |
+| Too wavy / busy refraction | **Flood Underwater Profile** | **Distortion Strength** | Lower toward `0`–`0.003` (default `0.008`). `0` disables waviness. |
+| Waves animate too fast | Same profile | **Distortion Speed** | Lower (default `0.35`). |
+| Tint too strong near surface | Same profile | **Shallow Tint Color** alpha / RGB | Reduce alpha or desaturate. |
+| Deep water too dark / opaque | Same profile | **Deep Tint Color**, **Full Effect Depth** | Soften deep tint or increase full-effect depth (meters). |
+| Fog too thick / too thin | Same profile | **Fog Density**, **Maximum Fog Strength** | Lower density/max for clearer water. |
+| Color grading odd | Same profile | **Saturation**, **Contrast** | `1` = unchanged; keep near `0.8`–`1.1`. |
+| Enter/exit snaps | Same profile | **Transition Duration** | Raise slightly (seconds). |
+| Waterline edge too hard / soft | **URP Renderer** → **Flood Underwater Renderer Feature** | **Waterline Softness Meters** | Default `0.03`; raise for a wider blend band. |
+| Effect never appears | URP Asset / Renderer / camera | Depth Texture; feature material; camera **Profile** | See [URP underwater camera effects](#urp-underwater-camera-effects). |
+| Underwater latch flickers | **Flood Camera Tracker** | **Enter/Exit Water Threshold Meters** | Widen the band (more negative enter, more positive exit). |
+| Audio not muffled | **Flood Underwater Audio** | **Audio Mixer**, parameter names, cutoffs | Expose mixer params; see [Underwater audio](#underwater-audio-audiomixer). |
+
+Presentation settings never change flood simulation volume or flow.
+
+## Underwater audio (AudioMixer)
+
+Use **Flood Underwater Audio** to muffle sound while submerged. It reads
+`FloodCameraTracker` only and never mutates simulation.
+
+1. Create or open an **Audio Mixer** asset.
+2. Add a **Lowpass** effect on the group that should muffle underwater.
+3. Expose parameters (right-click the parameter → **Expose**):
+   - Low-pass cutoff (Hz), default name `FloodLowPassCutoff`
+   - Optional volume (dB), default name `FloodUnderwaterVolume`
+4. Select the camera (or an audio director) GameObject.
+5. Add **Flood Underwater Audio**.
+6. Assign the **Audio Mixer**, tracker (optional if on the same GameObject /
+   Main Camera), and confirm parameter names match the exposed names.
+7. Tune normal vs underwater cutoff/volume and **Transition Duration**.
+
+```csharp
+// Exposed mixer parameters are driven from tracker.IsUnderwater.
+audio.Refresh(Time.deltaTime);
+float cutoff = audio.CurrentLowPassCutoffHz;
+```
+
+## Flood telemetry for UI
+
+Telemetry adapters are framework-neutral (no TextMeshPro dependency). Bind their
+public properties from your own UI, or subscribe to `ValuesChanged`.
+
+### Flood Volume Telemetry
+
+1. Select a GameObject (often the compartment root).
+2. Add **Flood Volume Telemetry**.
+3. Assign **Volume** (or leave empty to use a `FloodVolume` on the same object).
+4. Optionally assign a **Connection** to report `CurrentFlowRate`.
+
+Exposed values: `FillPercentage` (0–1), `CurrentVolumeCubicMeters`,
+`CapacityCubicMeters`, `IsEmpty`, `IsFull`,
+`ConnectionFlowRateCubicMetersPerSecond`.
+
+### Flood Camera Telemetry
+
+1. Select the camera GameObject.
+2. Add **Flood Camera Telemetry**.
+3. Assign **Tracker** or leave empty to resolve from this object / Main Camera.
+
+Exposed values: `IsInsideFloodVolume`, `IsUnderwater`,
+`SurfaceSignedDistanceMeters`, `SubmersionDepthMeters`, `ActiveVolume`.
+
+TMP or uGUI text binders belong in Samples or game code — not in the core
+package.
 
 ## Integrate flood mass with a Rigidbody
 
@@ -1440,6 +1717,10 @@ cell clipping, open-mesh rejection, and a deterministic 512-cell solver guard.
 - Confirm **Is Open** is enabled.
 - Confirm **Side A** and **Side B** resolve to different active boundaries with
   matching density.
+- If a boundary GameObject appears in the picker but **Side A**/**Side B**
+  stays empty after assignment, reselect the connection and try again after
+  script recompilation, or assign the **Flood Volume** / **External Fluid
+  Body** component header directly. Unsupported objects log a Console warning.
 - Confirm the connection and both endpoints reference the same manager.
 - Confirm the Transform is at the opening bottom rather than its center or top.
 - Confirm at least one water surface is above the opening bottom.

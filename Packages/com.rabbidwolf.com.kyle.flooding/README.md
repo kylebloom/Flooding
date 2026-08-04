@@ -29,6 +29,12 @@ rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
 - Replaceable, interpolated presentation driven by immutable state.
 - Scaled-cube and generated polygon-mesh water renderers.
 - Focused baked-data free-surface renderer.
+- Optional `FloodCameraTracker` for viewpoint / underwater presentation state
+  (sticky volume selection, hysteresis; no rendering).
+- Optional `Kyle.Flooding.URP` underwater fullscreen effect with plane-based
+  waterline crossing (requires URP depth texture).
+- Optional underwater AudioMixer muffling and framework-neutral flood telemetry
+  adapters (no TextMeshPro dependency).
 - Optional `FloodConnectionVisual` and connection/source/volume audio consumers.
 - Optional read-only Scene-view diagnostics for mass centers, gravity, solved
   surfaces, and connection flow.
@@ -180,7 +186,7 @@ Inspector field, and troubleshooting, follow the
 In **Window > Package Management > Package Manager**, select **Flooding**, open
 **Samples**, and import the sample you want:
 
-All four imported scenes contain persistent, authored hierarchies. Cameras,
+All imported scenes contain persistent, authored hierarchies. Cameras,
 lights, demonstration objects, component references, and local material assets
 are visible and editable before Play Mode; entering Play Mode adds only
 transient simulation or presentation state.
@@ -221,6 +227,13 @@ transient simulation or presentation state.
   Game-view readout. Tune the ocean Transform waterline on
   `ExternalFluidBoundary`, compartment state on `FloodVolume`, and opening
   fields on `FloodConnection`.
+- **First Person Flooding** imports to
+  `Assets/Samples/Flooding/0.9.1/First Person Flooding`. Open
+  `FirstPersonFlooding.unity` for a rising enclosed-room flood from first
+  person with `FloodCameraTracker`, optional URP waterline/underwater effects,
+  audio muffling, and telemetry. Enable the URP Depth Texture and Flood
+  Underwater Renderer Feature for the fullscreen waterline pass. Press **T** to
+  tilt the room; waterline follows the authoritative surface plane.
 
 The package folders under `Samples~` are the authoritative sample sources.
 Package Manager copies them into `Assets/Samples` rather than synchronizing

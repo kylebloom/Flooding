@@ -1,0 +1,24 @@
+{
+    "name": "Kyle.Flooding.URP",
+    "rootNamespace": "Kyle.Flooding.URP",
+    "references": [
+        "Kyle.Flooding.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "17.0.0",
+            "define": "KYLE_FLOODING_URP"
+        }
+    ],
+    "noEngineReferences": false
+}

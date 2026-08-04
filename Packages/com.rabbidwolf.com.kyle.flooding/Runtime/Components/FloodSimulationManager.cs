@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace Kyle.Flooding
@@ -54,6 +55,8 @@ namespace Kyle.Flooding
         private readonly Dictionary<FloodVolume, double> requestedInflows = new();
         private readonly Dictionary<FloodVolume, double> destinationScales = new();
         private readonly Dictionary<FloodVolume, double> volumeDeltas = new();
+
+        private ReadOnlyCollection<FloodVolume> registeredVolumesView;
 
         private double accumulatedTime;
 
@@ -135,6 +138,19 @@ namespace Kyle.Flooding
         /// Gets volume accounting from the most recently completed tick.
         /// </summary>
         public FloodTickMetrics LastTickMetrics { get; private set; }
+
+        /// <summary>
+        /// Gets the flood volumes currently registered with this manager, in
+        /// registration order.
+        /// </summary>
+        /// <remarks>
+        /// The returned collection is a live read-only view. Consumers must not
+        /// register or unregister volumes through it; ownership of membership
+        /// remains with this manager. Destroyed entries may appear as null until
+        /// the next simulation tick removes them.
+        /// </remarks>
+        public IReadOnlyList<FloodVolume> RegisteredVolumes =>
+            registeredVolumesView ??= volumes.AsReadOnly();
 
         /// <summary>
         /// Raised after one tick has committed all changes and published all

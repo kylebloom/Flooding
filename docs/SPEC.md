@@ -269,6 +269,10 @@ the next manager tick.
 - `IsSubmerged` (inside volume and below the current surface plane)
 - `SubmersionDepthMeters` (`max(0, -SurfacePlane.GetDistanceToPoint)`; zero
   when not submerged)
+- `SurfaceSignedDistanceMeters` (signed distance to the same authoritative
+  world-space `SurfacePlane`: `> 0` above the surface, `== 0` on the
+  surface, `< 0` below the surface; reported even when outside the
+  compartment)
 - `SurfacePoint` (closest point on the current surface plane)
 - `SurfaceNormal`
 
@@ -287,6 +291,49 @@ Containment precision is reported by
 - `BakeApproximation` for baked occupancy cells (resolution-dependent)
 
 Floor-to-surface water-column depth is not part of this contract.
+
+## Camera flood tracking (presentation)
+
+`FloodCameraTracker` is an optional presentation consumer. It does not
+participate in simulation ticks and does not mutate flood state.
+
+- **Explicit** mode tracks one assigned `FloodVolume`.
+- **Auto Discover Registered** mode reads
+  `FloodSimulationManager.RegisteredVolumes` (live read-only registry view;
+  registration remains manager-owned).
+- Active-volume selection is sticky while the current volume still contains
+  the viewpoint, independent of underwater state.
+- When reselection is required and multiple registered volumes contain the
+  viewpoint: prefer submerged candidates, then greatest submersion depth,
+  then registration order.
+- Overlapping compartments are ambiguous and are not physically merged.
+- `IsUnderwater` uses configurable signed-distance hysteresis (defaults
+  enter `-0.02` m, exit `+0.02` m) and is never true outside the active
+  compartment.
+
+## URP underwater presentation
+
+Optional `Kyle.Flooding.URP` types apply fullscreen underwater presentation:
+
+- Consume `FloodCameraTracker` + `FloodUnderwaterProfile` only.
+- Reconstruct world position from the camera depth texture and mask pixels
+  against the authoritative `FloodVolume.SurfacePlane` (works for rotated /
+  tilted volumes; not a world-Y water level).
+- Above-plane pixels stay unprocessed; below-plane pixels receive tint/fog/
+  optional distortion; fully submerged views tint the whole screen.
+- Do not mutate simulation state.
+
+## Underwater audio and telemetry
+
+Optional presentation consumers:
+
+- `FloodUnderwaterAudio` smooths exposed `AudioMixer` low-pass cutoff (Hz) and
+  optional volume (dB) from `FloodCameraTracker.IsUnderwater`.
+- `FloodVolumeTelemetry` reports fill percentage, volume (m³), capacity (m³),
+  and optional connection flow (m³/s).
+- `FloodCameraTelemetry` reports camera inside/underwater flags, signed
+  distance, and submersion depth.
+- These types do not depend on TextMeshPro and do not mutate simulation.
 
 ## Container geometry
 

@@ -372,9 +372,13 @@ new simulation behavior.
   containment and bake-cell approximation for baked geometry.
 - [x] Add `FloodVolume.ContainsPoint`, `IsPointSubmerged`, and `QueryPoint`
   over live authoritative state and the cached surface plane.
+- [x] Add `FloodQueryResult.SurfaceSignedDistanceMeters` (positive above,
+  zero on, negative below the authoritative surface plane) without changing
+  `SubmersionDepthMeters` semantics.
 - [x] Document live-read vs post-publish event contract and baked containment
   precision.
-- [x] Add Edit Mode containment tests and Play Mode query tests.
+- [x] Add Edit Mode containment / query-result tests and Play Mode query tests
+  (including rotated volume and tilted surface plane coverage).
 - [ ] Verify the new suites in Unity Editor regression.
 
 Acceptance criteria:
@@ -384,6 +388,32 @@ Acceptance criteria:
 - Baked containment precision is explicit on the geometry contract.
 - Existing fill/volume/state properties remain the canonical state reads
   (`FillPercentage`, `CurrentVolume`, `CurrentState`, `StateChanged`).
+
+## Phase 13 — Camera / presentation tracking
+
+Goal: expose reusable camera flood-state tracking without coupling rendering
+or URP into the core simulation assembly.
+
+- [x] Add `FloodSimulationManager.RegisteredVolumes` read-only registry view.
+- [x] Add `FloodCameraTracker` with explicit and sticky auto-discover selection,
+  underwater hysteresis, and presentation events.
+- [x] Document overlap policy, signed-distance hysteresis, and Editor setup.
+- [x] Add Edit Mode hysteresis tests and Play Mode tracker / selection tests.
+- [x] Add `FloodUnderwaterProfile` ScriptableObject (presentation settings only).
+- [x] Add optional `Kyle.Flooding.URP` assembly with underwater renderer feature,
+  camera effect bridge, fullscreen waterline shader, and depth-texture setup docs.
+- [x] Add `FloodUnderwaterAudio` and framework-neutral telemetry adapters.
+- [x] Add First Person Flooding sample (builder, bootstrap, README, package entry).
+- [x] Final regression: Edit Mode 90/90 and Play Mode 64/64 passed (Unity 6000.5.6f1).
+
+Acceptance criteria:
+
+- Tracker never mutates simulation state.
+- Auto-discover does not call scene-wide object search every frame.
+- Active volume selection stays sticky while the current volume contains the
+  viewpoint, even when dry.
+- Overlapping volumes remain ambiguous / not merged.
+- Core runtime remains free of URP and TextMeshPro dependencies.
 
 ## Documentation roadmap
 

@@ -1,10 +1,12 @@
 {
-  "name": "Kyle.Flooding.Tests.PlayMode",
-  "rootNamespace": "Kyle.Flooding.Tests",
-  "references": [
-    "Kyle.Flooding.Runtime"
-  ],
-  "optionalUnityReferences": [
-    "TestAssemblies"
-  ]
+    "name": "Kyle.Flooding.Tests.PlayMode",
+    "rootNamespace": "Kyle.Flooding.Tests",
+    "references": [
+        "Kyle.Flooding.Runtime",
+        "Kyle.Flooding.URP",
+        "Unity.RenderPipelines.Universal.Runtime"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
 }

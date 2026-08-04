@@ -15,10 +15,24 @@ Contains:
 - deterministic simulation rules,
 - immutable public state and mutation results,
 - Unity scene adapters,
-- current presentation components.
+- pipeline-agnostic presentation components (`FloodCameraTracker`,
+  `FloodUnderwaterProfile`, surface renderers, audio helpers).
 
 The pure simulation classes must not depend on scene objects. Unity-facing
-state may use Unity value types such as `Plane` and `Vector3`.
+state may use Unity value types such as `Plane` and `Vector3`. This assembly
+must not reference URP.
+
+### `Kyle.Flooding.URP`
+
+Optional Universal Render Pipeline presentation assembly:
+
+- `FloodUnderwaterRendererFeature` / `FloodUnderwaterPass`
+- `FloodUnderwaterCameraEffect`
+- fullscreen underwater shader/material consumers
+
+Depends on `Kyle.Flooding.Runtime` and
+`Unity.RenderPipelines.Universal.Runtime`. Camera effects read tracker/profile
+state only and never mutate simulation.
 
 ### `Kyle.Flooding.Editor`
 
@@ -54,8 +68,10 @@ Consumers receive snapshots. They must not mutate simulation internals.
 Gameplay point queries (`ContainsPoint`, `IsPointSubmerged`, `QueryPoint`) are
 read-only compositions over the same live authoritative volume, geometry
 containment, and cached surface plane. They never enter the manager tick path
-and never publish events. Containment for analytic prisms is exact; baked
-geometry containment uses occupancy cells and exposes
+and never publish events. `FloodQueryResult.SurfaceSignedDistanceMeters` exposes
+the plane distance sign convention (positive above, negative below) without
+changing `SubmersionDepthMeters`. Containment for analytic prisms is exact;
+baked geometry containment uses occupancy cells and exposes
 `FloodContainmentPrecision.BakeApproximation` on the geometry contract.
 
 ## Mutation contract
@@ -232,10 +248,26 @@ surface-renderer contract:
 - `FloodConnectionAudio`, `FloodSourceAudio`, and `FloodVolumeAudio` drive
   `AudioSource` volume and pitch from applied flow, configured source rate, or
   fill percentage.
+- `FloodCameraTracker` relates a viewpoint to registered or explicit volumes
+  using read-only `QueryPoint` / `RegisteredVolumes` data, sticky active-volume
+  selection, and underwater hysteresis. It raises presentation events only and
+  never mutates simulation.
+- `FloodUnderwaterProfile` is a shareable ScriptableObject of underwater
+  presentation settings (tint, fog, grading, distortion, transitions). It holds
+  no runtime state and does not reference URP.
+- `FloodUnderwaterAudio` drives exposed `AudioMixer` parameters from tracker
+  underwater state.
+- `FloodVolumeTelemetry` / `FloodCameraTelemetry` expose framework-neutral
+  values for UI; they do not depend on TextMeshPro.
+
+`FloodSimulationManager.RegisteredVolumes` exposes a live read-only view of
+registered volumes for presentation discovery. Membership remains
+manager-owned through internal register/unregister paths.
 
 These components poll public diagnostics in `LateUpdate`, never register as
 simulation participants, and must not mutate flooding state. Missing clips or
-unassigned visual targets fail soft.
+unassigned visual targets fail soft. Overlapping flood volumes are ambiguous
+for camera selection and are not physically merged.
 
 ## Physics boundary
 
@@ -280,13 +312,15 @@ Runtime state is not written back into authoring fields.
 ## Dependency direction
 
 ```text
-Presentation ───────► FloodState + read-only geometry
+Presentation ───────► FloodState + read-only geometry / queries
+URP underwater ─────► FloodCameraTracker + FloodUnderwaterProfile
 Scene components ───► Simulation + geometry
 Simulation manager ─► scene components + immutable snapshots
 Connections ────────► simulation manager request/commit phases
 Editor tooling ─────► scene authoring components
 Optional physics ───► Mass-contribution interface
-Simulation ─────────► no presentation or vessel physics
+Simulation ─────────► no presentation, URP, or vessel physics
+Kyle.Flooding.Runtime ─✗──► URP
 ```
 
 Dependencies must not point from simulation into presentation, audio, effects,

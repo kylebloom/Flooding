@@ -37,9 +37,19 @@ Practical step-by-step setup lives in the
    test, sample import, or build-from-components.
 2. [Choose your scenario](editor-workflow.md#choose-your-scenario) — leak,
    doorway, hull breach, polygon, baked geometry, vessel mass, visuals/audio,
-   and diagnostics.
+   diagnostics, and first-person underwater.
 3. Component field reference, scripting, upgrades, and troubleshooting in the
    same document.
+
+Camera / underwater presentation (optional):
+
+- [Track a camera](editor-workflow.md#track-a-camera-or-viewpoint-against-flood-volumes)
+- [Flood Underwater Profile](editor-workflow.md#create-an-underwater-presentation-profile)
+- [URP underwater setup](editor-workflow.md#urp-underwater-camera-effects)
+- [Tune underwater look](editor-workflow.md#tune-underwater-look-symptom--where-to-click)
+- [Underwater audio](editor-workflow.md#underwater-audio-audiomixer)
+- [Telemetry adapters](editor-workflow.md#flood-telemetry-for-ui)
+- [Scenario 9 — first-person rising flood](editor-workflow.md#scenario-9--first-person-camera-through-a-rising-flood)
 
 ### Fastest smoke test
 
@@ -63,6 +73,8 @@ a transparent material compatible with your render pipeline.
 | Drive Rigidbody mass from water | [Scenario 6](editor-workflow.md#scenario-6--flood-mass-affecting-a-vessel-rigidbody) |
 | Add flow VFX or SFX | [Scenario 7](editor-workflow.md#scenario-7--flow-visuals-and-audio) |
 | Debug surfaces and flow in Scene view | [Scenario 8](editor-workflow.md#scenario-8--scene-view-diagnostics-while-tuning) |
+| First-person waterline / underwater FX | [Scenario 9](editor-workflow.md#scenario-9--first-person-camera-through-a-rising-flood) |
+| Soften wavy underwater look | [Tune underwater look](editor-workflow.md#tune-underwater-look-symptom--where-to-click) |
 
 ## Units and ownership
 
@@ -90,6 +102,10 @@ finite volume deltas, then publishes state.
 - `FloodSource` — configured injection (not pressure equilibrium).
 - Surface renderers — optional water visuals from `FloodState`.
 - `FloodConnectionVisual` / audio components — optional flow/fill presentation.
+- `FloodCameraTracker` — optional viewpoint / underwater state for presentation.
+- `FloodUnderwaterProfile` — shared underwater effect settings asset.
+- `Kyle.Flooding.URP` — optional URP underwater renderer feature / waterline pass.
+- `FloodUnderwaterAudio` / telemetry adapters — optional presentation consumers.
 - `FloodMassAggregator` + `RigidbodyFloodMassAdapter` — optional mass reporting.
 - `FloodDiagnostics` — optional read-only Scene-view overlay.
 
@@ -104,6 +120,7 @@ In **Window > Package Management > Package Manager**, select **Flooding**, open
 | Baked Geometry | `Assets/Samples/Flooding/0.9.1/Baked Geometry` | Curved hull bake, cell viz, free surface |
 | Connected Compartments | `Assets/Samples/Flooding/0.9.1/Connected Compartments` | Conserved doorway equalization |
 | Hull Breach | `Assets/Samples/Flooding/0.9.1/Hull Breach` | Ocean waterline ↔ compartment exchange |
+| First Person Flooding | `Assets/Samples/Flooding/0.9.1/First Person Flooding` | Rising flood, waterline crossing, URP underwater FX |
 
 Each imported scene is authored and editable before Play Mode. `Samples~` in
 the package is authoritative; re-import can overwrite `Assets/Samples` copies.
@@ -129,7 +146,7 @@ setup fails.
 - `Materials` — prototype URP water material.
 - `Tests/Editor` and `Tests/PlayMode`.
 - `Samples~` — Mass Integration, Baked Geometry, Connected Compartments, Hull
-  Breach.
+  Breach, First Person Flooding.
 - `Documentation` — this overview and the Editor workflow guide.
 
 ## License

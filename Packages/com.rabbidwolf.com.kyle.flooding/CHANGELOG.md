@@ -9,10 +9,42 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `FloodQueryResult.SurfaceSignedDistanceMeters`: signed distance to the
+  authoritative world-space flood surface plane (`> 0` above, `== 0` on,
+  `< 0` below). Derived from the same `SurfacePlane` as submersion depth;
+  reported even when the sample is outside the compartment.
+  `SubmersionDepthMeters` semantics are unchanged.
+- `FloodSimulationManager.RegisteredVolumes`: live read-only view of registered
+  volumes in registration order. Registration/unregistration remains
+  manager-owned.
+- `FloodCameraTracker` presentation component with explicit or sticky
+  auto-discover volume selection, underwater hysteresis, and C# events
+  (`EnteredFloodVolume`, `ExitedFloodVolume`, `EnteredWater`, `ExitedWater`,
+  `ActiveVolumeChanged`). Overlapping volumes are ambiguous and not merged.
+- `FloodUnderwaterProfile` ScriptableObject for shared underwater presentation
+  settings (tint, fog, grading, distortion, transition duration) with pure
+  depth/tint/fog evaluation helpers and no runtime state.
+- Optional `Kyle.Flooding.URP` assembly with `FloodUnderwaterRendererFeature`,
+  `FloodUnderwaterPass`, `FloodUnderwaterCameraEffect`, and
+  `Kyle/Flooding/Underwater` fullscreen shader for plane-based waterline
+  crossing, tint/fog/distortion, and depth-aware intensity. Requires URP depth
+  texture; does not reference URP from the core runtime assembly.
+- `FloodUnderwaterAudio` presentation component that smooths exposed
+  AudioMixer low-pass / volume parameters from `FloodCameraTracker`.
+- Framework-neutral `FloodVolumeTelemetry` and `FloodCameraTelemetry` adapters
+  for UI bindings (no TextMeshPro dependency).
+- **First Person Flooding** sample: enclosed rising flood, first-person
+  controls, waterline/underwater presentation wiring, telemetry HUD, and room
+  tilt demo (`Flooding > Internal > Build First Person Flooding Sample`).
+- Camera/underwater docs: Scenario 9, symptom→field tuning cheat sheet, index
+  deep links, and First Person sample look-tuning section.
 - MIT License at the repository root; `package.json` declares `"license": "MIT"`.
 
 ### Fixed
 
+- `FloodConnection` **Side A**/**Side B** now accept boundary GameObjects from
+  the object picker and resolve them to `FloodVolume` or **External Fluid
+  Body** components automatically.
 - Play Mode `ExternalFluidBoundaryTests`: equalization uses a coarse fill then
   fine settle so orifice flow can reach the head deadband; multiple-breach
   capacity scaling keeps the exterior waterline above the nearly-full tank so

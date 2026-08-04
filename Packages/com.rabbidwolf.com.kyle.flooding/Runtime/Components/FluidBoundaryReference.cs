@@ -59,6 +59,51 @@ namespace Kyle.Flooding
             return boundary != null;
         }
 
+        /// <summary>
+        /// Resolves a cleared reference, an <see cref="IFluidBoundary"/> component,
+        /// or a GameObject that owns one boundary component on the same GameObject.
+        /// </summary>
+        /// <param name="source">
+        /// Null, a supported boundary component, or a GameObject containing one.
+        /// </param>
+        /// <param name="boundaryComponent">
+        /// The resolved boundary component, or null when <paramref name="source"/>
+        /// is null.
+        /// </param>
+        /// <returns>
+        /// True when <paramref name="source"/> is null or resolves to a supported
+        /// boundary; otherwise false.
+        /// </returns>
+        public static bool TryResolveComponent(
+            UnityEngine.Object source,
+            out Component boundaryComponent)
+        {
+            boundaryComponent = null;
+
+            if (source == null)
+                return true;
+
+            if (source is Component component && component is IFluidBoundary)
+            {
+                boundaryComponent = component;
+                return true;
+            }
+
+            if (source is GameObject gameObject)
+            {
+                foreach (var candidate in gameObject.GetComponents<Component>())
+                {
+                    if (candidate is IFluidBoundary)
+                    {
+                        boundaryComponent = candidate;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         /// <inheritdoc />
         public bool Equals(FluidBoundaryReference other)
         {

@@ -299,9 +299,12 @@ namespace Kyle.Flooding
                     transform.InverseTransformPoint(worldPoint));
 
             var surfacePlane = SurfacePlane;
-            var submersionDepth = Mathf.Max(
-                0f,
-                -surfacePlane.GetDistanceToPoint(worldPoint));
+            // Unity Plane distance is positive in the normal direction. Flood
+            // surface normals point out of the water, so positive distance means
+            // above the surface and negative means below.
+            var surfaceSignedDistance =
+                surfacePlane.GetDistanceToPoint(worldPoint);
+            var submersionDepth = Mathf.Max(0f, -surfaceSignedDistance);
             var isSubmerged = isInsideVolume && submersionDepth > 0f;
 
             return new FloodQueryResult(
@@ -309,7 +312,8 @@ namespace Kyle.Flooding
                 isSubmerged,
                 isSubmerged ? submersionDepth : 0f,
                 surfacePlane.ClosestPointOnPlane(worldPoint),
-                surfacePlane.normal);
+                surfacePlane.normal,
+                surfaceSignedDistance);
         }
 
         /// <summary>

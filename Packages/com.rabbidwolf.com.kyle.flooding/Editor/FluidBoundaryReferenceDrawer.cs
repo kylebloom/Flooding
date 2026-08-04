@@ -19,21 +19,23 @@ namespace Kyle.Flooding.Editor
                 position,
                 label,
                 assigned,
-                typeof(Component),
+                typeof(Object),
                 true);
 
             if (newValue != assigned)
             {
-                if (
-                    newValue == null
-                    || newValue is IFluidBoundary)
+                if (FluidBoundaryReference.TryResolveComponent(
+                        newValue,
+                        out var resolved))
                 {
-                    componentProperty.objectReferenceValue = newValue;
+                    componentProperty.objectReferenceValue = resolved;
                 }
                 else
                 {
                     Debug.LogWarning(
-                        "FloodConnection endpoints must be a FloodVolume or External Fluid Body.",
+                        "FloodConnection endpoints must reference a GameObject "
+                        + "containing a FloodVolume or External Fluid Body, "
+                        + "or assign the boundary component directly.",
                         newValue);
                 }
             }
