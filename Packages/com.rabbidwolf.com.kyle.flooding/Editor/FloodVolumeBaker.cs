@@ -162,7 +162,9 @@ namespace Kyle.Flooding.Editor
                 gridSize,
                 occupied.ToArray(),
                 boundaryCellCount,
-                fingerprint);
+                fingerprint,
+                vertices,
+                triangles);
             EditorUtility.SetDirty(data);
 
             Undo.RecordObject(authoring, "Assign Flood Volume Bake");
@@ -175,7 +177,20 @@ namespace Kyle.Flooding.Editor
             message =
                 $"Baked {occupied.Count:N0} occupied cells "
                 + $"({data.Capacity:0.###} m³) from "
-                + $"{totalGridCells:N0} inspected cells.";
+                + $"{totalGridCells:N0} inspected cells. "
+                + $"Presentation boundary: "
+                + $"{data.PresentationBoundaryVertexCount:N0} vertices, "
+                + $"{data.PresentationBoundaryTriangleCount:N0} triangles.";
+
+            if (data.PresentationBoundaryTriangleCount
+                > FloodVolumeData.PresentationBoundaryTriangleWarningThreshold)
+            {
+                message +=
+                    " Warning: presentation boundary exceeds "
+                    + $"{FloodVolumeData.PresentationBoundaryTriangleWarningThreshold:N0} "
+                    + "triangles; consider a simpler closed authoring mesh.";
+            }
+
             return true;
         }
 

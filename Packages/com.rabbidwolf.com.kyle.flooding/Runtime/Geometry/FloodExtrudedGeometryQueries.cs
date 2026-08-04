@@ -201,7 +201,9 @@ namespace Kyle.Flooding
             foreach (var face in faces)
             {
                 foreach (var point in face)
-                    AddUniquePoint(uniqueVertices, point);
+                    FloodMeshPlaneIntersection.AddUniquePoint(
+                        uniqueVertices,
+                        point);
             }
 
             if (uniqueVertices.Count < 4)
@@ -269,7 +271,7 @@ namespace Kyle.Flooding
                     nextDistance <= FloodGeometryTolerances.Position;
 
                 if (currentInside)
-                    AddUniquePoint(result, current);
+                    FloodMeshPlaneIntersection.AddUniquePoint(result, current);
 
                 if (currentInside == nextInside)
                     continue;
@@ -285,10 +287,14 @@ namespace Kyle.Flooding
                 var interpolation = currentDistance / denominator;
                 var intersection =
                     current + ((next - current) * interpolation);
-                AddUniquePoint(result, intersection);
+                FloodMeshPlaneIntersection.AddUniquePoint(result, intersection);
 
                 if (capPoints != null)
-                    AddUniquePoint(capPoints, intersection);
+                {
+                    FloodMeshPlaneIntersection.AddUniquePoint(
+                        capPoints,
+                        intersection);
+                }
             }
 
             if (capPoints != null)
@@ -298,7 +304,9 @@ namespace Kyle.Flooding
                     if (Math.Abs(plane.GetDistanceToPoint(point))
                         <= FloodGeometryTolerances.Position)
                     {
-                        AddUniquePoint(capPoints, point);
+                        FloodMeshPlaneIntersection.AddUniquePoint(
+                            capPoints,
+                            point);
                     }
                 }
             }
@@ -322,23 +330,9 @@ namespace Kyle.Flooding
                 return default;
             }
 
-            var segments = new List<FloodSurfaceSegment>();
-
-            foreach (var triangle in BuildBoundaryTriangles(geometry))
-            {
-                if (TryIntersectTriangle(
-                        triangle,
-                        plane,
-                        out var segment))
-                {
-                    AddUniqueSegment(segments, segment);
-                }
-            }
-
-            var contours = StitchContours(segments, plane.normal);
-            return contours.Count == 0
-                ? default
-                : new FloodSurfaceIntersection(contours.ToArray());
+            return FloodMeshPlaneIntersection.IntersectTriangles(
+                BuildBoundaryTriangles(geometry),
+                plane);
         }
 
         private static List<FloodGeometryTriangle> BuildBoundaryTriangles(
@@ -396,217 +390,6 @@ namespace Kyle.Flooding
             return result;
         }
 
-        private static bool TryIntersectTriangle(
-            FloodGeometryTriangle triangle,
-            Plane plane,
-            out FloodSurfaceSegment segment)
-        {
-            var points = new[] { triangle.A, triangle.B, triangle.C };
-            var distances = new[]
-            {
-                plane.GetDistanceToPoint(points[0]),
-                plane.GetDistanceToPoint(points[1]),
-                plane.GetDistanceToPoint(points[2]),
-            };
-            var allOnPlane = true;
-            var intersections = new List<Vector3>(3);
-
-            for (var index = 0; index < points.Length; index++)
-            {
-                if (Math.Abs(distances[index])
-                    > FloodGeometryTolerances.Position)
-                {
-                    allOnPlane = false;
-                }
-
-                if (Math.Abs(distances[index])
-                    <= FloodGeometryTolerances.Position)
-                {
-                    AddUniquePoint(intersections, points[index]);
-                }
-
-                var next = (index + 1) % points.Length;
-
-                if ((distances[index] < -FloodGeometryTolerances.Position
-                        && distances[next]
-                            > FloodGeometryTolerances.Position)
-                    || (distances[index]
-                            > FloodGeometryTolerances.Position
-                        && distances[next]
-                            < -FloodGeometryTolerances.Position))
-                {
-                    var interpolation =
-                        distances[index]
-                        / (distances[index] - distances[next]);
-                    AddUniquePoint(
-                        intersections,
-                        points[index]
-                            + ((points[next] - points[index])
-                                * interpolation));
-                }
-            }
-
-            if (allOnPlane || intersections.Count < 2)
-            {
-                segment = default;
-                return false;
-            }
-
-            var maximumDistance = -1f;
-            var first = Vector3.zero;
-            var second = Vector3.zero;
-
-            for (var firstIndex = 0;
-                 firstIndex < intersections.Count;
-                 firstIndex++)
-            {
-                for (var secondIndex = firstIndex + 1;
-                     secondIndex < intersections.Count;
-                     secondIndex++)
-                {
-                    var distance = (
-                        intersections[firstIndex]
-                        - intersections[secondIndex]).sqrMagnitude;
-
-                    if (distance <= maximumDistance)
-                        continue;
-
-                    maximumDistance = distance;
-                    first = intersections[firstIndex];
-                    second = intersections[secondIndex];
-                }
-            }
-
-            if (maximumDistance
-                <= FloodGeometryTolerances.Position
-                    * FloodGeometryTolerances.Position)
-            {
-                segment = default;
-                return false;
-            }
-
-            segment = new FloodSurfaceSegment(first, second);
-            return true;
-        }
-
-        private static List<FloodSurfaceContour> StitchContours(
-            List<FloodSurfaceSegment> segments,
-            Vector3 planeNormal)
-        {
-            var remaining = new List<FloodSurfaceSegment>(segments);
-            var contours = new List<FloodSurfaceContour>();
-
-            while (remaining.Count > 0)
-            {
-                var seed = remaining[0];
-                remaining.RemoveAt(0);
-                var points = new List<Vector3> { seed.First, seed.Second };
-                var closed = false;
-
-                while (remaining.Count > 0)
-                {
-                    var current = points[points.Count - 1];
-                    var found = false;
-
-                    for (var index = 0; index < remaining.Count; index++)
-                    {
-                        var candidate = remaining[index];
-                        Vector3 next;
-
-                        if (Approximately(current, candidate.First))
-                            next = candidate.Second;
-                        else if (Approximately(current, candidate.Second))
-                            next = candidate.First;
-                        else
-                            continue;
-
-                        remaining.RemoveAt(index);
-                        found = true;
-
-                        if (Approximately(next, points[0]))
-                            closed = true;
-                        else
-                            points.Add(next);
-
-                        break;
-                    }
-
-                    if (closed || !found)
-                        break;
-                }
-
-                if (!closed || points.Count < 3)
-                    continue;
-
-                SimplifyContour(points);
-                OrientContour(points, planeNormal);
-
-                if (points.Count >= 3)
-                {
-                    contours.Add(
-                        new FloodSurfaceContour(points.ToArray()));
-                }
-            }
-
-            return contours;
-        }
-
-        private static void SimplifyContour(List<Vector3> points)
-        {
-            var removed = true;
-
-            while (removed && points.Count > 3)
-            {
-                removed = false;
-
-                for (var index = 0; index < points.Count; index++)
-                {
-                    var previous =
-                        points[(index - 1 + points.Count) % points.Count];
-                    var current = points[index];
-                    var next = points[(index + 1) % points.Count];
-                    var firstDirection = current - previous;
-                    var secondDirection = next - current;
-
-                    if (Vector3.Cross(firstDirection, secondDirection).magnitude
-                        > FloodGeometryTolerances.Position)
-                    {
-                        continue;
-                    }
-
-                    points.RemoveAt(index);
-                    removed = true;
-                    break;
-                }
-            }
-        }
-
-        private static void OrientContour(
-            List<Vector3> points,
-            Vector3 planeNormal)
-        {
-            CreatePlaneBasis(
-                planeNormal,
-                out var tangent,
-                out var bitangent);
-            var twiceArea = 0d;
-
-            for (var index = 0; index < points.Count; index++)
-            {
-                var next = (index + 1) % points.Count;
-                var firstX = Vector3.Dot(points[index], tangent);
-                var firstY = Vector3.Dot(points[index], bitangent);
-                var secondX = Vector3.Dot(points[next], tangent);
-                var secondY = Vector3.Dot(points[next], bitangent);
-                twiceArea +=
-                    ((double)firstX * secondY)
-                    - ((double)secondX * firstY);
-            }
-
-            if (twiceArea < 0d)
-                points.Reverse();
-        }
-
         private static void AddSurfaceContour(
             IReadOnlyList<Vector3> contour,
             Vector3 planeNormal,
@@ -616,7 +399,7 @@ namespace Kyle.Flooding
             if (contour.Count < 3)
                 return;
 
-            CreatePlaneBasis(
+            FloodMeshPlaneIntersection.CreatePlaneBasis(
                 planeNormal,
                 out var tangent,
                 out var bitangent);
@@ -769,44 +552,6 @@ namespace Kyle.Flooding
             }
         }
 
-        private static void AddUniqueSegment(
-            List<FloodSurfaceSegment> segments,
-            FloodSurfaceSegment candidate)
-        {
-            foreach (var segment in segments)
-            {
-                if ((Approximately(segment.First, candidate.First)
-                        && Approximately(segment.Second, candidate.Second))
-                    || (Approximately(segment.First, candidate.Second)
-                        && Approximately(segment.Second, candidate.First)))
-                {
-                    return;
-                }
-            }
-
-            segments.Add(candidate);
-        }
-
-        private static void AddUniquePoint(
-            List<Vector3> points,
-            Vector3 candidate)
-        {
-            foreach (var point in points)
-            {
-                if (Approximately(point, candidate))
-                    return;
-            }
-
-            points.Add(candidate);
-        }
-
-        private static bool Approximately(Vector3 first, Vector3 second)
-        {
-            return (first - second).sqrMagnitude
-                <= FloodGeometryTolerances.Position
-                    * FloodGeometryTolerances.Position;
-        }
-
         private static void SortPointsOnPlane(
             List<Vector3> points,
             Vector3 normal)
@@ -817,7 +562,10 @@ namespace Kyle.Flooding
                 center += point;
 
             center /= points.Count;
-            CreatePlaneBasis(normal, out var tangent, out var bitangent);
+            FloodMeshPlaneIntersection.CreatePlaneBasis(
+                normal,
+                out var tangent,
+                out var bitangent);
             points.Sort(
                 (first, second) =>
                 {
@@ -831,18 +579,6 @@ namespace Kyle.Flooding
                         Vector3.Dot(secondOffset, tangent));
                     return firstAngle.CompareTo(secondAngle);
                 });
-        }
-
-        private static void CreatePlaneBasis(
-            Vector3 normal,
-            out Vector3 tangent,
-            out Vector3 bitangent)
-        {
-            normal.Normalize();
-            tangent = Math.Abs(normal.y) < 0.9f
-                ? Vector3.Cross(normal, Vector3.up).normalized
-                : Vector3.Cross(normal, Vector3.right).normalized;
-            bitangent = Vector3.Cross(normal, tangent).normalized;
         }
 
         private static Vector3 ToLocalPoint(Vector2 footprintPoint, float y)
@@ -871,35 +607,6 @@ namespace Kyle.Flooding
                     + "finite distance.",
                     nameof(plane));
             }
-        }
-
-        private readonly struct FloodGeometryTriangle
-        {
-            public FloodGeometryTriangle(
-                Vector3 first,
-                Vector3 second,
-                Vector3 third)
-            {
-                A = first;
-                B = second;
-                C = third;
-            }
-
-            public Vector3 A { get; }
-            public Vector3 B { get; }
-            public Vector3 C { get; }
-        }
-
-        private readonly struct FloodSurfaceSegment
-        {
-            public FloodSurfaceSegment(Vector3 first, Vector3 second)
-            {
-                First = first;
-                Second = second;
-            }
-
-            public Vector3 First { get; }
-            public Vector3 Second { get; }
         }
     }
 

@@ -196,8 +196,9 @@ transient simulation or presentation state.
   authoring source mesh and bake asset; optional fill/roll, a HUD, and **B**
   baked-cell visualization show why Baked Data is needed versus prism/extruded
   modes. Disable **Animate Fill** or **Animate Roll** independently. The
-  `FloodBakedSurfaceRenderer` free-surface mesh is generated from immutable
-  baked data and aligned to gravity.
+  `FloodBakedSurfaceRenderer` free-surface mesh is generated from the solved
+  gravity plane intersected with the bake's presentation-boundary mesh (voxel
+  contours remain the legacy fallback) and aligned to gravity.
 - **Connected Compartments** imports to
   `Assets/Samples/Flooding/0.9.1/Connected Compartments`. Open
   `ConnectedCompartments.unity` there and enter Play Mode to see conserved,

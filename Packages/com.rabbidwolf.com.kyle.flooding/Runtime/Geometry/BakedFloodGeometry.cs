@@ -93,9 +93,12 @@ namespace Kyle.Flooding
 
             var totalVolume = 0d;
             var weightedCentroid = Vector3.zero;
-            var contours = includeSurface
-                ? new List<FloodSurfaceContour>()
-                : null;
+            var useBoundarySurface =
+                includeSurface && data.HasPresentationBoundary;
+            var voxelContours =
+                includeSurface && !useBoundarySurface
+                    ? new List<FloodSurfaceContour>()
+                    : null;
 
             foreach (var cellIndex in data.OccupiedCellIndices)
             {
@@ -113,10 +116,10 @@ namespace Kyle.Flooding
                         ref weightedCentroid);
                 }
 
-                if (includeSurface
+                if (voxelContours != null
                     && TryBuildCellSurface(vertices, plane, out var contour))
                 {
-                    contours.Add(contour);
+                    voxelContours.Add(contour);
                 }
             }
 
@@ -125,9 +128,23 @@ namespace Kyle.Flooding
                 totalVolume > FloodGeometryTolerances.SolverAbsoluteVolume
                     ? weightedCentroid / (float)totalVolume
                     : FindMinimumBoundaryPoint(plane.normal);
-            var surface = contours != null && contours.Count > 0
-                ? new FloodSurfaceIntersection(contours.ToArray())
-                : default;
+
+            FloodSurfaceIntersection surface;
+            if (useBoundarySurface)
+            {
+                surface = FloodMeshPlaneIntersection.IntersectMesh(
+                    data.PresentationBoundaryVertices,
+                    data.PresentationBoundaryTriangles,
+                    plane);
+            }
+            else if (voxelContours != null && voxelContours.Count > 0)
+            {
+                surface = new FloodSurfaceIntersection(voxelContours.ToArray());
+            }
+            else
+            {
+                surface = default;
+            }
 
             return new FloodSubmersionResult(
                 totalVolume,

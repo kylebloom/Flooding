@@ -38,10 +38,15 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- Replaced the Baked Geometry stepped chamber with a closed curved hull-section
-  source mesh, shipped `FloodVolumeAuthoring` bake path,
-  `HullSectionFloodVolumeData`, Play Mode baked-cell toggle (**B**), pause/roll
-  keys, and a Game-view HUD for capacity, fill, resolution, and retained cells.
+- Baked free surfaces prefer an Editor-baked presentation-boundary mesh
+  (format `2`) intersected with the solved gravity plane via shared
+  `FloodMeshPlaneIntersection`. Occupancy voxels still drive capacity and plane
+  height; format `1` assets keep the voxel-contour fallback.
+- Replaced the Baked Geometry stepped chamber with a closed elliptical bowl /
+  hull-section source mesh (curved horizontal waterlines), shipped
+  `FloodVolumeAuthoring` bake path, `HullSectionFloodVolumeData`, Play Mode
+  baked-cell toggle (**B**), pause/roll keys, and a Game-view HUD for capacity,
+  fill, resolution, and retained cells.
 - Redesigned Flood Mass Integration into a cutaway four-compartment barge with
   visible `FloodCubeSurfaceRenderer` water, Game-view dry/flood/combined COM
   markers, keyboard presets and auto-demo, and HUD mass/attitude readout.

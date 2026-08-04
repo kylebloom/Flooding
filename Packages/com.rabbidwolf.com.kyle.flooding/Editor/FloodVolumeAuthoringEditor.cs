@@ -54,6 +54,33 @@ namespace Kyle.Flooding.Editor
                 EditorGUILayout.LabelField(
                     "Approximation Indicator",
                     $"{data.EstimatedApproximationVolume:0.###} m³");
+                EditorGUILayout.LabelField(
+                    "Bake Format",
+                    data.FormatVersion.ToString());
+                if (data.HasPresentationBoundary)
+                {
+                    EditorGUILayout.LabelField(
+                        "Presentation Boundary",
+                        $"{data.PresentationBoundaryVertexCount:N0} vertices, "
+                        + $"{data.PresentationBoundaryTriangleCount:N0} triangles");
+
+                    if (data.PresentationBoundaryTriangleCount
+                        > FloodVolumeData
+                            .PresentationBoundaryTriangleWarningThreshold)
+                    {
+                        EditorGUILayout.HelpBox(
+                            "Presentation boundary is very dense. Prefer a simpler "
+                            + "closed authoring mesh for package samples and "
+                            + "gameplay bakes.",
+                            MessageType.Warning);
+                    }
+                }
+                else
+                {
+                    EditorGUILayout.LabelField(
+                        "Presentation Boundary",
+                        "None (voxel free-surface fallback)");
+                }
             }
 
             if (!GUILayout.Button("Bake Closed Mesh To Flood Volume Data"))

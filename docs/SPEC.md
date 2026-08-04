@@ -309,11 +309,14 @@ preserve current volume, and clamp that volume to the new capacity.
 ### Editor-baked complex geometry
 
 `FloodVolumeData` publicly exposes version/usability, local bounds, capacity,
-full-volume centroid, generic sample count and XYZ resolution, and an estimated
-approximation volume. Serialized grid and occupied-index details are internal.
+full-volume centroid, generic sample count and XYZ resolution, an estimated
+approximation volume, and whether a presentation boundary is present. Serialized
+grid, occupied-index, and presentation-boundary mesh details are internal.
+Format version `1` is occupancy-only; format version `2` adds an optional
+volume-local presentation-boundary triangle mesh. `IsUsable` accepts both.
 An internal implementation answers `IFloodVolumeGeometry` queries for every
 finite non-zero local plane. Source mesh vertices and triangles are never read
-by runtime code.
+from live Mesh Filters at runtime.
 
 The Editor baker transforms one readable source Mesh Filter into the target
 `FloodVolume` local space. The source must be a closed manifold triangle mesh:
@@ -341,9 +344,14 @@ resolution marks the bake stale in the Editor. Missing or unsupported data is
 invalid in Baked Data mode. Runtime may switch to another previously baked
 asset with `ConfigureBakedGeometry`; runtime mutation or rebaking is unsupported.
 
-Baked surface intersection data uses one ordered convex contour per intersected
-occupied cell. `FloodBakedSurfaceRenderer` consumes those contours as focused
-free-surface patches and intentionally does not reconstruct source-mesh walls.
+Baked free-surface contours prefer plane ∩ presentation-boundary mesh (format
+`2`), stitched into one or more closed contours by the shared mesh-plane
+intersection helper. Occupancy voxels still determine capacity, submerged
+volume, and the solved surface plane. Therefore the visible footprint can be
+more accurate than the voxel volume approximation. Format `1` assets without a
+presentation boundary fall back to one ordered contour per intersected occupied
+cell. `FloodBakedSurfaceRenderer` consumes those contours as focused free-surface
+patches. Hole loops (inner contours) are a known triangulation limitation.
 
 ## Presentation
 

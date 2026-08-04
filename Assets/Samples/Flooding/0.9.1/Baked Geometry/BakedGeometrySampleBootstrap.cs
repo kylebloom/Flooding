@@ -109,9 +109,17 @@ namespace Kyle.Flooding.Samples
                 ? $"{resolution.x:0.##} × {resolution.y:0.##} × {resolution.z:0.##} m"
                 : "n/a";
 
-            const float boxWidth = 420f;
+            var hasBoundary = data != null && data.HasPresentationBoundary;
+            var surfaceLabel = hasBoundary
+                ? "Source mesh bake"
+                : "Voxel cells (legacy)";
+            var cellsLabel = showBakedCells
+                ? "Baked cells shown"
+                : "Baked cells hidden";
+
+            const float boxWidth = 440f;
             var boxX = 16f;
-            GUI.Box(new Rect(boxX, 16f, boxWidth, 228f), "Baked Geometry");
+            GUI.Box(new Rect(boxX, 16f, boxWidth, 268f), "Baked Geometry");
             GUI.Label(
                 new Rect(boxX + 14f, 44f, boxWidth - 28f, 20f),
                 $"Capacity:       {capacity,8:F2} m³");
@@ -128,12 +136,20 @@ namespace Kyle.Flooding.Samples
                 new Rect(boxX + 14f, 132f, boxWidth - 28f, 20f),
                 $"Retained cells:  {sampleCount}");
             GUI.Label(
-                new Rect(boxX + 14f, 160f, boxWidth - 28f, 20f),
-                paused ? "Paused" : "Running");
+                new Rect(boxX + 14f, 156f, boxWidth - 28f, 20f),
+                "Simulation geometry: Voxel occupancy");
             GUI.Label(
-                new Rect(boxX + 14f, 184f, boxWidth - 28f, 40f),
+                new Rect(boxX + 14f, 176f, boxWidth - 28f, 20f),
+                $"Surface boundary:     {surfaceLabel}");
+            GUI.Label(
+                new Rect(boxX + 14f, 196f, boxWidth - 28f, 20f),
+                paused
+                    ? $"Paused — {cellsLabel}"
+                    : $"Running — {cellsLabel}");
+            GUI.Label(
+                new Rect(boxX + 14f, 220f, boxWidth - 28f, 40f),
                 "[Space] Pause   [B] Show baked cells   [R] Toggle roll\n"
-                + "Authoring source mesh is baked once; runtime reads cells only.");
+                + "Voxels answer quantity; boundary answers footprint shape.");
         }
 
         private void OnValidate()

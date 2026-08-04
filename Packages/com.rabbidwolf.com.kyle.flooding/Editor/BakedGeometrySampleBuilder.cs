@@ -25,11 +25,11 @@ namespace Kyle.Flooding.Editor
         private const float HalfWidth = 2f;
         private const float Height = 2.5f;
         private const float HalfLength = 1.5f;
-        // Deep bilge so retained cells leave empty bottom corners inside the AABB.
-        private const float BilgeRadius = 1.35f;
-        private const float CellResolution = 0.4f;
-        private const int BilgeSegments = 10;
-        private const int LengthSegments = 4;
+        // Ellipsoid bowl so horizontal free-surface footprints are curved (not
+        // rectangles from a Z-extruded U-section).
+        private const float CellResolution = 0.35f;
+        private const int RadialSegments = 32;
+        private const int HeightSegments = 12;
 
         [MenuItem("Flooding/Internal/Build Baked Geometry Sample", priority = 2002)]
         public static void Build()
@@ -217,39 +217,69 @@ namespace Kyle.Flooding.Editor
 
         private static Mesh BuildHullSectionMesh()
         {
-            var profile = BuildHullProfile();
-            var ringCount = LengthSegments + 1;
-            var pointsPerRing = profile.Count;
-            var vertices = new List<Vector3>(ringCount * pointsPerRing);
+            // Closed elliptical bowl with a flat deck. Horizontal free-surface
+            // footprints are ellipses — unlike a Z-extruded U-section, whose
+            // waterline is always a rectangle.
+            var radiusX = HalfWidth;
+            var radiusY = Height * 0.5f;
+            var radiusZ = HalfLength;
+            var deckY = radiusY * 0.25f;
+            var keelY = -radiusY;
+
+            var vertices = new List<Vector3>();
             var triangles = new List<int>();
 
-            for (var ring = 0; ring < ringCount; ring++)
+            // Keel pole.
+            vertices.Add(new Vector3(0f, keelY, 0f));
+            var keelIndex = 0;
+
+            // Bowl rings from just above the keel up to the deck.
+            for (var ring = 1; ring <= HeightSegments; ring++)
             {
-                var z = Mathf.Lerp(
-                    -HalfLength,
-                    HalfLength,
-                    ring / (float)LengthSegments);
-                for (var point = 0; point < pointsPerRing; point++)
+                var t = ring / (float)HeightSegments;
+                var y = Mathf.Lerp(keelY, deckY, t);
+                var scale = Mathf.Sqrt(
+                    Mathf.Max(0f, 1f - ((y * y) / (radiusY * radiusY))));
+                var ringRadiusX = radiusX * scale;
+                var ringRadiusZ = radiusZ * scale;
+
+                for (var segment = 0; segment < RadialSegments; segment++)
                 {
-                    var profilePoint = profile[point];
+                    var angle = (segment / (float)RadialSegments) * Mathf.PI * 2f;
                     vertices.Add(new Vector3(
-                        profilePoint.x,
-                        profilePoint.y - (Height * 0.5f),
-                        z));
+                        Mathf.Cos(angle) * ringRadiusX,
+                        y,
+                        Mathf.Sin(angle) * ringRadiusZ));
                 }
             }
 
-            for (var ring = 0; ring < LengthSegments; ring++)
+            // Deck center.
+            var deckCenterIndex = vertices.Count;
+            vertices.Add(new Vector3(0f, deckY, 0f));
+
+            // Keel pole to first ring.
+            for (var segment = 0; segment < RadialSegments; segment++)
             {
-                var ringStart = ring * pointsPerRing;
-                var nextRingStart = (ring + 1) * pointsPerRing;
-                for (var point = 0; point < pointsPerRing; point++)
+                var next = (segment + 1) % RadialSegments;
+                var first = 1 + segment;
+                var second = 1 + next;
+                triangles.Add(keelIndex);
+                triangles.Add(second);
+                triangles.Add(first);
+            }
+
+            // Bowl side quads between rings.
+            for (var ring = 0; ring < HeightSegments - 1; ring++)
+            {
+                var ringStart = 1 + (ring * RadialSegments);
+                var nextRingStart = 1 + ((ring + 1) * RadialSegments);
+                for (var segment = 0; segment < RadialSegments; segment++)
                 {
-                    var nextPoint = (point + 1) % pointsPerRing;
-                    var first = ringStart + point;
-                    var second = ringStart + nextPoint;
-                    var third = nextRingStart + nextPoint;
-                    var fourth = nextRingStart + point;
+                    var next = (segment + 1) % RadialSegments;
+                    var first = ringStart + segment;
+                    var second = ringStart + next;
+                    var third = nextRingStart + next;
+                    var fourth = nextRingStart + segment;
                     triangles.Add(first);
                     triangles.Add(second);
                     triangles.Add(third);
@@ -259,16 +289,15 @@ namespace Kyle.Flooding.Editor
                 }
             }
 
-            CapProfile(
-                triangles,
-                ringOffset: 0,
-                pointsPerRing,
-                reverse: true);
-            CapProfile(
-                triangles,
-                ringOffset: LengthSegments * pointsPerRing,
-                pointsPerRing,
-                reverse: false);
+            // Flat deck fan (inward / downward-facing from outside).
+            var deckRingStart = 1 + ((HeightSegments - 1) * RadialSegments);
+            for (var segment = 0; segment < RadialSegments; segment++)
+            {
+                var next = (segment + 1) % RadialSegments;
+                triangles.Add(deckCenterIndex);
+                triangles.Add(deckRingStart + segment);
+                triangles.Add(deckRingStart + next);
+            }
 
             var mesh = new Mesh
             {
@@ -279,73 +308,6 @@ namespace Kyle.Flooding.Editor
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
             return mesh;
-        }
-
-        private static List<Vector2> BuildHullProfile()
-        {
-            // CCW when viewed from +Z: keel → starboard bilge/wall → deck → port wall/bilge.
-            var profile = new List<Vector2>();
-            var flatHalf = Mathf.Max(0.05f, HalfWidth - BilgeRadius);
-
-            profile.Add(new Vector2(-flatHalf, 0f));
-            profile.Add(new Vector2(flatHalf, 0f));
-
-            var starboardCenter = new Vector2(flatHalf, BilgeRadius);
-            for (var segment = 1; segment <= BilgeSegments; segment++)
-            {
-                var angle = Mathf.Lerp(
-                    -Mathf.PI * 0.5f,
-                    0f,
-                    segment / (float)BilgeSegments);
-                profile.Add(starboardCenter + new Vector2(
-                    Mathf.Cos(angle) * BilgeRadius,
-                    Mathf.Sin(angle) * BilgeRadius));
-            }
-
-            profile.Add(new Vector2(HalfWidth, Height));
-            profile.Add(new Vector2(-HalfWidth, Height));
-            profile.Add(new Vector2(-HalfWidth, BilgeRadius));
-
-            var portCenter = new Vector2(-flatHalf, BilgeRadius);
-            // Exclude the final angle (3π/2): it duplicates the keel-port start point.
-            for (var segment = 1; segment < BilgeSegments; segment++)
-            {
-                var angle = Mathf.Lerp(
-                    Mathf.PI,
-                    Mathf.PI * 1.5f,
-                    segment / (float)BilgeSegments);
-                profile.Add(portCenter + new Vector2(
-                    Mathf.Cos(angle) * BilgeRadius,
-                    Mathf.Sin(angle) * BilgeRadius));
-            }
-
-            return profile;
-        }
-
-        private static void CapProfile(
-            List<int> triangles,
-            int ringOffset,
-            int pointsPerRing,
-            bool reverse)
-        {
-            for (var point = 1; point < pointsPerRing - 1; point++)
-            {
-                var first = ringOffset;
-                var second = ringOffset + point;
-                var third = ringOffset + point + 1;
-                if (reverse)
-                {
-                    triangles.Add(first);
-                    triangles.Add(third);
-                    triangles.Add(second);
-                }
-                else
-                {
-                    triangles.Add(first);
-                    triangles.Add(second);
-                    triangles.Add(third);
-                }
-            }
         }
 
         private static Mesh CreateOccupiedCellsMesh(FloodVolumeData data)

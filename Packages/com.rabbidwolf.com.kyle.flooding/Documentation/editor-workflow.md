@@ -415,13 +415,16 @@ regenerate the authored hierarchy.
   compartment geometry on each child `FloodVolume`.
 - **Baked Geometry**: Unity copies it to
   `Assets/Samples/Flooding/0.9.1/Baked Geometry`. Open `BakedGeometry.unity`
-  there and enter Play Mode. The sample shows a closed curved hull-section
-  interior with its authored source mesh, `FloodVolumeAuthoring`, and
-  `HullSectionFloodVolumeData`. `BakedGeometrySampleBootstrap` supplies optional
-  fill/roll, a Game-view HUD, **Space** pause, **B** baked-cell toggle, and
-  **R** roll toggle. Clear **Animate Fill** or **Animate Roll** independently.
-  `FloodBakedSurfaceRenderer` generates only the transient free-surface mesh at
-  runtime from immutable baked data; runtime does not analyze the source mesh.
+  there and enter Play Mode. The sample shows a closed elliptical bowl /
+  hull-section interior (curved horizontal waterlines) with its authored source
+  mesh, `FloodVolumeAuthoring`, and `HullSectionFloodVolumeData`.
+  `BakedGeometrySampleBootstrap` supplies optional fill/roll, a Game-view HUD,
+  **Space** pause, **B** baked-cell toggle, and **R** roll toggle. Clear
+  **Animate Fill** or **Animate Roll** independently. `FloodBakedSurfaceRenderer`
+  generates the free-surface mesh from the solved gravity plane intersected with
+  the bake's presentation-boundary mesh when present (voxel-cell contours remain
+  the format-1 fallback). Runtime does not analyze a live source mesh. HUD lines
+  separate voxel simulation geometry from surface-boundary presentation.
 - **Connected Compartments**: Unity copies it to
   `Assets/Samples/Flooding/0.9.1/Connected Compartments`. Open
   `ConnectedCompartments.unity` there and enter Play Mode. Water moves from the

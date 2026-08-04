@@ -9,8 +9,9 @@ Open `BakedGeometry.unity` from that imported folder, then enter Play Mode.
 
 ## What this sample teaches
 
-Baked Data can flood a **closed curved hull-section interior** that is not a
-rectangular prism and is not a horizontal polygon extruded along local Y.
+Baked Data can flood a **closed elliptical bowl / hull-section interior** that
+is not a rectangular prism and is not a horizontal polygon extruded along local
+Y. Horizontal free-surface footprints are ellipses that follow the curved wall.
 
 ```text
 Rectangular Prism   ❌
@@ -18,9 +19,14 @@ Extruded Polygon    ❌
 Baked Geometry      ✅
 ```
 
-The Editor bakes occupancy cells once from a readable closed source mesh.
-Runtime queries only that immutable `FloodVolumeData` asset—no source-mesh
-analysis in Play Mode or player builds.
+The Editor bakes occupancy cells and a presentation-boundary copy of the closed
+source mesh once. Runtime queries only that immutable `FloodVolumeData`
+asset—no live source-mesh analysis in Play Mode or player builds.
+
+**Voxels answer quantity** (capacity, fill, solved plane height).
+**The baked boundary answers footprint shape** (water edges follow the hull
+curve). The visual footprint can therefore look more accurate than the voxel
+volume approximation.
 
 ## Expected behavior
 

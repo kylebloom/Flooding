@@ -8,13 +8,23 @@ namespace Kyle.Flooding
     /// <summary>
     /// Immutable, Editor-baked representation of a closed floodable volume.
     /// Runtime code reads this asset but never analyzes its source mesh.
+    /// Occupancy cells answer quantity; optional presentation-boundary triangles
+    /// answer free-surface footprint shape.
     /// </summary>
     [CreateAssetMenu(
         fileName = "FloodVolumeData",
         menuName = "Flooding/Flood Volume Data")]
     public sealed class FloodVolumeData : ScriptableObject
     {
-        internal const int CurrentFormatVersion = 1;
+        /// <summary>
+        /// Format for bakes that include optional presentation-boundary mesh data.
+        /// </summary>
+        internal const int CurrentFormatVersion = 2;
+
+        /// <summary>Legacy occupancy-only bake format.</summary>
+        internal const int LegacyFormatVersion = 1;
+
+        private const int PresentationBoundaryTriangleWarning = 50000;
 
         [SerializeField]
         private int formatVersion;
@@ -46,7 +56,15 @@ namespace Kyle.Flooding
         [SerializeField]
         private string sourceFingerprint = string.Empty;
 
+        [SerializeField]
+        private Vector3[] presentationBoundaryVertices = Array.Empty<Vector3>();
+
+        [SerializeField]
+        private int[] presentationBoundaryTriangles = Array.Empty<int>();
+
         private ReadOnlyCollection<int> readOnlyOccupiedCells;
+        private ReadOnlyCollection<Vector3> readOnlyPresentationVertices;
+        private ReadOnlyCollection<int> readOnlyPresentationTriangles;
 
         /// <summary>Gets the serialized bake format version.</summary>
         public int FormatVersion => formatVersion;
@@ -74,9 +92,19 @@ namespace Kyle.Flooding
         /// </summary>
         public double EstimatedApproximationVolume => estimatedBoundaryVolume;
 
+        /// <summary>
+        /// Gets whether a usable presentation-boundary mesh is present for
+        /// free-surface footprint generation.
+        /// </summary>
+        public bool HasPresentationBoundary =>
+            ValidatePresentationBoundary(
+                presentationBoundaryVertices,
+                presentationBoundaryTriangles);
+
         /// <summary>Gets whether this asset contains supported baked data.</summary>
         public bool IsUsable =>
-            formatVersion == CurrentFormatVersion
+            (formatVersion == LegacyFormatVersion
+                || formatVersion == CurrentFormatVersion)
             && gridSize.x > 0
             && gridSize.y > 0
             && gridSize.z > 0
@@ -100,13 +128,34 @@ namespace Kyle.Flooding
 
         internal string SourceFingerprint => sourceFingerprint;
 
+        internal IReadOnlyList<Vector3> PresentationBoundaryVertices =>
+            readOnlyPresentationVertices ??=
+                Array.AsReadOnly(
+                    presentationBoundaryVertices ?? Array.Empty<Vector3>());
+
+        internal IReadOnlyList<int> PresentationBoundaryTriangles =>
+            readOnlyPresentationTriangles ??=
+                Array.AsReadOnly(
+                    presentationBoundaryTriangles ?? Array.Empty<int>());
+
+        internal int PresentationBoundaryVertexCount =>
+            presentationBoundaryVertices?.Length ?? 0;
+
+        internal int PresentationBoundaryTriangleCount =>
+            (presentationBoundaryTriangles?.Length ?? 0) / 3;
+
+        internal static int PresentationBoundaryTriangleWarningThreshold =>
+            PresentationBoundaryTriangleWarning;
+
         internal void Initialize(
             Bounds newLocalBounds,
             Vector3 newCellSize,
             Vector3Int newGridSize,
             int[] newOccupiedCellIndices,
             int newBoundaryCellCount,
-            string newSourceFingerprint)
+            string newSourceFingerprint,
+            Vector3[] newPresentationBoundaryVertices = null,
+            int[] newPresentationBoundaryTriangles = null)
         {
             if (newOccupiedCellIndices == null)
                 throw new ArgumentNullException(nameof(newOccupiedCellIndices));
@@ -115,7 +164,6 @@ namespace Kyle.Flooding
                     "A bake must contain at least one occupied cell.",
                     nameof(newOccupiedCellIndices));
 
-            formatVersion = CurrentFormatVersion;
             localBounds = newLocalBounds;
             cellSize = newCellSize;
             gridSize = newGridSize;
@@ -124,6 +172,27 @@ namespace Kyle.Flooding
             boundaryCellCount = Math.Max(0, newBoundaryCellCount);
             sourceFingerprint = newSourceFingerprint ?? string.Empty;
             readOnlyOccupiedCells = null;
+            readOnlyPresentationVertices = null;
+            readOnlyPresentationTriangles = null;
+
+            var hasBoundary = ValidatePresentationBoundary(
+                newPresentationBoundaryVertices,
+                newPresentationBoundaryTriangles);
+
+            if (hasBoundary)
+            {
+                formatVersion = CurrentFormatVersion;
+                presentationBoundaryVertices =
+                    (Vector3[])newPresentationBoundaryVertices.Clone();
+                presentationBoundaryTriangles =
+                    (int[])newPresentationBoundaryTriangles.Clone();
+            }
+            else
+            {
+                formatVersion = LegacyFormatVersion;
+                presentationBoundaryVertices = Array.Empty<Vector3>();
+                presentationBoundaryTriangles = Array.Empty<int>();
+            }
 
             var cellVolume =
                 (double)cellSize.x * cellSize.y * cellSize.z;
@@ -171,6 +240,61 @@ namespace Kyle.Flooding
             }
 
             return true;
+        }
+
+        private static bool ValidatePresentationBoundary(
+            Vector3[] vertices,
+            int[] triangles)
+        {
+            if (vertices == null
+                || triangles == null
+                || vertices.Length < 3
+                || triangles.Length < 3
+                || triangles.Length % 3 != 0)
+            {
+                return false;
+            }
+
+            for (var index = 0; index < vertices.Length; index++)
+            {
+                var vertex = vertices[index];
+                if (!float.IsFinite(vertex.x)
+                    || !float.IsFinite(vertex.y)
+                    || !float.IsFinite(vertex.z))
+                {
+                    return false;
+                }
+            }
+
+            var hasNonDegenerate = false;
+            var areaTolerance =
+                FloodGeometryTolerances.Position
+                * FloodGeometryTolerances.Position;
+
+            for (var index = 0; index < triangles.Length; index += 3)
+            {
+                var first = triangles[index];
+                var second = triangles[index + 1];
+                var third = triangles[index + 2];
+
+                if (first < 0
+                    || first >= vertices.Length
+                    || second < 0
+                    || second >= vertices.Length
+                    || third < 0
+                    || third >= vertices.Length)
+                {
+                    return false;
+                }
+
+                var areaVector = Vector3.Cross(
+                    vertices[second] - vertices[first],
+                    vertices[third] - vertices[first]);
+                if (areaVector.sqrMagnitude > areaTolerance)
+                    hasNonDegenerate = true;
+            }
+
+            return hasNonDegenerate;
         }
     }
 }

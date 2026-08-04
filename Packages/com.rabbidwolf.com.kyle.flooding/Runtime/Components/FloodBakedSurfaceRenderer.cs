@@ -4,8 +4,10 @@ using UnityEngine;
 namespace Kyle.Flooding
 {
     /// <summary>
-    /// Presents the free surface of baked geometry without reconstructing the
-    /// source mesh.
+    /// Presents the free surface of baked geometry. Volume comes from occupancy
+    /// cells; when the bake includes a presentation boundary, contours are the
+    /// gravity plane intersected with that immutable boundary mesh rather than
+    /// per-cell voxel patches. Runtime never analyzes a live source Mesh Filter.
     /// </summary>
     public sealed class FloodBakedSurfaceRenderer : FloodSurfaceRenderer
     {

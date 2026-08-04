@@ -508,6 +508,8 @@ phase begins:
 - Added Edit Mode density/flow coverage, Play Mode external-boundary coverage,
   and the Hull Breach sample.
 - Phase 9 Unity regression verification remains pending.
+- Baked free surfaces use presentation-boundary mesh ∩ plane (format 2) while
+  occupancy voxels remain the quantity solver; format 1 keeps voxel contours.
 - Implemented Phase 10 optional presentation consumers:
   `FloodConnectionVisual`, `FloodConnectionAudio`, `FloodSourceAudio`, and
   `FloodVolumeAudio`, plus intensity mapping helpers and Play Mode

@@ -70,6 +70,61 @@ namespace Kyle.Flooding.Tests
             Assert.That(data.Capacity, Is.EqualTo(2d));
             Assert.That(data.EstimatedApproximationVolume, Is.EqualTo(2d));
             Assert.That(data.IsUsable, Is.True);
+            Assert.That(
+                data.FormatVersion,
+                Is.EqualTo(FloodVolumeData.LegacyFormatVersion));
+            Assert.That(data.HasPresentationBoundary, Is.False);
+
+            UnityEngine.Object.DestroyImmediate(data);
+        }
+
+        [Test]
+        public void BakedData_WithPresentationBoundary_UsesBoundarySurfaceNotVoxelPatches()
+        {
+            var box = CreateUnitBoxBoundary();
+            var data = ScriptableObject.CreateInstance<FloodVolumeData>();
+            data.Initialize(
+                new Bounds(Vector3.zero, Vector3.one * 2f),
+                Vector3.one,
+                new Vector3Int(2, 2, 2),
+                new[] { 0, 1, 2, 3, 4, 5, 6, 7 },
+                newBoundaryCellCount: 8,
+                newSourceFingerprint: "boundary-test",
+                box.vertices,
+                box.triangles);
+
+            Assert.That(
+                data.FormatVersion,
+                Is.EqualTo(FloodVolumeData.CurrentFormatVersion));
+            Assert.That(data.HasPresentationBoundary, Is.True);
+
+            var geometry = new BakedFloodGeometry(data);
+            var plane = new Plane(Vector3.up, new Vector3(0f, 0f, 0f));
+            var result = geometry.EvaluateSubmersion(plane);
+
+            Assert.That(result.Volume, Is.EqualTo(4d).Within(0.00001d));
+            Assert.That(result.SurfaceIntersection.HasSurface, Is.True);
+            Assert.That(result.SurfaceIntersection.Contours.Count, Is.EqualTo(1));
+            Assert.That(
+                result.SurfaceIntersection.Contours[0].Vertices.Count,
+                Is.EqualTo(4));
+
+            UnityEngine.Object.DestroyImmediate(data);
+        }
+
+        [Test]
+        public void BakedData_WithoutPresentationBoundary_FallsBackToVoxelContours()
+        {
+            var data = CreateFilledData(new Vector3Int(2, 2, 2));
+            var geometry = new BakedFloodGeometry(data);
+            var plane = new Plane(Vector3.up, Vector3.zero);
+            var result = geometry.EvaluateSubmersion(plane);
+
+            Assert.That(data.HasPresentationBoundary, Is.False);
+            Assert.That(result.SurfaceIntersection.HasSurface, Is.True);
+            Assert.That(
+                result.SurfaceIntersection.Contours.Count,
+                Is.GreaterThan(1));
 
             UnityEngine.Object.DestroyImmediate(data);
         }
@@ -185,6 +240,31 @@ namespace Kyle.Flooding.Tests
                 newBoundaryCellCount: 0,
                 newSourceFingerprint: "test");
             return data;
+        }
+
+        private static (Vector3[] vertices, int[] triangles) CreateUnitBoxBoundary()
+        {
+            var vertices = new[]
+            {
+                new Vector3(-1f, -1f, -1f),
+                new Vector3(1f, -1f, -1f),
+                new Vector3(1f, 1f, -1f),
+                new Vector3(-1f, 1f, -1f),
+                new Vector3(-1f, -1f, 1f),
+                new Vector3(1f, -1f, 1f),
+                new Vector3(1f, 1f, 1f),
+                new Vector3(-1f, 1f, 1f),
+            };
+            var triangles = new[]
+            {
+                0, 2, 1, 0, 3, 2,
+                4, 5, 6, 4, 6, 7,
+                0, 1, 5, 0, 5, 4,
+                3, 7, 6, 3, 6, 2,
+                0, 4, 7, 0, 7, 3,
+                1, 2, 6, 1, 6, 5,
+            };
+            return (vertices, triangles);
         }
     }
 }
