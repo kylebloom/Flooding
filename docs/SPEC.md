@@ -307,9 +307,12 @@ participate in simulation ticks and does not mutate flood state.
   viewpoint: prefer submerged candidates, then greatest submersion depth,
   then registration order.
 - Overlapping compartments are ambiguous and are not physically merged.
+- Auto-discover resolves `FloodSimulationManager` from a parent or
+  `FindAnyObjectByType`, retries about twice per second while null, and
+  retries again after scene loads.
 - `IsUnderwater` uses configurable signed-distance hysteresis (defaults
   enter `-0.02` m, exit `+0.02` m) and is never true outside the active
-  compartment.
+  compartment. Threshold setters keep `enter <= exit`.
 
 ## URP underwater presentation
 

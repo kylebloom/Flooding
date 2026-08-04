@@ -3,7 +3,7 @@
 Import **Flood Mass Integration** from **Window > Package Management > Package
 Manager > Flooding > Samples**. Unity copies it to:
 
-`Assets/Samples/Flooding/0.9.1/Flood Mass Integration`
+`Assets/Samples/Flooding/0.10.0/Flood Mass Integration`
 
 Open `FloodMassRollPitch.unity` from that imported folder, then enter Play Mode.
 
@@ -83,7 +83,7 @@ The Package Manager imports a copy; it does not keep the scene synchronized
 with `Packages/com.rabbidwolf.com.kyle.flooding/Samples~/Mass Integration`.
 Back up any edits made under `Assets/Samples` before refreshing the sample.
 Then delete only the imported
-`Assets/Samples/Flooding/0.9.1/Flood Mass Integration` folder and click
+`Assets/Samples/Flooding/0.10.0/Flood Mass Integration` folder and click
 **Import** for **Flood Mass Integration** again in the package's **Samples**
 list.
 

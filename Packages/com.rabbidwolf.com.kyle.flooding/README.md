@@ -1,7 +1,7 @@
 # Flooding
 
 Flooding is a reusable, gameplay-focused flooding simulation package for Unity
-6.5. The current `0.9.1` prototype models gravity-aligned water volume inside
+6.5. The current `0.10.0` prototype models gravity-aligned water volume inside
 rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
 
 ## Current features
@@ -198,7 +198,7 @@ are visible and editable before Play Mode; entering Play Mode adds only
 transient simulation or presentation state.
 
 - **Flood Mass Integration** imports to
-  `Assets/Samples/Flooding/0.9.1/Flood Mass Integration`. Open
+  `Assets/Samples/Flooding/0.10.0/Flood Mass Integration`. Open
   `FloodMassRollPitch.unity` there and enter Play Mode. A cutaway
   four-compartment barge renders visible water with
   `FloodCubeSurfaceRenderer`, shifts Rigidbody center of mass through
@@ -208,7 +208,7 @@ transient simulation or presentation state.
   COM markers and a HUD show dry, flood, and combined centers. This is not
   production buoyancy.
 - **Baked Geometry** imports to
-  `Assets/Samples/Flooding/0.9.1/Baked Geometry`. Open `BakedGeometry.unity`
+  `Assets/Samples/Flooding/0.10.0/Baked Geometry`. Open `BakedGeometry.unity`
   there and enter Play Mode. A curved hull-section compartment ships its
   authoring source mesh and bake asset; optional fill/roll, a HUD, and **B**
   baked-cell visualization show why Baked Data is needed versus prism/extruded
@@ -217,14 +217,14 @@ transient simulation or presentation state.
   gravity plane intersected with the bake's presentation-boundary mesh (voxel
   contours remain the legacy fallback) and aligned to gravity.
 - **Connected Compartments** imports to
-  `Assets/Samples/Flooding/0.9.1/Connected Compartments`. Open
+  `Assets/Samples/Flooding/0.10.0/Connected Compartments`. Open
   `ConnectedCompartments.unity` there and enter Play Mode to see conserved,
   bidirectional pressure-driven flow equalize two finite compartments. Tune
   scheduling on `FloodSimulationManager`, dimensions and initial cubic meters
   on the two `FloodVolume` components, and opening behavior on
   `FloodConnection`. `FloodConnectionVisual` drives the live flow arrow; the
   sample bootstrap only updates water cubes and the Game-view readout.
-- **Hull Breach** imports to `Assets/Samples/Flooding/0.9.1/Hull Breach`. Open
+- **Hull Breach** imports to `Assets/Samples/Flooding/0.10.0/Hull Breach`. Open
   `HullBreach.unity` there and enter Play Mode to watch ocean head drive
   inflow into an empty compartment, approach equalization, reverse to outflow
   when the interior is higher, and stop when the connection is closed.
@@ -234,7 +234,7 @@ transient simulation or presentation state.
   `ExternalFluidBoundary`, compartment state on `FloodVolume`, and opening
   fields on `FloodConnection`.
 - **First Person Flooding** imports to
-  `Assets/Samples/Flooding/0.9.1/First Person Flooding`. Open
+  `Assets/Samples/Flooding/0.10.0/First Person Flooding`. Open
   `FirstPersonFlooding.unity` for a rising enclosed-room flood from first
   person with `FloodCameraTracker`, optional URP waterline/underwater effects,
   audio muffling, and telemetry. Enable the URP Depth Texture and Flood

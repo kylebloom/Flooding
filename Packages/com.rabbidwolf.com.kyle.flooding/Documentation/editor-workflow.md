@@ -1,6 +1,6 @@
 # Unity Editor workflow
 
-This guide describes how to use Flooding `0.9.1` in Unity
+This guide describes how to use Flooding `0.10.0` in Unity
 `6000.5.6f1`.
 
 Use this document as the practical how-to. Start with
@@ -59,7 +59,7 @@ Best when you want a complete authored hierarchy to inspect and edit.
 1. Open **Window > Package Management > Package Manager**.
 2. Select **Flooding** in the package list.
 3. Open the **Samples** tab and import one sample.
-4. Open the imported scene under `Assets/Samples/Flooding/0.9.1/...`.
+4. Open the imported scene under `Assets/Samples/Flooding/0.10.0/...`.
 5. Enter Play Mode, then stop and edit Inspector fields before playing again.
 
 | Sample | What it teaches |
@@ -433,7 +433,7 @@ Mode starts simulation and transient presentation updates; it does not
 regenerate the authored hierarchy.
 
 - **Flood Mass Integration**: Unity copies it to
-  `Assets/Samples/Flooding/0.9.1/Flood Mass Integration`. Open
+  `Assets/Samples/Flooding/0.10.0/Flood Mass Integration`. Open
   `FloodMassRollPitch.unity` there and enter Play Mode. A cutaway
   four-compartment barge renders gravity-aligned water with
   `FloodCubeSurfaceRenderer`, aggregates flood mass into a Rigidbody COM, and
@@ -444,7 +444,7 @@ regenerate the authored hierarchy.
   `RigidbodyFloodMassAdapter`, support response on `SampleVesselSupport`, and
   compartment geometry on each child `FloodVolume`.
 - **Baked Geometry**: Unity copies it to
-  `Assets/Samples/Flooding/0.9.1/Baked Geometry`. Open `BakedGeometry.unity`
+  `Assets/Samples/Flooding/0.10.0/Baked Geometry`. Open `BakedGeometry.unity`
   there and enter Play Mode. The sample shows a closed elliptical bowl /
   hull-section interior (curved horizontal waterlines) with its authored source
   mesh, `FloodVolumeAuthoring`, and `HullSectionFloodVolumeData`.
@@ -456,7 +456,7 @@ regenerate the authored hierarchy.
   the format-1 fallback). Runtime does not analyze a live source mesh. HUD lines
   separate voxel simulation geometry from surface-boundary presentation.
 - **Connected Compartments**: Unity copies it to
-  `Assets/Samples/Flooding/0.9.1/Connected Compartments`. Open
+  `Assets/Samples/Flooding/0.10.0/Connected Compartments`. Open
   `ConnectedCompartments.unity` there and enter Play Mode. Water moves from the
   initially higher-head compartment toward the lower-head compartment while
   total finite water volume is conserved. Tune scheduling on the root
@@ -466,7 +466,7 @@ regenerate the authored hierarchy.
   `ConnectedCompartmentsBootstrap` only updates water cubes and the Game-view
   readout.
 - **Hull Breach**: Unity copies it to
-  `Assets/Samples/Flooding/0.9.1/Hull Breach`. Open `HullBreach.unity` there
+  `Assets/Samples/Flooding/0.10.0/Hull Breach`. Open `HullBreach.unity` there
   and enter Play Mode. An `ExternalFluidBoundary` waterline exchanges water
   with one finite compartment through a `FloodConnection`.
   `FloodCubeSurfaceRenderer` presents gravity-aligned compartment water;
@@ -475,7 +475,7 @@ regenerate the authored hierarchy.
   water, or rotate the compartment to see inflow, equalization, outflow,
   closure, and gravity-aligned surfaces.
 - **First Person Flooding**: Unity copies it to
-  `Assets/Samples/Flooding/0.9.1/First Person Flooding`. Open
+  `Assets/Samples/Flooding/0.10.0/First Person Flooding`. Open
   `FirstPersonFlooding.unity` there. A `FloodSource` fills a closed room while
   a first-person camera uses `FloodCameraTracker`, optional URP underwater
   effects, audio, and telemetry. Enable Depth Texture and the Flood Underwater
@@ -486,7 +486,7 @@ creates a writable copy under `Assets/Samples` but does not synchronize that
 copy with the package source. Re-importing a sample or upgrading the package can
 overwrite edited scenes, scripts, materials, and other same-named imported
 files. Before either operation, duplicate or move each customized copy outside
-its versioned `Assets/Samples/Flooding/0.9.1/<Sample Name>` folder, or preserve
+its versioned `Assets/Samples/Flooding/0.10.0/<Sample Name>` folder, or preserve
 it in version control.
 
 ### Baked Data minimum checklist
@@ -1140,11 +1140,14 @@ presentation-only: it never advances simulation and does not render.
    - **Explicit** — assign **Explicit Volume** to one `FloodVolume`.
    - **Auto Discover Registered** — assign **Manager** to the scene's
      `FloodSimulationManager` (or leave empty to resolve a parent manager /
-     `FindAnyObjectByType` once). The tracker reads
-     `manager.RegisteredVolumes` and does not search the scene every frame.
+     `FindAnyObjectByType`). If none exists yet, the tracker retries about
+     twice per second and again when scenes load, so late-loaded simulation
+     scenes still work. Once resolved, it reads `manager.RegisteredVolumes`
+     and does not search the scene every frame.
 5. Keep the default underwater hysteresis unless you need a wider band:
    - **Enter Water Threshold Meters** = `-0.02` (must cross slightly below)
    - **Exit Water Threshold Meters** = `+0.02` (must cross slightly above)
+   - Runtime setters and Inspector validation keep **enter ≤ exit**.
 
 ### Public state
 
@@ -1310,7 +1313,7 @@ Hover any Inspector **field label** (not only the value box) to read the
 1. Select **Main Camera** (child of **Player**).
 2. On **Flood Underwater Camera Effect**, click the **Profile** object
    (`FirstPersonUnderwaterProfile`), or open
-   `Assets/Samples/Flooding/0.9.1/First Person Flooding/FirstPersonUnderwaterProfile`
+   `Assets/Samples/Flooding/0.10.0/First Person Flooding/FirstPersonUnderwaterProfile`
    in the Project window.
 3. Edit that ScriptableObject while Play Mode is running to preview changes.
 
@@ -1415,7 +1418,7 @@ enabled. The adapter does not provide buoyancy or restoring forces.
 
 To inspect a working setup, import **Flood Mass Integration** from **Window >
 Package Management > Package Manager > Flooding > Samples**, then open
-`Assets/Samples/Flooding/0.9.1/Flood Mass Integration/FloodMassRollPitch.unity`
+`Assets/Samples/Flooding/0.10.0/Flood Mass Integration/FloodMassRollPitch.unity`
 and enter Play Mode. Its `SampleVesselSupport` component is sample-only
 spring scaffolding, not production buoyancy or vessel stability. The sample
 renders visible compartment water and Game-view COM markers so the chain from

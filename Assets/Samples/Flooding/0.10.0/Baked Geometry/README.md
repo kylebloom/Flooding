@@ -3,7 +3,7 @@
 Import **Baked Geometry** from **Window > Package Management > Package Manager
 > Flooding > Samples**. Unity copies it to:
 
-`Assets/Samples/Flooding/0.9.1/Baked Geometry`
+`Assets/Samples/Flooding/0.10.0/Baked Geometry`
 
 Open `BakedGeometry.unity` from that imported folder, then enter Play Mode.
 
@@ -130,6 +130,6 @@ Package Manager sample import copies package contents into `Assets/Samples`.
 Reimporting can overwrite files with the same names, including changes to the
 scene, bootstrap, README, meshes, materials, and bake asset. Before
 reimporting, move or duplicate any edited assets outside the imported
-`Assets/Samples/Flooding/0.9.1/Baked Geometry` folder, or back them up in
+`Assets/Samples/Flooding/0.10.0/Baked Geometry` folder, or back them up in
 version control. Reimporting does not write changes back into the package's
 `Samples~` source folder.

@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: FirstPersonUnderwaterProfile
   m_EditorClassIdentifier: Kyle.Flooding.Runtime::Kyle.Flooding.FloodUnderwaterProfile
   shallowTintColor: {r: 0.45, g: 0.7, b: 0.78, a: 0.35}
-  deepTintColor: {r: 0.08, g: 0.22, b: 0.38, a: 0.72}
+  deepTintColor: {r: 0.18485224, g: 0.37189022, b: 0.5849056, a: 0.72}
   fullEffectDepthMeters: 2
-  fogDensity: 0.12
+  fogDensity: 0.15
   maximumFogStrength: 0.8
   saturation: 1.065
   contrast: 1.545

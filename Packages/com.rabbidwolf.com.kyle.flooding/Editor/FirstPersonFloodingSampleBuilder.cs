@@ -14,7 +14,7 @@ namespace Kyle.Flooding.Editor
     internal static class FirstPersonFloodingSampleBuilder
     {
         private const string SampleFolder =
-            "Assets/Samples/Flooding/0.9.1/First Person Flooding";
+            "Assets/Samples/Flooding/0.10.0/First Person Flooding";
 
         private const string PackageSampleFolder =
             "Packages/com.rabbidwolf.com.kyle.flooding/Samples~/First Person Flooding";

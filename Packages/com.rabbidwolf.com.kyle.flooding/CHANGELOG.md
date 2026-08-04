@@ -7,8 +7,12 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-08-04
+
 ### Changed
 
+- Package version and Package Manager sample import paths are now `0.10.0`
+  (`Assets/Samples/Flooding/0.10.0/...`).
 - `Kyle.Flooding.URP` is now gated with `defineConstraints` /
   `versionDefines` (`KYLE_FLOODING_URP` when Universal RP ≥ 17 is present) so
   the package compiles in Built-in / HDRP projects without URP installed.
@@ -56,6 +60,11 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `FloodCameraTracker` auto manager resolution no longer permanently gives up
+  when no `FloodSimulationManager` exists at first resolve. It retries about
+  twice per second and resets on scene load so late-loaded simulation scenes
+  are discovered. Enter/exit underwater threshold setters now enforce
+  `enter <= exit` at runtime (not only in `OnValidate`).
 - `FloodConnection` **Side A**/**Side B** now accept boundary GameObjects from
   the object picker and resolve them to `FloodVolume` or **External Fluid
   Body** components automatically.

@@ -309,6 +309,60 @@ namespace Kyle.Flooding.Tests
         }
 
         [UnityTest]
+        public IEnumerator AutoMode_ResolvesManagerSpawnedAfterTracker()
+        {
+            var trackerObject = new GameObject("Late manager tracker");
+            trackerObject.transform.position = new Vector3(0f, 0.25f, 0f);
+            var tracker = trackerObject.AddComponent<FloodCameraTracker>();
+            tracker.UpdateAutomatically = false;
+            tracker.VolumeSelectionMode =
+                FloodCameraVolumeSelectionMode.AutoDiscoverRegistered;
+            tracker.Viewpoint = trackerObject.transform;
+
+            tracker.Refresh();
+            Assert.That(tracker.Manager, Is.Null);
+            Assert.That(tracker.ActiveVolume, Is.Null);
+
+            var root = new GameObject("Late manager root");
+            var manager = root.AddComponent<FloodSimulationManager>();
+            manager.SimulateAutomatically = false;
+            var volume = root.AddComponent<FloodVolume>();
+            volume.ConfigureRectangularGeometry(2f, 2f, 2f);
+            volume.AddWater(4f);
+
+            // First failed resolve schedules a retry; wait past the interval.
+            yield return new WaitForSecondsRealtime(0.55f);
+            tracker.Refresh();
+
+            Assert.That(tracker.Manager, Is.SameAs(manager));
+            Assert.That(tracker.ActiveVolume, Is.SameAs(volume));
+            Assert.That(tracker.IsInsideFloodVolume, Is.True);
+
+            Object.Destroy(root);
+            Object.Destroy(trackerObject);
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator ThresholdSetters_EnforceEnterNotAboveExit()
+        {
+            var trackerObject = new GameObject("Threshold tracker");
+            var tracker = trackerObject.AddComponent<FloodCameraTracker>();
+
+            tracker.ExitWaterThresholdMeters = 0.01f;
+            tracker.EnterWaterThresholdMeters = 0.05f;
+
+            Assert.That(tracker.EnterWaterThresholdMeters, Is.EqualTo(0.05f));
+            Assert.That(tracker.ExitWaterThresholdMeters, Is.EqualTo(0.05f));
+
+            tracker.ExitWaterThresholdMeters = 0.01f;
+            Assert.That(tracker.ExitWaterThresholdMeters, Is.EqualTo(0.05f));
+
+            Object.Destroy(trackerObject);
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator RotatedVolume_UsesSurfacePlaneSignedDistance()
         {
             var root = new GameObject("Rotated tracker root");

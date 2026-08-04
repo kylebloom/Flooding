@@ -338,7 +338,7 @@ namespace Kyle.Flooding.Editor
             var packagePath = Path.Combine(SampleFolder, fileName)
                 .Replace('\\', '/');
             var importedPath =
-                "Assets/Samples/Flooding/0.9.1/Flood Mass Integration/"
+                "Assets/Samples/Flooding/0.10.0/Flood Mass Integration/"
                 + fileName;
             return AssetDatabase.LoadAssetAtPath<MonoScript>(importedPath)
                 ?? AssetDatabase.LoadAssetAtPath<MonoScript>(packagePath);

@@ -8,7 +8,7 @@ infinite external fluid boundary and one finite rectangular `FloodVolume`.
 Import **Hull Breach** from **Window > Package Management > Package Manager >
 Flooding > Samples**. Unity copies it to:
 
-`Assets/Samples/Flooding/0.9.1/Hull Breach`
+`Assets/Samples/Flooding/0.10.0/Hull Breach`
 
 Open `HullBreach.unity` from that imported folder and enter Play Mode. The scene
 hierarchy, component wiring, camera, light, water meshes, and presentation

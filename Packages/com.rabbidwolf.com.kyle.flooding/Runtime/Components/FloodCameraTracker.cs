@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Kyle.Flooding
 {
@@ -13,6 +14,8 @@ namespace Kyle.Flooding
     [DefaultExecutionOrder(100)]
     public sealed class FloodCameraTracker : MonoBehaviour
     {
+        private const float ManagerRetryIntervalSeconds = 0.5f;
+
         [Header("Viewpoint")]
 
         [SerializeField]
@@ -31,7 +34,7 @@ namespace Kyle.Flooding
         private FloodVolume explicitVolume;
 
         [SerializeField]
-        [Tooltip("Manager whose RegisteredVolumes list is used for Auto Discover Registered selection. Leave empty to use a parent manager or FindAnyObjectByType once.")]
+        [Tooltip("Manager whose RegisteredVolumes list is used for Auto Discover Registered selection. Leave empty to resolve a parent manager or FindAnyObjectByType, retrying periodically until one appears (supports late-loaded simulation scenes).")]
         private FloodSimulationManager manager;
 
         [Header("Underwater Hysteresis")]
@@ -52,7 +55,7 @@ namespace Kyle.Flooding
         [Tooltip("When enabled, Refresh runs automatically from LateUpdate.")]
         private bool updateAutomatically = true;
 
-        private bool resolvedManager;
+        private float nextManagerResolveUnscaledTime;
 
         /// <summary>
         /// Gets or sets the world-space viewpoint used for flood queries.
@@ -92,28 +95,40 @@ namespace Kyle.Flooding
             set
             {
                 manager = value;
-                resolvedManager = manager != null;
+                nextManagerResolveUnscaledTime = 0f;
             }
         }
 
         /// <summary>
         /// Gets or sets the signed-distance threshold for entering water
-        /// (meters).
+        /// (meters). Enforces <c>enter &lt;= exit</c> at runtime.
         /// </summary>
         public float EnterWaterThresholdMeters
         {
             get => enterWaterThresholdMeters;
-            set => enterWaterThresholdMeters = value;
+            set
+            {
+                enterWaterThresholdMeters = SanitizeThreshold(
+                    value,
+                    FloodCameraUnderwaterHysteresis.DefaultEnterWaterThresholdMeters);
+                EnforceEnterNotAboveExit();
+            }
         }
 
         /// <summary>
         /// Gets or sets the signed-distance threshold for exiting water
-        /// (meters).
+        /// (meters). Enforces <c>enter &lt;= exit</c> at runtime.
         /// </summary>
         public float ExitWaterThresholdMeters
         {
             get => exitWaterThresholdMeters;
-            set => exitWaterThresholdMeters = value;
+            set
+            {
+                exitWaterThresholdMeters = SanitizeThreshold(
+                    value,
+                    FloodCameraUnderwaterHysteresis.DefaultExitWaterThresholdMeters);
+                EnforceEnterNotAboveExit();
+            }
         }
 
         /// <summary>
@@ -203,14 +218,22 @@ namespace Kyle.Flooding
         private void Awake()
         {
             ResolveViewpointIfNeeded();
+            nextManagerResolveUnscaledTime = 0f;
             ResolveManagerIfNeeded();
         }
 
         private void OnEnable()
         {
+            SceneManager.sceneLoaded += OnSceneLoaded;
             ResolveViewpointIfNeeded();
+            nextManagerResolveUnscaledTime = 0f;
             ResolveManagerIfNeeded();
             Refresh();
+        }
+
+        private void OnDisable()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         private void LateUpdate()
@@ -221,22 +244,13 @@ namespace Kyle.Flooding
 
         private void OnValidate()
         {
-            if (float.IsNaN(enterWaterThresholdMeters)
-                || float.IsInfinity(enterWaterThresholdMeters))
-            {
-                enterWaterThresholdMeters =
-                    FloodCameraUnderwaterHysteresis.DefaultEnterWaterThresholdMeters;
-            }
-
-            if (float.IsNaN(exitWaterThresholdMeters)
-                || float.IsInfinity(exitWaterThresholdMeters))
-            {
-                exitWaterThresholdMeters =
-                    FloodCameraUnderwaterHysteresis.DefaultExitWaterThresholdMeters;
-            }
-
-            if (enterWaterThresholdMeters > exitWaterThresholdMeters)
-                exitWaterThresholdMeters = enterWaterThresholdMeters;
+            enterWaterThresholdMeters = SanitizeThreshold(
+                enterWaterThresholdMeters,
+                FloodCameraUnderwaterHysteresis.DefaultEnterWaterThresholdMeters);
+            exitWaterThresholdMeters = SanitizeThreshold(
+                exitWaterThresholdMeters,
+                FloodCameraUnderwaterHysteresis.DefaultExitWaterThresholdMeters);
+            EnforceEnterNotAboveExit();
         }
 
         /// <summary>
@@ -307,6 +321,12 @@ namespace Kyle.Flooding
                 ExitedWater?.Invoke();
         }
 
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (manager == null)
+                nextManagerResolveUnscaledTime = 0f;
+        }
+
         private FloodVolume ResolveActiveVolume(Vector3 samplePoint)
         {
             if (volumeSelectionMode == FloodCameraVolumeSelectionMode.Explicit)
@@ -346,23 +366,46 @@ namespace Kyle.Flooding
         private void ResolveManagerIfNeeded()
         {
             if (manager != null)
+                return;
+
+            if (volumeSelectionMode
+                != FloodCameraVolumeSelectionMode.AutoDiscoverRegistered)
             {
-                resolvedManager = true;
                 return;
             }
 
-            if (resolvedManager
-                || volumeSelectionMode
-                    != FloodCameraVolumeSelectionMode.AutoDiscoverRegistered)
-            {
+            if (Time.unscaledTime < nextManagerResolveUnscaledTime)
                 return;
-            }
 
             manager = GetComponentInParent<FloodSimulationManager>();
             if (manager == null)
+            {
                 manager = UnityEngine.Object.FindAnyObjectByType<FloodSimulationManager>();
+            }
 
-            resolvedManager = true;
+            if (manager == null)
+            {
+                nextManagerResolveUnscaledTime =
+                    Time.unscaledTime + ManagerRetryIntervalSeconds;
+            }
+            else
+            {
+                nextManagerResolveUnscaledTime = 0f;
+            }
+        }
+
+        private void EnforceEnterNotAboveExit()
+        {
+            if (enterWaterThresholdMeters > exitWaterThresholdMeters)
+                exitWaterThresholdMeters = enterWaterThresholdMeters;
+        }
+
+        private static float SanitizeThreshold(float value, float fallback)
+        {
+            if (float.IsNaN(value) || float.IsInfinity(value))
+                return fallback;
+
+            return value;
         }
     }
 }

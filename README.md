@@ -9,7 +9,7 @@ breaches, connected rooms, and optional Rigidbody mass integration—without
 computational fluid dynamics. Water **volume** (cubic meters) is authoritative;
 surface height, mass, and center of mass are derived.
 
-**Current version:** `0.9.1` (pre-1.0 prototype)
+**Current version:** `0.10.0` (pre-1.0 prototype)
 
 ## Requirements
 
@@ -107,7 +107,7 @@ In **Window > Package Management > Package Manager**, select **Flooding**, open
 | **Baked Geometry** | Curved hull-section bake, cell viz, gravity-aligned free surface |
 | **Flood Mass Integration** | Cutaway barge: visible water, COM markers, roll/pitch from flood mass |
 
-Imported samples copy to `Assets/Samples/Flooding/0.9.1/`. The `Samples~`
+Imported samples copy to `Assets/Samples/Flooding/0.10.0/`. The `Samples~`
 folders in the package are the authoritative sources.
 
 ## Features (summary)

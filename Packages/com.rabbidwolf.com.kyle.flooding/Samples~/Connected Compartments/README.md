@@ -8,7 +8,7 @@ This Unity 6.5 sample demonstrates bidirectional flow between two rectangular
 Import **Connected Compartments** from **Window > Package Management > Package
 Manager > Flooding > Samples**. Unity copies it to:
 
-`Assets/Samples/Flooding/0.9.1/Connected Compartments`
+`Assets/Samples/Flooding/0.10.0/Connected Compartments`
 
 Open `ConnectedCompartments.unity` from that imported folder and enter Play
 Mode. The scene hierarchy, component wiring, camera, light, water meshes, and

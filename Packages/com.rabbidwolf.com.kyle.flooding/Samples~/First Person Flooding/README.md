@@ -10,7 +10,7 @@ simulation.
 Import **First Person Flooding** from **Window > Package Management > Package
 Manager > Flooding > Samples**. Unity copies it to:
 
-`Assets/Samples/Flooding/0.9.1/First Person Flooding`
+`Assets/Samples/Flooding/0.10.0/First Person Flooding`
 
 Open `FirstPersonFlooding.unity` from that imported folder.
 

@@ -120,18 +120,18 @@ In **Window > Package Management > Package Manager**, select **Flooding**, open
 
 | Sample | Import path | Demonstrates |
 | --- | --- | --- |
-| Flood Mass Integration | `Assets/Samples/Flooding/0.9.1/Flood Mass Integration` | Cutaway barge: visible water, COM markers, roll/pitch from flood mass |
-| Baked Geometry | `Assets/Samples/Flooding/0.9.1/Baked Geometry` | Curved hull bake, cell viz, free surface |
-| Connected Compartments | `Assets/Samples/Flooding/0.9.1/Connected Compartments` | Conserved doorway equalization |
-| Hull Breach | `Assets/Samples/Flooding/0.9.1/Hull Breach` | Ocean waterline ↔ compartment exchange |
-| First Person Flooding | `Assets/Samples/Flooding/0.9.1/First Person Flooding` | Rising flood, waterline crossing, URP underwater FX |
+| Flood Mass Integration | `Assets/Samples/Flooding/0.10.0/Flood Mass Integration` | Cutaway barge: visible water, COM markers, roll/pitch from flood mass |
+| Baked Geometry | `Assets/Samples/Flooding/0.10.0/Baked Geometry` | Curved hull bake, cell viz, free surface |
+| Connected Compartments | `Assets/Samples/Flooding/0.10.0/Connected Compartments` | Conserved doorway equalization |
+| Hull Breach | `Assets/Samples/Flooding/0.10.0/Hull Breach` | Ocean waterline ↔ compartment exchange |
+| First Person Flooding | `Assets/Samples/Flooding/0.10.0/First Person Flooding` | Rising flood, waterline crossing, URP underwater FX |
 
 Each imported scene is authored and editable before Play Mode. `Samples~` in
 the package is authoritative; re-import can overwrite `Assets/Samples` copies.
 
 ## Current limitations
 
-Version `0.9.1` does not provide CFD, mixed densities in one compartment,
+Version `0.10.0` does not provide CFD, mixed densities in one compartment,
 automatic overflow-edge discovery, runtime rebaking, buoyancy forces, or
 bundled audio/particle content. Gravity-aligned surfaces are instantaneous
 equilibrium results. See the Editor workflow troubleshooting section when

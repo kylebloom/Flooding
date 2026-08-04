@@ -17,7 +17,7 @@ namespace Kyle.Flooding.Editor
         // AssetDatabase can create/load Mesh assets reliably under Assets/Samples.
         // Generated files are mirrored into the package Samples~ folder at the end.
         private const string SampleFolder =
-            "Assets/Samples/Flooding/0.9.1/Baked Geometry";
+            "Assets/Samples/Flooding/0.10.0/Baked Geometry";
 
         private const string PackageSampleFolder =
             "Packages/com.rabbidwolf.com.kyle.flooding/Samples~/Baked Geometry";
@@ -455,7 +455,7 @@ namespace Kyle.Flooding.Editor
             var packagePath = Path.Combine(SampleFolder, fileName)
                 .Replace('\\', '/');
             var importedPath =
-                "Assets/Samples/Flooding/0.9.1/Baked Geometry/" + fileName;
+                "Assets/Samples/Flooding/0.10.0/Baked Geometry/" + fileName;
             return AssetDatabase.LoadAssetAtPath<MonoScript>(importedPath)
                 ?? AssetDatabase.LoadAssetAtPath<MonoScript>(packagePath);
         }

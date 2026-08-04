@@ -421,6 +421,9 @@ Acceptance criteria:
 - Core runtime remains free of URP and TextMeshPro dependencies.
 - Package installs/compiles without Universal RP; underwater assembly appears
   only when URP ≥ 17 is present.
+- Auto-discover manager resolution retries while null and after scene loads.
+- Package version `0.10.0` for the first-person / camera presentation feature
+  set.
 
 ## Documentation roadmap
 

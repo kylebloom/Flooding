@@ -139,7 +139,7 @@ Acceptance criteria:
 - [x] Synchronize the authoritative `Samples~` package source.
 - [x] Update package-wide sample documentation, tuning ownership, and
       re-import/upgrade warnings.
-- [x] Synchronize the current imported `0.9.1` copies with exact relative-path
+- [x] Synchronize the current imported `0.10.0` copies with exact relative-path
       and SHA-256 parity to authoritative `Samples~`.
 - [x] Re-import and inspect all three current `Assets/Samples` copies.
 - [x] Verify all three sample behaviors in Play Mode.
@@ -163,7 +163,7 @@ Acceptance criteria:
 - [x] Unity 6.5 batch import compiled the package runtime, Editor, and test
       assemblies without script errors after the onboarding changes.
 - [x] Package manifest JSON, sample declarations, scene-script GUIDs, baked-data
-      reference, documentation names, and `0.9.1` import paths were checked.
+      reference, documentation names, and `0.10.0` import paths were checked.
 - [x] Unity batch test retries were intermittently rejected by the project lock;
       the successful import/compile pass exited during assembly reload without
       producing a test-results XML file.
@@ -210,7 +210,7 @@ Acceptance criteria:
 - Added focused prefab, renderer, sample, baked-data, and connection quick
   references.
 - Registered Flood Mass Integration, Baked Geometry, and Connected Compartments
-  for Package Manager import with exact `0.9.1` destinations and Play Mode
+  for Package Manager import with exact `0.10.0` destinations and Play Mode
   instructions.
 - Completed the importable Baked Geometry and Connected Compartments samples;
   Unity import, Scene-view, and full regression verification remain pending.

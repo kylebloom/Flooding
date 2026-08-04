@@ -256,8 +256,9 @@ surface-renderer contract:
   fill percentage.
 - `FloodCameraTracker` relates a viewpoint to registered or explicit volumes
   using read-only `QueryPoint` / `RegisteredVolumes` data, sticky active-volume
-  selection, and underwater hysteresis. It raises presentation events only and
-  never mutates simulation.
+  selection, and underwater hysteresis. Auto-discover manager lookup retries
+  while unresolved and after scene loads. It raises presentation events only
+  and never mutates simulation.
 - `FloodUnderwaterProfile` is a shareable ScriptableObject of underwater
   presentation settings (tint, fog, grading, distortion, transitions). It holds
   no runtime state and does not reference URP.
