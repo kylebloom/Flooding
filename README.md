@@ -143,3 +143,7 @@ Implementation and Unity regression verification status are tracked in
 ## Author
 
 Kyle Bloom
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

@@ -7,6 +7,10 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- MIT License at the repository root; `package.json` declares `"license": "MIT"`.
+
 ### Fixed
 
 - Play Mode `ExternalFluidBoundaryTests`: equalization uses a coarse fill then

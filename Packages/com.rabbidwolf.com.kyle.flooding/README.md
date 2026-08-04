@@ -237,4 +237,8 @@ See:
 - [Package model and technical overview](https://github.com/kylebloom/Flooding/blob/main/Packages/com.rabbidwolf.com.kyle.flooding/Documentation/index.md).
 - Repository-level
   [specification, architecture, and implementation plans](https://github.com/kylebloom/Flooding/tree/main/docs)
+
+## License
+
+This package is licensed under the [MIT License](https://github.com/kylebloom/Flooding/blob/main/LICENSE).
   for behavior, boundaries, delivery status, and refinement verification.

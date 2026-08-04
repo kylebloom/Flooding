@@ -131,3 +131,7 @@ setup fails.
 - `Samples~` — Mass Integration, Baked Geometry, Connected Compartments, Hull
   Breach.
 - `Documentation` — this overview and the Editor workflow guide.
+
+## License
+
+MIT — see the repository [LICENSE](https://github.com/kylebloom/Flooding/blob/main/LICENSE).

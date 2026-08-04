@@ -5,6 +5,7 @@
   "unity": "6000.5",
   "unityRelease": "6f1",
   "description": "Gameplay-focused, volume-based flooding simulation for Unity.",
+  "license": "MIT",
   "dependencies": {
     "com.unity.test-framework": "1.6.0"
   },
