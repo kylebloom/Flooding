@@ -316,11 +316,17 @@ participate in simulation ticks and does not mutate flood state.
 Optional `Kyle.Flooding.URP` types apply fullscreen underwater presentation:
 
 - Consume `FloodCameraTracker` + `FloodUnderwaterProfile` only.
-- Reconstruct world position from the camera depth texture and mask pixels
-  against the authoritative `FloodVolume.SurfacePlane` (works for rotated /
-  tilted volumes; not a world-Y water level).
-- Above-plane pixels stay unprocessed; below-plane pixels receive tint/fog/
-  optional distortion; fully submerged views tint the whole screen.
+- The `Kyle.Flooding.URP` assembly is gated with a package `versionDefines` /
+  `defineConstraints` pair (`KYLE_FLOODING_URP`) so it compiles only when
+  Universal RP ≥ 17 is installed. Core runtime never references URP.
+- For each pixel, reconstruct the camera ray and scene depth, intersect the ray
+  with the authoritative `FloodVolume.SurfacePlane`, and tint/fog using the
+  underwater optical path along that ray (works for rotated / tilted volumes;
+  not a world-Y water level). Open sky / far-plane views still receive a
+  camera-aware waterline.
+- The surface is treated as an infinite plane for screen-space effects; effects
+  are not yet clipped to FloodVolume bounds (openings may show infinite-plane
+  artifacts on exterior geometry below the same plane).
 - Do not mutate simulation state.
 
 ## Underwater audio and telemetry

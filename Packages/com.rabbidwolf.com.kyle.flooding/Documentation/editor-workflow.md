@@ -1221,7 +1221,25 @@ submersion depth without storing state on the asset.
 
 Camera effects are **presentation consumers** of Flooding state and do not
 participate in simulation. They live in the optional `Kyle.Flooding.URP`
-assembly and require Universal Render Pipeline in the project.
+assembly, which Unity compiles only when
+`com.unity.render-pipelines.universal` ≥ 17 is installed in the project
+(`KYLE_FLOODING_URP` define constraint). Core `Kyle.Flooding.Runtime` never
+references URP assemblies.
+
+### Install without Universal RP
+
+Flooding installs into Built-in or HDRP projects without requiring URP:
+
+| Feature | Without URP | With URP |
+| --- | --- | --- |
+| Simulation, geometry, connections | Yes | Yes |
+| `FloodCameraTracker`, hysteresis, sticky volumes | Yes | Yes |
+| Underwater audio / telemetry | Yes | Yes |
+| `FloodUnderwaterCameraEffect` / renderer feature / waterline shader | No (assembly excluded) | Yes |
+| Included `Floodwater` / `FloodUnderwater` materials | Assign your own materials | Package materials work |
+
+Do **not** add Universal RP as a mandatory package dependency just to use
+Flooding simulation. Add URP only when you want the underwater camera pass.
 
 ### 1. Enable the depth texture
 
@@ -1269,9 +1287,18 @@ World-position reconstruction for the waterline uses the camera depth texture.
 
 - Not CFD, waves, or slosh simulation.
 - Does not change equilibrium flooding behavior.
-- Sky / far-plane pixels use the tracker's latched underwater state because
-  depth reconstruction has no scene geometry there.
-- Requires URP; the core `Kyle.Flooding.Runtime` assembly stays URP-free.
+- The pass reconstructs each camera ray, intersects it with
+  `FloodVolume.SurfacePlane`, and combines that with scene depth so the
+  waterline is camera-aware (including open sky / far-plane views). Fog and
+  tint strength use underwater **optical path length** along the view ray, not
+  only vertical submersion.
+- The active surface is still treated as an **infinite plane**. Screen-space
+  underwater effects are **not** clipped to FloodVolume geometry, so through
+  doorways, hatches, or broken hull plating, exterior geometry below the same
+  plane can receive underwater treatment even when it is outside the flooded
+  compartment. Volume masking is a future enhancement.
+- Requires URP for the assembly to compile; the core `Kyle.Flooding.Runtime`
+  assembly stays URP-free.
 
 ## Tune underwater look (symptom → where to click)
 
@@ -1295,7 +1322,7 @@ Hover any Inspector **field label** (not only the value box) to read the
 | Waves animate too fast | Same profile | **Distortion Speed** | Lower (default `0.35`). |
 | Tint too strong near surface | Same profile | **Shallow Tint Color** alpha / RGB | Reduce alpha or desaturate. |
 | Deep water too dark / opaque | Same profile | **Deep Tint Color**, **Full Effect Depth** | Soften deep tint or increase full-effect depth (meters). |
-| Fog too thick / too thin | Same profile | **Fog Density**, **Maximum Fog Strength** | Lower density/max for clearer water. |
+| Fog too thick / too thin | Same profile | **Fog Density**, **Maximum Fog Strength** | Lower density/max for clearer water. URP fog follows optical path along the view ray (sideways looks fog more than straight down). |
 | Color grading odd | Same profile | **Saturation**, **Contrast** | `1` = unchanged; keep near `0.8`–`1.1`. |
 | Enter/exit snaps | Same profile | **Transition Duration** | Raise slightly (seconds). |
 | Waterline edge too hard / soft | **URP Renderer** → **Flood Underwater Renderer Feature** | **Waterline Softness Meters** | Default `0.03`; raise for a wider blend band. |

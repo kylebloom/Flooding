@@ -18,10 +18,19 @@ Open `FirstPersonFlooding.unity` from that imported folder.
 > `Assets/Samples`. Move or rename an imported copy before re-importing if you
 > want to preserve local changes.
 
+## Requirements
+
+- Core sample (movement, rising water, tracker, telemetry, audio): any render
+  pipeline.
+- Fullscreen waterline / underwater tint: **Universal RP ≥ 17** plus the
+  one-time renderer-feature setup below. Without URP, `Kyle.Flooding.URP` is
+  excluded and the underwater camera effect is unavailable.
+
 ## One-time URP project setup (waterline effect)
 
-The sample wires `FloodCameraTracker`, `FloodUnderwaterCameraEffect`, and a
-profile asset. The fullscreen waterline pass is a **project renderer feature**:
+The sample wires `FloodCameraTracker`, optional `FloodUnderwaterCameraEffect`,
+and a profile asset. The fullscreen waterline pass is a **project renderer
+feature**:
 
 1. Open your **URP Asset** and enable **Depth Texture**.
 2. Open the **URP Renderer** asset → **Add Renderer Feature** →
@@ -109,13 +118,21 @@ in the package documentation.
 3. As the surface reaches eye height, the waterline moves through the view
    (with the URP feature enabled).
 4. After submersion, the full view receives underwater tint/fog; intensity
-   increases somewhat with depth.
+   increases with underwater optical path along the view ray.
 5. Audio blend rises underwater when an AudioMixer is assigned.
 6. Press **T** to tilt the room: the free surface stays gravity-aligned and the
    waterline still uses the authoritative plane (not world Y).
 
 Camera effects are presentation consumers only. They do not add CFD, waves, or
 slosh, and they do not alter equilibrium flooding.
+
+### Known presentation limits
+
+- The URP pass evaluates the active flood surface as an **infinite plane** and
+  does not yet clip underwater tint/fog to the room’s FloodVolume bounds.
+- Fog/tint strength follow underwater **optical path** along the view ray
+  (oblique looks through water fog more than looking straight down the same
+  vertical depth).
 
 ## Rebuild
 

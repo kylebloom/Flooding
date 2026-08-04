@@ -17,8 +17,8 @@ MonoBehaviour:
   fullEffectDepthMeters: 2
   fogDensity: 0.12
   maximumFogStrength: 0.8
-  saturation: 0.85
-  contrast: 1.05
-  distortionStrength: 0.008
-  distortionSpeed: 0.35
+  saturation: 1.065
+  contrast: 1.545
+  distortionStrength: 0.003
+  distortionSpeed: 0.1
   transitionDurationSeconds: 0.25

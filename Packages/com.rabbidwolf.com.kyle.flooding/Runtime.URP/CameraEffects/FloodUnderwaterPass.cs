@@ -8,8 +8,15 @@ namespace Kyle.Flooding.URP
 {
     /// <summary>
     /// Fullscreen URP render-graph pass that applies underwater tint/fog and a
-    /// plane-based waterline using camera depth reconstruction.
+    /// camera-ray / surface-plane waterline using depth reconstruction.
     /// </summary>
+    /// <remarks>
+    /// The shader traces each pixel ray against <see cref="FloodVolume.SurfacePlane"/>
+    /// and combines that with scene depth so open views (sky / far plane) still
+    /// receive a waterline. Fog strength uses underwater optical path length
+    /// along the view ray. The active surface is still treated as an infinite
+    /// plane; it is not clipped to FloodVolume bounds.
+    /// </remarks>
     public sealed class FloodUnderwaterPass : ScriptableRenderPass
     {
         private static readonly int SurfaceNormalId =

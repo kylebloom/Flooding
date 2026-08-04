@@ -68,9 +68,32 @@ Shader "Kyle/Flooding/Underwater"
                 return ComputeWorldSpacePosition(uv, deviceDepth, UNITY_MATRIX_I_VP);
             }
 
+            // Positive above surface, negative below (matches FloodQueryResult).
             float SurfaceSignedDistance(float3 worldPosition)
             {
                 return dot(worldPosition, _FloodSurfaceNormal.xyz) + _FloodSurfacePlaneD;
+            }
+
+            // Length of the camera→scene segment that lies in the water half-space
+            // (signed distance < 0). Linear sd along the ray means at most one crossing.
+            float UnderwaterPathLength(float cameraSigned, float sceneSigned, float tScene)
+            {
+                tScene = max(tScene, 0.0);
+                bool startWet = cameraSigned < 0.0;
+                bool endWet = sceneSigned < 0.0;
+
+                if (startWet && endWet)
+                    return tScene;
+
+                if (!startWet && !endWet)
+                    return 0.0;
+
+                float denom = sceneSigned - cameraSigned;
+                if (abs(denom) < 1e-6)
+                    return startWet ? tScene : 0.0;
+
+                float tCross = saturate(-cameraSigned / denom) * tScene;
+                return startWet ? tCross : (tScene - tCross);
             }
 
             half4 Frag(Varyings input) : SV_Target
@@ -85,20 +108,48 @@ Shader "Kyle/Flooding/Underwater"
                 }
 
                 float deviceDepth = SampleDeviceDepth(uv);
-                float3 worldPos = ReconstructWorldPosition(uv, deviceDepth);
-                float signedDistance = SurfaceSignedDistance(worldPos);
+                float3 sceneWorldPos = ReconstructWorldPosition(uv, deviceDepth);
+                float3 cameraWorldPos = _WorldSpaceCameraPos;
+                float3 toScene = sceneWorldPos - cameraWorldPos;
+                float tScene = length(toScene);
 
-                // Far-plane / sky pixels: fall back to latched camera underwater state
-                // so the whole view tints when fully submerged.
                 #if UNITY_REVERSED_Z
                 float isFar = deviceDepth <= 1e-5 ? 1.0 : 0.0;
                 #else
                 float isFar = deviceDepth >= 0.999999 ? 1.0 : 0.0;
                 #endif
 
+                // For sky / far-plane pixels, keep a stable ray length for path
+                // classification so open views still get a camera-ray waterline.
+                if (isFar > 0.5)
+                    tScene = max(tScene, _ProjectionParams.z);
+
+                float3 rayDir = tScene > 1e-5
+                    ? toScene / max(tScene, 1e-5)
+                    : float3(0.0, 0.0, 1.0);
+
+                // Re-derive scene point from ray when far so sd uses the frustum
+                // far hit rather than a degenerate reconstruct.
+                float3 evalScenePos = cameraWorldPos + rayDir * tScene;
+                float cameraSigned = SurfaceSignedDistance(cameraWorldPos);
+                float sceneSigned = SurfaceSignedDistance(evalScenePos);
+                float pathLength = UnderwaterPathLength(
+                    cameraSigned,
+                    sceneSigned,
+                    tScene);
+
                 float softness = max(_FloodWaterlineSoftness, 1e-4);
-                float geometryMask = 1.0 - smoothstep(-softness, softness, signedDistance);
-                float underwaterMask = lerp(geometryMask, _FloodCameraUnderwater, isFar);
+                // Soft waterline: short underwater paths near the crossing fade in.
+                float pathMask = smoothstep(0.0, softness, pathLength);
+                // Also soften against scene signed distance so wall waterlines
+                // match enclosed-compartment looks from v1.
+                float geometryMask = 1.0 - smoothstep(-softness, softness, sceneSigned);
+                float underwaterMask = max(pathMask, geometryMask * (1.0 - isFar));
+                // Fully submerged camera: keep residual coverage if path is tiny
+                // due to numerical issues near the surface.
+                underwaterMask = max(
+                    underwaterMask,
+                    _FloodCameraUnderwater * effectBlend * isFar);
                 underwaterMask *= effectBlend;
 
                 if (underwaterMask <= 1e-4)
@@ -114,16 +165,21 @@ Shader "Kyle/Flooding/Underwater"
 
                 float3 source = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, distortedUv).rgb;
 
-                float pixelSubmersion = max(0.0, -signedDistance);
-                float submersion = lerp(pixelSubmersion, max(pixelSubmersion, _FloodCameraSubmersion), isFar);
+                // Intensity from optical path through water (meters along view ray),
+                // not perpendicular plane depth — oblique views fog more correctly.
                 float fullDepth = max(_FloodFullEffectDepth, 1e-4);
-                float depthStrength = saturate(submersion / fullDepth);
+                float pathForStrength = pathLength;
+                if (isFar > 0.5 && _FloodCameraUnderwater > 0.5)
+                    pathForStrength = max(pathForStrength, _FloodCameraSubmersion);
 
-                // Approaching / shallow: keep a little tint even with small submersion.
-                float shallowBoost = saturate((-signedDistance + softness) / (softness * 2.0));
+                float depthStrength = saturate(pathForStrength / fullDepth);
+                float shallowBoost = saturate(pathLength / (softness * 2.0));
                 depthStrength = max(depthStrength, shallowBoost * 0.25 * underwaterMask);
 
                 float4 tint = lerp(_FloodShallowTint, _FloodDeepTint, depthStrength);
+                // Shape fog with the same density*depthStrength curve as
+                // FloodUnderwaterProfile.EvaluateFogStrength, but feed optical
+                // path (via depthStrength) instead of vertical submersion.
                 float fog = _FloodMaxFog * (1.0 - exp(-_FloodFogDensity * 6.0 * depthStrength));
                 fog = saturate(fog) * underwaterMask;
 

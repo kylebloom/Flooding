@@ -31,8 +31,9 @@ rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
 - Focused baked-data free-surface renderer.
 - Optional `FloodCameraTracker` for viewpoint / underwater presentation state
   (sticky volume selection, hysteresis; no rendering).
-- Optional `Kyle.Flooding.URP` underwater fullscreen effect with plane-based
-  waterline crossing (requires URP depth texture).
+- Optional `Kyle.Flooding.URP` underwater fullscreen effect with camera-ray /
+  surface-plane waterline crossing (compiled only when Universal RP ≥ 17 is
+  installed; requires URP depth texture).
 - Optional underwater AudioMixer muffling and framework-neutral flood telemetry
   adapters (no TextMeshPro dependency).
 - Optional `FloodConnectionVisual` and connection/source/volume audio consumers.
@@ -43,10 +44,15 @@ rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
 ## Prerequisites
 
 - Unity Editor 6.5 (`6000.5.6f1`).
-- The core simulation and geometry are render-pipeline independent.
-- The included `Materials/Floodwater.mat` is a Universal Render Pipeline (URP)
-  material. In Built-in, HDRP, or a custom render pipeline, assign your own
-  transparent material to each water visual.
+- The core simulation, geometry, `FloodCameraTracker`, audio, and telemetry are
+  render-pipeline independent. Universal RP is **not** required to install or
+  compile the package.
+- The optional `Kyle.Flooding.URP` assembly (underwater renderer feature /
+  waterline shader) compiles only when
+  `com.unity.render-pipelines.universal` ≥ 17 is present.
+- The included `Materials/Floodwater.mat` and `Materials/FloodUnderwater.mat`
+  are Universal Render Pipeline (URP) materials. In Built-in, HDRP, or a custom
+  render pipeline, assign your own transparent material to each water visual.
 
 ## Install
 

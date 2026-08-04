@@ -7,6 +7,18 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- `Kyle.Flooding.URP` is now gated with `defineConstraints` /
+  `versionDefines` (`KYLE_FLOODING_URP` when Universal RP ≥ 17 is present) so
+  the package compiles in Built-in / HDRP projects without URP installed.
+  Editor and core Play Mode assemblies no longer hard-reference URP; optional
+  underwater effect tests live in `Tests/PlayMode.URP`.
+- Underwater fullscreen shader now uses camera-ray / `SurfacePlane`
+  intersection with scene depth (open-view waterline) and optical-path-based
+  fog/tint strength instead of classifying only the depth-buffer hit against
+  the plane.
+
 ### Added
 
 - `FloodQueryResult.SurfaceSignedDistanceMeters`: signed distance to the
@@ -26,9 +38,11 @@ and this project follows [Semantic Versioning](https://semver.org/).
   depth/tint/fog evaluation helpers and no runtime state.
 - Optional `Kyle.Flooding.URP` assembly with `FloodUnderwaterRendererFeature`,
   `FloodUnderwaterPass`, `FloodUnderwaterCameraEffect`, and
-  `Kyle/Flooding/Underwater` fullscreen shader for plane-based waterline
-  crossing, tint/fog/distortion, and depth-aware intensity. Requires URP depth
-  texture; does not reference URP from the core runtime assembly.
+  `Kyle/Flooding/Underwater` fullscreen shader for camera-ray waterline
+  crossing, tint/fog/distortion, and optical-path intensity. Requires URP depth
+  texture; does not reference URP from the core runtime assembly. Documents
+  that the active surface is still an infinite plane (no FloodVolume screen
+  masking yet).
 - `FloodUnderwaterAudio` presentation component that smooths exposed
   AudioMixer low-pass / volume parameters from `FloodCameraTracker`.
 - Framework-neutral `FloodVolumeTelemetry` and `FloodCameraTelemetry` adapters

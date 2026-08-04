@@ -8,10 +8,14 @@ computational fluid dynamics.
 ## Requirements
 
 - Unity Editor 6.5 (`6000.5.6f1`)
-- No render-pipeline requirement for core simulation
-- Universal Render Pipeline only for the included
-  `Materials/Floodwater.mat`; Built-in, HDRP, and custom pipelines need their
-  own transparent water material
+- No render-pipeline requirement for core simulation, `FloodCameraTracker`,
+  underwater audio, or telemetry
+- Universal Render Pipeline (`com.unity.render-pipelines.universal` ≥ 17) only
+  for the optional `Kyle.Flooding.URP` underwater assembly and the included
+  `Materials/Floodwater.mat` / `Materials/FloodUnderwater.mat`
+- Built-in, HDRP, or custom pipelines: install Flooding without URP; assign your
+  own transparent water material. The URP assembly is excluded automatically
+  when Universal RP is not present
 
 ## Installation
 
@@ -133,6 +137,19 @@ bundled audio/particle content. Gravity-aligned surfaces are instantaneous
 equilibrium results. See the Editor workflow troubleshooting section when
 setup fails.
 
+Camera underwater presentation limitations:
+
+- The URP fullscreen pass treats the active `FloodVolume.SurfacePlane` as an
+  **infinite plane**. It does **not** clip screen-space underwater tint/fog to
+  the FloodVolume bounds, so geometry visible through openings that lies below
+  the same mathematical plane may receive underwater treatment even when it is
+  outside the flooded compartment.
+- Volume screen masking (stencil, analytic bounds clip, or dedicated water-
+  volume rendering) is not implemented yet.
+- The **First Person Flooding** sample’s fullscreen waterline effect requires
+  URP plus the renderer-feature setup; without URP the sample still compiles
+  and runs tracker/telemetry/audio, but the underwater pass is unavailable.
+
 ## Package contents
 
 - `Runtime/Simulation` — deterministic rules and boundary contracts.
@@ -144,7 +161,9 @@ setup fails.
 - `Runtime/Prefabs` — `Room.prefab` and `Flooding.prefab`.
 - `Editor` — baking, drawers, and sample builders.
 - `Materials` — prototype URP water material.
-- `Tests/Editor` and `Tests/PlayMode`.
+- `Tests/Editor`, `Tests/PlayMode`, and optional `Tests/PlayMode.URP`.
+- `Runtime.URP` — optional underwater renderer feature (compiled only when
+  Universal RP ≥ 17 is installed).
 - `Samples~` — Mass Integration, Baked Geometry, Connected Compartments, Hull
   Breach, First Person Flooding.
 - `Documentation` — this overview and the Editor workflow guide.

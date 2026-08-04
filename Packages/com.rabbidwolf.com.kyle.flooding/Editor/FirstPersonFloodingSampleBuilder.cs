@@ -1,6 +1,6 @@
 #if UNITY_EDITOR
+using System;
 using System.IO;
-using Kyle.Flooding.URP;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -184,10 +184,10 @@ namespace Kyle.Flooding.Editor
             tracker.Viewpoint = cameraObject.transform;
             tracker.Manager = manager;
 
-            var underwaterEffect =
-                cameraObject.AddComponent<FloodUnderwaterCameraEffect>();
-            underwaterEffect.Tracker = tracker;
-            underwaterEffect.Profile = profile;
+            var underwaterEffect = TryAddUnderwaterCameraEffect(
+                cameraObject,
+                tracker,
+                profile);
 
             var underwaterAudio =
                 cameraObject.AddComponent<FloodUnderwaterAudio>();
@@ -303,6 +303,37 @@ namespace Kyle.Flooding.Editor
             File.Copy(source, destination, overwrite: true);
         }
 
+        /// <summary>
+        /// Adds <c>FloodUnderwaterCameraEffect</c> via reflection so the Editor
+        /// assembly does not hard-reference optional <c>Kyle.Flooding.URP</c>.
+        /// </summary>
+        private static Component TryAddUnderwaterCameraEffect(
+            GameObject cameraObject,
+            FloodCameraTracker tracker,
+            FloodUnderwaterProfile profile)
+        {
+            var effectType = Type.GetType(
+                "Kyle.Flooding.URP.FloodUnderwaterCameraEffect, Kyle.Flooding.URP");
+            if (effectType == null)
+            {
+                Debug.LogWarning(
+                    "Kyle.Flooding.URP is unavailable (install Universal RP "
+                    + ">= 17 to enable FloodUnderwaterCameraEffect). "
+                    + "First Person Flooding sample will run without the "
+                    + "fullscreen underwater pass.");
+                return null;
+            }
+
+            var effect = cameraObject.AddComponent(effectType);
+            var serializedEffect = new SerializedObject(effect);
+            serializedEffect.FindProperty("tracker").objectReferenceValue =
+                tracker;
+            serializedEffect.FindProperty("profile").objectReferenceValue =
+                profile;
+            serializedEffect.ApplyModifiedPropertiesWithoutUndo();
+            return effect;
+        }
+
         private static GameObject CreateCube(
             string name,
             Transform parent,
@@ -317,7 +348,7 @@ namespace Kyle.Flooding.Editor
             cube.transform.localPosition = localPosition;
             cube.transform.localScale = localScale;
             if (!keepCollider)
-                Object.DestroyImmediate(cube.GetComponent<Collider>());
+                UnityEngine.Object.DestroyImmediate(cube.GetComponent<Collider>());
 
             cube.GetComponent<MeshRenderer>().sharedMaterial = material;
             return cube;

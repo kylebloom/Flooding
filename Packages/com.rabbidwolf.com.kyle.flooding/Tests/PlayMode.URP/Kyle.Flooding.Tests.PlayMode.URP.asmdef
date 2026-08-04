@@ -1,17 +1,14 @@
 {
-    "name": "Kyle.Flooding.URP",
-    "rootNamespace": "Kyle.Flooding.URP",
+    "name": "Kyle.Flooding.Tests.PlayMode.URP",
+    "rootNamespace": "Kyle.Flooding.Tests",
     "references": [
         "Kyle.Flooding.Runtime",
-        "Unity.RenderPipelines.Core.Runtime",
+        "Kyle.Flooding.URP",
         "Unity.RenderPipelines.Universal.Runtime"
     ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
     "defineConstraints": [
         "KYLE_FLOODING_URP"
     ],
@@ -21,6 +18,5 @@
             "expression": "17.0.0",
             "define": "KYLE_FLOODING_URP"
         }
-    ],
-    "noEngineReferences": false
+    ]
 }

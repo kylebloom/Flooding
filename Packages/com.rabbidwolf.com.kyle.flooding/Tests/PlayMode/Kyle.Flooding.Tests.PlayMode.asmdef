@@ -2,9 +2,7 @@
     "name": "Kyle.Flooding.Tests.PlayMode",
     "rootNamespace": "Kyle.Flooding.Tests",
     "references": [
-        "Kyle.Flooding.Runtime",
-        "Kyle.Flooding.URP",
-        "Unity.RenderPipelines.Universal.Runtime"
+        "Kyle.Flooding.Runtime"
     ],
     "optionalUnityReferences": [
         "TestAssemblies"

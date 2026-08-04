@@ -2,8 +2,7 @@
     "name": "Kyle.Flooding.Editor",
     "rootNamespace": "Kyle.Flooding.Editor",
     "references": [
-        "Kyle.Flooding.Runtime",
-        "Kyle.Flooding.URP"
+        "Kyle.Flooding.Runtime"
     ],
     "includePlatforms": [
         "Editor"

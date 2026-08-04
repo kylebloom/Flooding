@@ -402,6 +402,11 @@ or URP into the core simulation assembly.
 - [x] Add `FloodUnderwaterProfile` ScriptableObject (presentation settings only).
 - [x] Add optional `Kyle.Flooding.URP` assembly with underwater renderer feature,
   camera effect bridge, fullscreen waterline shader, and depth-texture setup docs.
+- [x] Gate `Kyle.Flooding.URP` with `KYLE_FLOODING_URP` defineConstraints so the
+  package compiles without Universal RP installed; decouple Editor / core Play
+  Mode from hard URP references (`Tests/PlayMode.URP` for effect tests).
+- [x] Upgrade underwater shader to camera-ray / `SurfacePlane` intersection with
+  optical-path fog; document infinite-plane (no volume screen mask) limitation.
 - [x] Add `FloodUnderwaterAudio` and framework-neutral telemetry adapters.
 - [x] Add First Person Flooding sample (builder, bootstrap, README, package entry).
 - [x] Final regression: Edit Mode 90/90 and Play Mode 64/64 passed (Unity 6000.5.6f1).
@@ -414,6 +419,8 @@ Acceptance criteria:
   viewpoint, even when dry.
 - Overlapping volumes remain ambiguous / not merged.
 - Core runtime remains free of URP and TextMeshPro dependencies.
+- Package installs/compiles without Universal RP; underwater assembly appears
+  only when URP ≥ 17 is present.
 
 ## Documentation roadmap
 

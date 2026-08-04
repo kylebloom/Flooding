@@ -40,14 +40,14 @@ namespace Kyle.Flooding
         [Header("Depth")]
 
         [SerializeField]
-        [Tooltip("Submersion depth in meters at which tint, fog, and related strengths reach their configured maxima. Must be greater than zero.")]
+        [Tooltip("Path length through water (meters) at which tint and related strengths reach their configured maxima. The URP underwater pass uses optical path along the view ray; helper APIs may use vertical submersion. Must be greater than zero.")]
         [Min(0.01f)]
         private float fullEffectDepthMeters = DefaultFullEffectDepthMeters;
 
         [Header("Fog")]
 
         [SerializeField]
-        [Tooltip("Base underwater fog density scale used by presentation consumers. Dimensionless; higher values thicken fog faster with depth.")]
+        [Tooltip("Underwater fog density scale used by EvaluateFogStrength and the URP pass. Dimensionless; higher values thicken fog faster as optical path (URP) or submersion (helpers) approaches Full Effect Depth.")]
         [Min(0f)]
         private float fogDensity = 0.12f;
 

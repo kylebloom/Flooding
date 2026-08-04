@@ -31,8 +31,14 @@ Optional Universal Render Pipeline presentation assembly:
 - fullscreen underwater shader/material consumers
 
 Depends on `Kyle.Flooding.Runtime` and
-`Unity.RenderPipelines.Universal.Runtime`. Camera effects read tracker/profile
-state only and never mutate simulation.
+`Unity.RenderPipelines.Universal.Runtime`. The asmdef uses
+`versionDefines` + `defineConstraints` (`KYLE_FLOODING_URP` when
+`com.unity.render-pipelines.universal` ≥ 17) so the assembly is excluded when
+URP is not installed. `Kyle.Flooding.Editor` and core Play Mode tests must not
+hard-reference this assembly; optional URP Play Mode tests live in
+`Tests/PlayMode.URP`. Camera effects read tracker/profile state only and never
+mutate simulation. The underwater pass traces camera rays against
+`SurfacePlane` (optical-path fog) and does not yet mask to volume bounds.
 
 ### `Kyle.Flooding.Editor`
 

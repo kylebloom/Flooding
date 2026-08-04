@@ -6,4 +6,5 @@
   <Project Path="Kyle.Flooding.Editor.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Kyle.Flooding.Tests.PlayMode.URP.csproj" />
 </Solution>

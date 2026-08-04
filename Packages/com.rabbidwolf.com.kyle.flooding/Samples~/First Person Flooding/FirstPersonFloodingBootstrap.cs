@@ -1,8 +1,8 @@
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
+using System.Reflection;
 using UnityEngine;
-using Kyle.Flooding.URP;
 
 namespace Kyle.Flooding.Samples
 {
@@ -44,8 +44,8 @@ namespace Kyle.Flooding.Samples
         private FloodCameraTracker cameraTracker;
 
         [SerializeField]
-        [Tooltip("Optional URP underwater camera effect bridge.")]
-        private FloodUnderwaterCameraEffect underwaterEffect;
+        [Tooltip("Optional URP FloodUnderwaterCameraEffect on the camera. Requires the Kyle.Flooding.URP assembly (Universal RP installed). Stored as Component so the sample compiles without URP.")]
+        private Component underwaterEffect;
 
         [SerializeField]
         [Tooltip("Optional underwater audio presentation component.")]
@@ -153,7 +153,7 @@ namespace Kyle.Flooding.Samples
             GUI.Label(
                 new Rect(x + 14f, 88f, width - 28f, 20f),
                 $"URP effect blend: "
-                + $"{(underwaterEffect != null ? underwaterEffect.EffectBlend : 0f):F2}  "
+                + $"{ReadEffectBlend(underwaterEffect):F2}  "
                 + $"audio blend: "
                 + $"{(underwaterAudio != null ? underwaterAudio.CurrentUnderwaterBlend : 0f):F2}");
             GUI.Label(
@@ -313,6 +313,20 @@ namespace Kyle.Flooding.Samples
 #else
             return false;
 #endif
+        }
+
+        private static float ReadEffectBlend(Component effect)
+        {
+            if (effect == null)
+                return 0f;
+
+            var property = effect.GetType().GetProperty(
+                "EffectBlend",
+                BindingFlags.Instance | BindingFlags.Public);
+            if (property == null || property.PropertyType != typeof(float))
+                return 0f;
+
+            return (float)property.GetValue(effect);
         }
     }
 }
