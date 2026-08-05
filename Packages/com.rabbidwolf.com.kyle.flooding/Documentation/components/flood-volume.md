@@ -9,7 +9,9 @@ gameplay queries.
   (`CurrentVolume`, `InitialVolume`, shared `SurfacePlane`) comes from the
   owning [`FloodRegion`](flood-region.md).
 
-See also: [FloodRegion](flood-region.md) for multi-room continuous flooding.
+See also: [FloodRegion](flood-region.md) for multi-room continuous flooding
+(two-box analytic or **Bake Region** / `FloodRegionData` for N members and mixed
+modes).
 
 ## Use this when
 

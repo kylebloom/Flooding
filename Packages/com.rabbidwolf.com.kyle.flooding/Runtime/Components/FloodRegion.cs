@@ -21,6 +21,7 @@ namespace Kyle.Flooding
     {
         private const float MinimumDimension = 0.01f;
         private const float MinimumDensity = 0.01f;
+        private const float MinimumCellResolution = 0.01f;
 
         [Header("Simulation")]
 
@@ -33,6 +34,26 @@ namespace Kyle.Flooding
         [SerializeField]
         [Tooltip("Explicit FloodVolume members that compose this region's floodable geometry. Membership is authoring truth; overlap or face-sharing is validated, not discovered.")]
         private List<FloodVolume> members = new();
+
+        [Header("Baked Region Geometry")]
+
+        [SerializeField]
+        [Tooltip("Optional Editor-baked Flood Region Data asset for N-member or mixed-geometry unions. When usable, CompositeFloodGeometry prefers RegionOccupancyUnionStrategy over the two-box analytic path. Leave empty for one-member regions or eligible two rectangular members.")]
+        private FloodRegionData bakedRegionData;
+
+        [SerializeField]
+        [Tooltip("Requested maximum region-local cell edge length in meters for Bake Region. Smaller values improve boundary fidelity but increase bake time, asset size, and runtime query cost.")]
+        [Min(MinimumCellResolution)]
+        private float cellResolution = 0.25f;
+
+        [SerializeField]
+        [Tooltip("Maximum number of region grid cells the Editor baker may inspect. The bake stops instead of creating an unexpectedly large asset.")]
+        [Min(1)]
+        private int maximumGridCells = 1000000;
+
+        [SerializeField]
+        [Tooltip("Draw baked region occupancy cells and bounds in the Scene view while this FloodRegion is selected.")]
+        private bool visualizeBake = true;
 
         [Header("Fluid")]
 
@@ -84,6 +105,26 @@ namespace Kyle.Flooding
         /// Gets the active region geometry (member geometry or composite).
         /// </summary>
         public IFloodVolumeGeometry Geometry => geometry;
+
+        /// <summary>
+        /// Gets the optional Editor-baked region occupancy asset.
+        /// </summary>
+        public FloodRegionData BakedRegionData => bakedRegionData;
+
+        /// <summary>
+        /// Gets requested maximum region-local cell edge length in meters.
+        /// </summary>
+        public float CellResolution => cellResolution;
+
+        /// <summary>
+        /// Gets the Editor bake grid-cell safety limit.
+        /// </summary>
+        public int MaximumGridCells => maximumGridCells;
+
+        /// <summary>
+        /// Gets whether selected-object bake visualization is enabled.
+        /// </summary>
+        public bool VisualizeBake => visualizeBake;
 
         /// <summary>
         /// Gets the authoritative authored initial water volume in cubic meters.
@@ -343,6 +384,8 @@ namespace Kyle.Flooding
         {
             waterDensity = Mathf.Max(MinimumDensity, waterDensity);
             initialVolume = Mathf.Max(0f, initialVolume);
+            cellResolution = Mathf.Max(MinimumCellResolution, cellResolution);
+            maximumGridCells = Mathf.Max(1, maximumGridCells);
 
             if (members == null)
                 members = new List<FloodVolume>();
@@ -352,6 +395,33 @@ namespace Kyle.Flooding
                     GetComponentInParent<FloodSimulationManager>();
 
             TryValidateMembers(out validationMessage);
+        }
+
+        /// <summary>
+        /// Configures Editor bake resolution settings used by Bake Region.
+        /// </summary>
+        public void ConfigureBakeSettings(
+            float resolutionMeters,
+            int maximumCells)
+        {
+            cellResolution = Mathf.Max(MinimumCellResolution, resolutionMeters);
+            maximumGridCells = Mathf.Max(1, maximumCells);
+        }
+
+        /// <summary>
+        /// Assigns a baked region occupancy asset and rebuilds when enabled.
+        /// </summary>
+        public void AssignBakedRegionData(FloodRegionData data)
+        {
+            bakedRegionData = data;
+
+            if (isActiveAndEnabled)
+                Rebuild();
+        }
+
+        internal void AssignBake(FloodRegionData data)
+        {
+            bakedRegionData = data;
         }
 
         /// <summary>

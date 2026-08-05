@@ -212,6 +212,89 @@ namespace Kyle.Flooding.Tests
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator OccupancyBake_TiltedRegion_KeepsGravityAlignedSurface()
+        {
+            var root = new GameObject("TiltedOccupancyRegion");
+            root.SetActive(false);
+            var manager = root.AddComponent<FloodSimulationManager>();
+            manager.SimulateAutomatically = false;
+            manager.GravityMode = FloodGravityMode.Custom;
+            manager.CustomGravity = new Vector3(0f, -9.81f, 0f);
+
+            var region = root.AddComponent<FloodRegion>();
+            var roomA = CreateChildVolume(
+                root.transform,
+                "RoomA",
+                new Vector3(-0.5f, 0f, 0f),
+                2f,
+                2f,
+                2f);
+            var roomB = CreateChildVolume(
+                root.transform,
+                "RoomB",
+                new Vector3(0.5f, 0f, 0f),
+                2f,
+                2f,
+                2f);
+            var roomC = CreateChildVolume(
+                root.transform,
+                "RoomC",
+                new Vector3(1.5f, 0f, 0f),
+                2f,
+                2f,
+                2f);
+
+            var bake = CreateSimpleRegionOccupancy(
+                new Bounds(new Vector3(0.5f, 0f, 0f), new Vector3(5f, 2f, 2f)),
+                new Vector3Int(10, 4, 4));
+            region.AssignBakedRegionData(bake);
+            region.SetMembers(
+                new List<FloodVolume> { roomA, roomB, roomC });
+            region.ConfigureInitialVolume(8f);
+            root.SetActive(true);
+            yield return null;
+
+            Assert.That(region.Geometry, Is.TypeOf<BakedFloodGeometry>());
+            Assert.That(region.CurrentVolume, Is.EqualTo(8f).Within(1e-3f));
+
+            root.transform.rotation = Quaternion.Euler(0f, 0f, 25f);
+            manager.SimulateTick(0.1d);
+
+            var plane = region.SurfacePlane;
+            Assert.That(
+                Vector3.Dot(plane.normal.normalized, Vector3.up),
+                Is.GreaterThan(0.99f));
+            Assert.That(region.CurrentVolume, Is.EqualTo(8f).Within(1e-3f));
+
+            Object.Destroy(bake);
+            Object.Destroy(root);
+            yield return null;
+        }
+
+        private static FloodRegionData CreateSimpleRegionOccupancy(
+            Bounds localBounds,
+            Vector3Int gridSize)
+        {
+            var data = ScriptableObject.CreateInstance<FloodRegionData>();
+            var occupied = new int[gridSize.x * gridSize.y * gridSize.z];
+            for (var index = 0; index < occupied.Length; index++)
+                occupied[index] = index;
+
+            var cellSize = new Vector3(
+                localBounds.size.x / gridSize.x,
+                localBounds.size.y / gridSize.y,
+                localBounds.size.z / gridSize.z);
+            data.Initialize(
+                localBounds,
+                cellSize,
+                gridSize,
+                occupied,
+                newBoundaryCellCount: 0,
+                newSourceFingerprint: "playmode-occupancy");
+            return data;
+        }
+
         private static FloodVolume CreateChildVolume(
             Transform parent,
             string name,

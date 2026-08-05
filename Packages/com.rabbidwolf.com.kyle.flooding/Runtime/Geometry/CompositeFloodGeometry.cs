@@ -48,6 +48,17 @@ namespace Kyle.Flooding
                 return true;
             }
 
+            if (RegionOccupancyUnionStrategy.CanHandle(region))
+            {
+                var occupancy = new RegionOccupancyUnionStrategy(
+                    region.BakedRegionData);
+                return occupancy.TryBuild(
+                    region.transform,
+                    members,
+                    out geometry,
+                    out message);
+            }
+
             if (members.Count == 2
                 && TwoBoxAnalyticUnionStrategy.CanHandle(members))
             {
@@ -60,9 +71,11 @@ namespace Kyle.Flooding
             }
 
             message =
-                $"No region union strategy supports {members.Count} members yet. "
-                + "Phase B supports exactly two rectangular members via "
-                + "TwoBoxAnalyticUnionStrategy; general occupancy bake is planned.";
+                $"No region union strategy supports these {members.Count} "
+                + "members without a usable FloodRegionData bake. Use Bake "
+                + "Region in the FloodRegion Inspector. Exactly two Rectangular "
+                + "Prism members that are axis-aligned with the region can still "
+                + "use TwoBoxAnalyticUnionStrategy without baking.";
             return false;
         }
     }

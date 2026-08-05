@@ -11,3 +11,7 @@ alwaysApply: true
 
 - Do not force MonoBehaviours into unit-testable abstractions purely for test coverage.
   Prioritize tests around deterministic domain rules and state transitions.
+
+- Do not run Unity tests via CLI / batchmode or other outside processes from the
+  agent. Ask the user to run suites in the Editor. See
+  `unity-test-execution-rules.mdc`.

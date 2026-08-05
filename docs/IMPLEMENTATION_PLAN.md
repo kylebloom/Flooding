@@ -44,13 +44,18 @@ This document remains authoritative for feature-phase delivery.
 
 ## Current status
 
-- Current milestone: **Phase 16R FloodRegion composition landed (tests pending open-Editor regression); Phase 17 stress sample next**
+- Current milestone: **Phase 17 / 0.14 complex multi-compartment stress sample
+  next** (Phase 16S FloodRegionData occupancy bake landed)
 - Overall package status: **Gameplay-consumable simulation prototype**
 - Simulation vocabulary complete for v1 flooding gameplay:
   `FloodSource` (add), `FloodConnection` (transfer + `OpenFraction`),
-  `FloodSink` (remove), `FloodVolume` (store/query), plus presentation layers
-- Current supported geometry: **Rotated prism or Editor-baked data**
-- Current presentation: **Clipped prism volume, baked free-surface patches, connection visuals, optional flow/fill audio, camera/underwater, and local ingress**
+  `FloodSink` (remove), `FloodVolume` (store/query), `FloodRegion`
+  (composition + optional occupancy bake), plus presentation layers
+- Current supported geometry: **Rotated prism, Editor-baked volume data, and
+  region unions via FloodRegionData bake or two-box analytic**
+- Current presentation: **Clipped prism volume, baked free-surface patches,
+  region surface renderer (two-box + occupancy), connection visuals, optional
+  flow/fill audio, camera/underwater, and local ingress**
 - Current flow model: **Configured inflow/outflow sinks, finite connections with open-fraction aperture control, and external boundaries**
 - Current query surface: **Live read-only point queries over authoritative state**
 - Path to publish: see [Path to 1.0](#path-to-10--gameplay-ready-package)
@@ -73,7 +78,8 @@ the same regression suites remain pending.
 3. Simulation code determines volume transfers and derived water state.
 4. Geometry implementations answer capacity, submerged-volume, centroid, and
    surface-intersection queries. Region unions use `CompositeFloodGeometry`
-   with pluggable strategies (analytic two-box prototype; occupancy bake later).
+   with pluggable strategies (`RegionOccupancyUnionStrategy` when baked;
+   `TwoBoxAnalyticUnionStrategy` when eligible).
 5. Presentation components consume simulation state without mutating it.
    Composed regions use region-level surface presentation, not stacked member
    renderers.
@@ -559,7 +565,7 @@ FloodSimulationManager = orchestration / conservation
   tilt tests.
 - [x] Phase D — Design only: region-local occupancy / `FloodRegionData` bake
   documented in `docs/FLOOD_REGION_OCCUPANCY_DESIGN.md`.
-  No runtime mesh CSG; no silent analytic voxelization.
+  Implementation is **Phase 16S** (next).
 
 Acceptance criteria (vertical slice):
 
@@ -569,10 +575,69 @@ Acceptance criteria (vertical slice):
 - [x] One region-owned `CurrentVolume` and one equilibrium `SurfacePlane`.
 - [x] Member `ContainsPoint` = member geometry; water/depth from region.
 - [x] Continuous region-level surface via `FloodRegionSurfaceRenderer`.
-- [ ] Standalone volume and existing connection regressions pass (Unity suite
-  pending — project locked by open Editor).
+- [x] Standalone volume and existing connection regressions pass (Unity suite
+  verified with Phase 16S).
 - [x] Rotated/tilted region preserves gravity-aligned surface (Play Mode test).
 - [x] Same-region `FloodConnection` is an authoring error.
+
+## Phase 16S — FloodRegionData occupancy bake (0.14.1)
+
+Goal: generalize `FloodRegion` beyond the two-rectangular-member analytic
+prototype so N members and mixed geometry modes compose one region with
+correct union capacity and continuous presentation — without runtime mesh CSG
+and without silently voxelizing every analytic volume.
+
+Design reference: [`docs/FLOOD_REGION_OCCUPANCY_DESIGN.md`](FLOOD_REGION_OCCUPANCY_DESIGN.md).
+
+```text
+Member geometry
+      ↓
+Editor bake → FloodRegionData (region-local occupancy union)
+      ↓
+RegionOccupancyUnionStrategy : IRegionUnionStrategy
+      ↓
+capacity / volume-below-plane / centroid / containment / surface
+```
+
+Checklist:
+
+- [x] Add immutable `FloodRegionData` ScriptableObject (bounds, grid, sorted
+  unique occupied indices, capacity, centroid; optional presentation boundary).
+- [x] Editor **Bake Region** action: sample members into the region frame,
+  dedupe cells, write asset + fingerprint/stale diagnostics.
+  - Rectangular / extruded: sample via member `ContainsLocalPoint`.
+  - Baked members: remap occupied cell centers into region cells.
+- [x] Add `RegionOccupancyUnionStrategy` selected by `CompositeFloodGeometry`
+  when a usable `FloodRegionData` is assigned (keep
+  `TwoBoxAnalyticUnionStrategy` for eligible two-box cases).
+- [x] `FloodRegion` Inspector: optional baked data reference, bake/rebuild UX,
+  continuity validation for N members.
+- [x] Region presentation from occupancy / presentation boundary (extend
+  `FloodRegionSurfaceRenderer`; no stacked member renderers).
+- [x] Tests: N-member overlap counted once; partial-fill; face-touch;
+  mixed-mode bake; tilt; two-box analytic path still works; standalone
+  volumes unchanged.
+- [x] Docs: component guides, Editor workflow, package README; mark two-box
+  limits as superseded where bake is available.
+- [x] Package version `0.14.1`.
+
+Acceptance criteria:
+
+- [x] Three or more explicit members can form one region with union capacity
+  (overlap cells once).
+- [x] Partial-fill volume-below-plane does not double-count overlapping cells.
+- [x] One region `CurrentVolume` and one equilibrium `SurfacePlane`.
+- [x] Continuous region-level surface across composed members.
+- [x] Analytic standalone volumes remain exact; bake is opt-in per region.
+- [x] No runtime arbitrary mesh CSG; no auto membership from overlap.
+- [x] Closed-door pattern remains two regions + `FloodConnection`.
+- [x] Unity Edit Mode, Play Mode, and Player test suites pass (verified).
+
+Out of scope for 16S:
+
+- Dynamic region merge when a door opens.
+- Auto-discovery of region membership.
+- Replacing per-volume `FloodVolumeData` baking.
 
 ## Path to 1.0 — gameplay-ready package
 
@@ -584,8 +649,9 @@ mark delivery sequence; SemVer may insert patch releases between milestones.
 | **0.11** | Polished local ingress presentation | [x] Phase 14 complete |
 | **0.12** | Runtime flow-control / opening controls (`OpenFraction`) | [x] Phase 15 complete |
 | **0.13** | Pumps / drains / sinks (`FloodSink`) | [x] Phase 16 complete |
-| **0.14** | Complex multi-compartment stress sample | [ ] Phase 17 |
-| **0.14.x** | FloodRegion composition (ownership → two-box union → region surface) | [~] Phase 16R |
+| **0.14.x** | FloodRegion composition (two-box analytic prototype) | [x] Phase 16R |
+| **0.14.1** | FloodRegionData / region occupancy bake (N-member unions) | [x] Phase 16S |
+| **0.14** | Complex multi-compartment stress sample | [ ] Phase 17 **NEXT** |
 | **0.15** | Authoring / debug UX pass | [ ] Phase 18 |
 | **0.16** | Performance / profiling pass | [ ] Phase 19 |
 | **0.9x / RC** | API stabilization + docs freeze candidate | [ ] Phase 20 |
@@ -605,7 +671,10 @@ real-time arbitrary mesh fluid occupancy beyond the baked/analytic approach.
 Future work after 1.0 is optional fidelity and tooling, not fundamental
 capability gaps.
 
-## Phase 17 — Complex multi-compartment stress sample (0.14)
+## Phase 17 — Complex multi-compartment stress sample (0.14) **NEXT**
+
+Depends on Phase 16S so multi-room open geometry can use `FloodRegion` +
+`FloodRegionData` instead of only two-box analytic unions.
 
 Goal: prove the full vocabulary together in a moderately complex network, not
 isolated features.
@@ -810,6 +879,11 @@ phase begins:
 - Completed Phase 15 / 0.12 `OpenFraction` runtime aperture control.
 - Completed Phase 16 / 0.13 `FloodSink` pumps/drains with applied-flow
   diagnostics and Hull Breach bilge sample.
+- Completed Phase 16R FloodRegion two-box composition prototype.
+- Completed Phase 16S / 0.14.1 `FloodRegionData` occupancy bake
+  (`RegionOccupancyUnionStrategy`, Bake Region Editor UX, N-member / mixed-mode
+  unions, region surface occupancy presentation).
+- Verified Phase 16S: full Unity Edit Mode, Play Mode, and Player suites pass.
 - Documented the Path to 1.0 publishing roadmap (Phases 17–21: stress sample,
   authoring UX, performance, RC API freeze, 1.0 release) with explicit 1.0
   non-goals.

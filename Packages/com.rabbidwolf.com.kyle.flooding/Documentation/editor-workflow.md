@@ -1,6 +1,6 @@
 # Unity Editor workflow
 
-This guide describes how to use Flooding `0.10.0` in Unity
+This guide describes how to use Flooding `0.14.1` in Unity
 `6000.5.6f1`.
 
 Use this document as the practical how-to. Start with
@@ -936,6 +936,33 @@ void ApplyDamagedHull(FloodVolume compartment)
     compartment.ConfigureBakedGeometry(damagedHullBake);
 }
 ```
+
+### Bake a FloodRegion occupancy union
+
+Use **Bake Region** when a `FloodRegion` has three or more members, mixed
+geometry modes (rectangular / extruded / baked), or you want a single
+region-local occupancy asset. Exactly two rectangular axis-aligned members can
+still use the analytic two-box path without baking.
+
+1. Create the region GameObject and add **Flood Region**.
+2. Create child `FloodVolume` members and assign them on **Members**.
+3. Set **Cell Resolution** (meters) and **Maximum Grid Cells** on the region.
+4. Click **Bake Region**. On the first successful bake, choose a Project path
+   for the new `FloodRegionData` asset. Later bakes update that asset in place.
+5. Confirm the Inspector reports a current bake (sample count, capacity) and
+   that Scene-view **Visualize Bake** shows occupied region cells when the
+   region is selected.
+6. Add **Flood Region Surface Renderer** for continuous presentation. Disable
+   member surface renderers.
+
+Rectangular and extruded members are sampled through containment in region
+space. Baked members contribute by remapping occupied cell centers into the
+region grid. Overlapping cells are stored once. Disconnected members fail the
+bake. The bake is marked stale when members, transforms, geometry, or Cell
+Resolution change — re-bake before Play Mode.
+
+Per-volume `FloodVolumeData` baking is unchanged and separate. See
+[FloodRegion](components/flood-region.md#bake-region-floodregiondata).
 
 For presentation:
 

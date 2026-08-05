@@ -6,22 +6,22 @@ using UnityEngine;
 namespace Kyle.Flooding
 {
     /// <summary>
-    /// Immutable, Editor-baked representation of a closed floodable volume.
-    /// Runtime code reads this asset but never analyzes its source mesh.
-    /// Occupancy cells answer quantity; optional presentation-boundary triangles
-    /// answer free-surface footprint shape.
+    /// Immutable, Editor-baked region-local occupancy union for a
+    /// <see cref="FloodRegion"/>. Runtime reads this asset but never analyzes
+    /// member meshes. Occupancy cells answer quantity; optional presentation
+    /// boundary triangles answer free-surface footprint shape.
     /// </summary>
     [CreateAssetMenu(
-        fileName = "FloodVolumeData",
-        menuName = "Flooding/Flood Volume Data")]
-    public sealed class FloodVolumeData : ScriptableObject, IOccupancyBakeData
+        fileName = "FloodRegionData",
+        menuName = "Flooding/Flood Region Data")]
+    public sealed class FloodRegionData : ScriptableObject, IOccupancyBakeData
     {
         /// <summary>
         /// Format for bakes that include optional presentation-boundary mesh data.
         /// </summary>
         internal const int CurrentFormatVersion = 2;
 
-        /// <summary>Legacy occupancy-only bake format.</summary>
+        /// <summary>Occupancy-only bake format.</summary>
         internal const int LegacyFormatVersion = 1;
 
         private const int PresentationBoundaryTriangleWarning = 50000;
@@ -69,7 +69,7 @@ namespace Kyle.Flooding
         /// <summary>Gets the serialized bake format version.</summary>
         public int FormatVersion => formatVersion;
 
-        /// <summary>Gets the baked representation's local-space bounds.</summary>
+        /// <summary>Gets the baked representation's region-local bounds.</summary>
         public Bounds LocalBounds => localBounds;
 
         /// <summary>Gets actual local X/Y/Z sample resolution in meters.</summary>
@@ -80,15 +80,14 @@ namespace Kyle.Flooding
         /// </summary>
         public int SampleCount => occupiedCellIndices?.Length ?? 0;
 
-        /// <summary>Gets baked capacity in cubic meters.</summary>
+        /// <summary>Gets baked union capacity in cubic meters.</summary>
         public double Capacity => capacity;
 
-        /// <summary>Gets the full baked volume's local-space centroid.</summary>
+        /// <summary>Gets the full baked union's region-local centroid.</summary>
         public Vector3 Centroid => centroid;
 
         /// <summary>
         /// Gets a resolution-dependent approximation indicator in cubic meters.
-        /// This is a design diagnostic, not a certified source-mesh error bound.
         /// </summary>
         public double EstimatedApproximationVolume => estimatedBoundaryVolume;
 
@@ -138,6 +137,15 @@ namespace Kyle.Flooding
                 Array.AsReadOnly(
                     presentationBoundaryTriangles ?? Array.Empty<int>());
 
+        internal int PresentationBoundaryVertexCount =>
+            presentationBoundaryVertices?.Length ?? 0;
+
+        internal int PresentationBoundaryTriangleCount =>
+            (presentationBoundaryTriangles?.Length ?? 0) / 3;
+
+        internal static int PresentationBoundaryTriangleWarningThreshold =>
+            PresentationBoundaryTriangleWarning;
+
         Vector3 IOccupancyBakeData.CellSize => CellSize;
 
         Vector3Int IOccupancyBakeData.GridSize => GridSize;
@@ -153,15 +161,6 @@ namespace Kyle.Flooding
 
         Vector3 IOccupancyBakeData.GetCellCenter(int flattenedIndex) =>
             GetCellCenter(flattenedIndex);
-
-        internal int PresentationBoundaryVertexCount =>
-            presentationBoundaryVertices?.Length ?? 0;
-
-        internal int PresentationBoundaryTriangleCount =>
-            (presentationBoundaryTriangles?.Length ?? 0) / 3;
-
-        internal static int PresentationBoundaryTriangleWarningThreshold =>
-            PresentationBoundaryTriangleWarning;
 
         internal void Initialize(
             Bounds newLocalBounds,
@@ -185,6 +184,7 @@ namespace Kyle.Flooding
             gridSize = newGridSize;
             occupiedCellIndices = (int[])newOccupiedCellIndices.Clone();
             Array.Sort(occupiedCellIndices);
+            DeduplicateSorted(occupiedCellIndices, out occupiedCellIndices);
             boundaryCellCount = Math.Max(0, newBoundaryCellCount);
             sourceFingerprint = newSourceFingerprint ?? string.Empty;
             readOnlyOccupiedCells = null;
@@ -235,6 +235,36 @@ namespace Kyle.Flooding
                 (x + 0.5f) * cellSize.x,
                 (y + 0.5f) * cellSize.y,
                 (z + 0.5f) * cellSize.z);
+        }
+
+        private static void DeduplicateSorted(
+            int[] sorted,
+            out int[] unique)
+        {
+            if (sorted.Length <= 1)
+            {
+                unique = sorted;
+                return;
+            }
+
+            var write = 1;
+            for (var read = 1; read < sorted.Length; read++)
+            {
+                if (sorted[read] == sorted[write - 1])
+                    continue;
+
+                sorted[write] = sorted[read];
+                write++;
+            }
+
+            if (write == sorted.Length)
+            {
+                unique = sorted;
+                return;
+            }
+
+            unique = new int[write];
+            Array.Copy(sorted, unique, write);
         }
 
         private bool HasValidOccupiedCells()

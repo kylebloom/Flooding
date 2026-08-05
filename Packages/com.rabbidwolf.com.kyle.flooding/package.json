@@ -1,7 +1,7 @@
 {
   "name": "com.rabbidwolf.com.kyle.flooding",
   "displayName": "Flooding",
-  "version": "0.13.0",
+  "version": "0.14.1",
   "unity": "6000.5",
   "unityRelease": "6f1",
   "description": "Gameplay-focused, volume-based flooding simulation for Unity.",

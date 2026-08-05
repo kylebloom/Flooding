@@ -1,7 +1,11 @@
-# FloodRegion occupancy / bake design (Phase D)
+# FloodRegion occupancy / bake design (Phase 16S)
 
-Design-only. Do not implement runtime mesh CSG. Do not silently voxelize
-analytic volumes in gameplay scenes.
+**Roadmap status:** delivered in Phase 16S / package `0.14.1` — see
+[`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md).
+
+Design reference for the shipped bake. Do not implement runtime mesh CSG. Do not
+silently voxelize analytic volumes in gameplay scenes; bake is an explicit
+Editor action per `FloodRegion`.
 
 ## Goal
 
@@ -25,6 +29,8 @@ capacity / volume-below-plane / centroid / containment / surface
   and awkward for mixed geometry modes.
 - A region-local grid remaps all members into one frame so overlapping cells
   exist once.
+- Authors currently cannot put three overlapping rooms in one region; Phase 16S
+  removes that ceiling.
 
 ## Proposed asset: `FloodRegionData`
 
@@ -57,7 +63,7 @@ hidden conversion of every analytic volume.
 
 ```text
 IRegionUnionStrategy
-  ├─ TwoBoxAnalyticUnionStrategy     (prototype; keep for tests / simple cases)
+  ├─ TwoBoxAnalyticUnionStrategy     (keep for eligible two-box cases)
   └─ RegionOccupancyUnionStrategy    (consumes FloodRegionData)
 ```
 
@@ -69,8 +75,8 @@ IE vs occupancy internals.
 - Analytic standalone volumes remain exact.
 - Region occupancy bake is exact for the **cell union**, approximate vs source
   solids (same contract as `FloodVolumeData`).
-- Prefer keeping two-box analytic strategy available when eligible so doorway
-  prototypes do not lose precision.
+- Prefer keeping two-box analytic strategy available when eligible so simple
+  doorway prototypes do not lose precision.
 
 ## Out of scope
 

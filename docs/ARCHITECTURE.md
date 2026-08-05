@@ -97,11 +97,15 @@ present. A `FloodConnection` whose endpoints resolve to the same region is an
 authoring error.
 
 Composite geometry is consumed through `CompositeFloodGeometry` with pluggable
-union strategies (`TwoBoxAnalyticUnionStrategy` for the two-rectangle
-prototype; region-local occupancy / `FloodRegionData` bake as the eventual
-general path). Inclusion-exclusion is not the long-term region architecture.
-Do not silently voxelize analytic volumes. See
-`docs/FLOOD_REGION_OCCUPANCY_DESIGN.md` for the bake design.
+union strategies:
+
+- `RegionOccupancyUnionStrategy` when a usable `FloodRegionData` bake is
+  assigned (N members / mixed modes; cell-union capacity)
+- `TwoBoxAnalyticUnionStrategy` for eligible two rectangular members without a
+  bake (exact inclusion-exclusion)
+
+Do not silently voxelize analytic volumes; region bake is an explicit Editor
+action. See `docs/FLOOD_REGION_OCCUPANCY_DESIGN.md`.
 
 ### Shared caching and queries
 

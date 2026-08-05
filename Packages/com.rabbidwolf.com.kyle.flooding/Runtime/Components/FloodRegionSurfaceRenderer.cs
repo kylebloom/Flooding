@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Kyle.Flooding
@@ -255,26 +256,42 @@ namespace Kyle.Flooding
             if (waterMeshFilter == null)
                 return;
 
-            IExtrudedFloodVolumeGeometry geometry;
+            EnsureRuntimeMesh();
+            var localSurfacePlane = FloodPlaneUtility.WorldToLocal(
+                floodRegion.transform,
+                state.SurfacePlane);
+
             switch (floodRegion.Geometry)
             {
                 case TwoBoxInclusionExclusionGeometry union
                     when union.PresentationGeometry != null:
-                    geometry = union.PresentationGeometry;
+                    ApplyExtrudedMesh(
+                        union.PresentationGeometry,
+                        localSurfacePlane);
                     break;
                 case IExtrudedFloodVolumeGeometry extruded
                     when extruded.Footprint.Count >= 3:
-                    geometry = extruded;
+                    ApplyExtrudedMesh(extruded, localSurfacePlane);
+                    break;
+                case BakedFloodGeometry:
+                    ApplyOccupancySurfaceMesh(
+                        floodRegion.Geometry,
+                        localSurfacePlane);
                     break;
                 default:
                     waterVisual.gameObject.SetActive(false);
                     return;
             }
 
-            EnsureRuntimeMesh();
-            var localSurfacePlane = FloodPlaneUtility.WorldToLocal(
-                floodRegion.transform,
-                state.SurfacePlane);
+            waterVisual.localPosition = Vector3.zero;
+            waterVisual.localRotation = Quaternion.identity;
+            waterVisual.localScale = Vector3.one;
+        }
+
+        private void ApplyExtrudedMesh(
+            IExtrudedFloodVolumeGeometry geometry,
+            Plane localSurfacePlane)
+        {
             var meshData = FloodExtrudedGeometryQueries.BuildSubmergedMesh(
                 geometry,
                 localSurfacePlane);
@@ -284,9 +301,57 @@ namespace Kyle.Flooding
             runtimeMesh.triangles = meshData.Triangles;
             runtimeMesh.RecalculateBounds();
             runtimeMesh.RecalculateNormals();
-            waterVisual.localPosition = Vector3.zero;
-            waterVisual.localRotation = Quaternion.identity;
-            waterVisual.localScale = Vector3.one;
+        }
+
+        private void ApplyOccupancySurfaceMesh(
+            IFloodVolumeGeometry geometry,
+            Plane localSurfacePlane)
+        {
+            var intersection =
+                geometry.EvaluateSubmersion(localSurfacePlane)
+                    .SurfaceIntersection;
+            var vertices = new List<Vector3>();
+            var triangles = new List<int>();
+
+            foreach (var contour in intersection.Contours)
+            {
+                if (contour.Vertices.Count < 3)
+                    continue;
+
+                var offset = vertices.Count;
+                foreach (var point in contour.Vertices)
+                    vertices.Add(ConvertToWaterVisualLocal(point));
+
+                for (var index = 1;
+                     index < contour.Vertices.Count - 1;
+                     index++)
+                {
+                    triangles.Add(offset);
+                    triangles.Add(offset + index);
+                    triangles.Add(offset + index + 1);
+                }
+            }
+
+            runtimeMesh.Clear();
+            runtimeMesh.SetVertices(vertices);
+            runtimeMesh.SetTriangles(triangles, 0);
+            runtimeMesh.RecalculateBounds();
+            runtimeMesh.RecalculateNormals();
+
+            if (triangles.Count == 0)
+                waterVisual.gameObject.SetActive(false);
+        }
+
+        private Vector3 ConvertToWaterVisualLocal(Vector3 regionLocalPoint)
+        {
+            if (floodRegion == null || waterVisual == null)
+                return regionLocalPoint;
+
+            if (floodRegion.transform == waterVisual)
+                return regionLocalPoint;
+
+            return waterVisual.InverseTransformPoint(
+                floodRegion.transform.TransformPoint(regionLocalPoint));
         }
 
         private void WarnIfMemberRenderersPresent()

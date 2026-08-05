@@ -35,19 +35,35 @@ namespace Kyle.Flooding
             { 4, 6 }, { 5, 7 }, { 6, 7 },
         };
 
-        private readonly FloodVolumeData data;
+        private readonly IOccupancyBakeData data;
         private readonly HashSet<int> occupiedCells;
 
         /// <summary>
-        /// Creates runtime geometry from a valid baked asset.
+        /// Creates runtime geometry from a valid baked volume asset.
         /// </summary>
         internal BakedFloodGeometry(FloodVolumeData data)
+            : this((IOccupancyBakeData)data)
+        {
+        }
+
+        /// <summary>
+        /// Creates runtime geometry from a valid baked region asset.
+        /// </summary>
+        internal BakedFloodGeometry(FloodRegionData data)
+            : this((IOccupancyBakeData)data)
+        {
+        }
+
+        /// <summary>
+        /// Creates runtime geometry from a valid occupancy bake asset.
+        /// </summary>
+        internal BakedFloodGeometry(IOccupancyBakeData data)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
             if (!data.IsUsable)
                 throw new ArgumentException(
-                    "FloodVolumeData is missing, empty, or uses an unsupported bake format.",
+                    "Occupancy bake data is missing, empty, or uses an unsupported bake format.",
                     nameof(data));
 
             this.data = data;

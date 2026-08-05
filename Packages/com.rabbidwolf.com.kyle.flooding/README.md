@@ -1,8 +1,9 @@
 # Flooding
 
 Flooding is a reusable, gameplay-focused flooding simulation package for Unity
-6.5. The current `0.13.0` prototype models gravity-aligned water volume inside
-rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
+6.5. The current `0.14.1` prototype models gravity-aligned water volume inside
+rotated rectangular, extruded-polygon, or Editor-baked complex compartments,
+including composed `FloodRegion` unions via optional region occupancy bake.
 
 ## Current features
 
@@ -12,6 +13,9 @@ rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
 - Rectangular and validated concave polygon-prism compartments.
 - Editor-baked geometry data for closed meshes with sloped, curved, or uneven
   interiors; runtime performs no source-mesh analysis.
+- `FloodRegion` composition with optional Editor **Bake Region**
+  (`FloodRegionData`) for N-member and mixed-geometry unions; two rectangular
+  members can still use exact analytic inclusion-exclusion without baking.
 - Gravity-aligned surfaces solved from authoritative volume.
 - Global or manager-specific gravity with documented zero-gravity fallback.
 - Immutable state snapshots with surface, mass, and center-of-mass data.

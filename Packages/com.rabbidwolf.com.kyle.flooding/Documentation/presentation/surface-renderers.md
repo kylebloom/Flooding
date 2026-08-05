@@ -209,6 +209,9 @@ doorways inside a region.
 
 - Extruded composite footprints with at least three points.
 - Two-box inclusion/exclusion when `PresentationGeometry` is available.
+- Region occupancy bake (`FloodRegionData` / `BakedFloodGeometry`): free-surface
+  contours from plane ∩ occupancy (voxel fallback, or presentation boundary when
+  the bake asset includes one).
 
 Unsupported composite geometry hides the visual.
 

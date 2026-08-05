@@ -1,0 +1,26 @@
+---
+description: Do not run Unity tests via CLI or outside processes
+alwaysApply: true
+---
+
+# Unity test execution
+
+Do **not** run Unity Test Framework suites from the agent via:
+
+- Unity Editor CLI / batchmode (`Unity.exe -runTests`, `-batchmode`, etc.)
+- External shells, scripts, or CI wrappers invoked from the agent to drive those runs
+- Waiting on / polling outside Unity processes for Edit Mode or Play Mode results
+
+CLI and outside-process Unity test runs are unreliable in this environment (project
+locks, early process exit, incomplete logs).
+
+## Prefer
+
+- Write or update UTF Edit Mode / Play Mode tests in the package
+- Ask the user to run the relevant suites inside the open Unity Editor
+- Use code review and static reasoning when verifying behavior without Editor results
+
+## Still allowed
+
+- Non-Unity commands (git, file search, builds that are not Unity test batchmode)
+- Reading existing test result / log files the user already produced

@@ -10,8 +10,10 @@ namespace Kyle.Flooding
     /// </summary>
     /// <remarks>
     /// Uses exact inclusion-exclusion for capacity and volume-below-plane.
-    /// This is an internal prototype strategy only — not the long-term region
-    /// geometry architecture (see region-local occupancy / FloodRegionData).
+    /// Kept for eligible two rectangular members when no
+    /// <see cref="FloodRegionData"/> bake is assigned. For N members or mixed
+    /// geometry modes, bake a region occupancy asset and use
+    /// <see cref="RegionOccupancyUnionStrategy"/>.
     /// </remarks>
     public sealed class TwoBoxAnalyticUnionStrategy : IRegionUnionStrategy
     {

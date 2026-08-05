@@ -197,8 +197,9 @@ Camera underwater presentation limitations:
 ## Maturity and Path to 1.0
 
 The package is a pre-1.0 gameplay prototype. The flooding vocabulary through
-`0.13.0` is in place (`FloodSource` / `FloodConnection` / `FloodSink` /
-`FloodVolume` plus presentation). Remaining publish milestones:
+`0.14.1` is in place (`FloodSource` / `FloodConnection` / `FloodSink` /
+`FloodVolume` / `FloodRegion` with optional occupancy bake, plus presentation).
+Remaining publish milestones:
 
 | Milestone     | Goal                                    |
 | ------------- | --------------------------------------- |
