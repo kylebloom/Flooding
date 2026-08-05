@@ -62,6 +62,16 @@ namespace Kyle.Flooding
         protected virtual void OnEnable()
         {
             Subscribe();
+
+            if (floodVolume != null && floodVolume.IsRegionMember)
+            {
+                Debug.LogWarning(
+                    $"FloodSurfaceRenderer on '{name}' targets FloodVolume "
+                    + $"'{floodVolume.name}', which is a FloodRegion member. "
+                    + "Disable this renderer and use FloodRegionSurfaceRenderer "
+                    + "on the region for continuous presentation.",
+                    this);
+            }
         }
 
         protected virtual void Start()

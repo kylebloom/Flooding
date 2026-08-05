@@ -62,14 +62,14 @@ Best when you want a complete authored hierarchy to inspect and edit.
 4. Open the imported scene under `Assets/Samples/Flooding/<version>/...`.
 5. Enter Play Mode, then stop and edit Inspector fields before playing again.
 
-| Sample | What it teaches |
-| --- | --- |
-| Flood Mass Integration | Aggregate water mass moving a Rigidbody center of mass |
-| Baked Geometry | Editor-baked complex interior + gravity-aligned free surface |
-| Connected Compartments | Conserved doorway flow between two finite rooms |
-| Hull Breach | Ocean waterline exchanging water with one compartment |
-| First Person Flooding | Rising flood from first person with waterline / URP FX; see [Scenario 9](#scenario-9--first-person-camera-through-a-rising-flood) |
-| Local Ingress | Localized breach stream/spread vs instant bulk surface; see [Scenario 10](#scenario-10--local-ingress-presentation-vs-instant-bulk-surface) |
+| Sample                 | What it teaches                                                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Flood Mass Integration | Aggregate water mass moving a Rigidbody center of mass                                                                                      |
+| Baked Geometry         | Editor-baked complex interior + gravity-aligned free surface                                                                                |
+| Connected Compartments | Conserved doorway flow between two finite rooms                                                                                             |
+| Hull Breach            | Ocean waterline exchanging water with one compartment                                                                                       |
+| First Person Flooding  | Rising flood from first person with waterline / URP FX; see [Scenario 9](#scenario-9--first-person-camera-through-a-rising-flood)           |
+| Local Ingress          | Localized breach stream/spread vs instant bulk surface; see [Scenario 10](#scenario-10--local-ingress-presentation-vs-instant-bulk-surface) |
 
 Re-importing a sample can overwrite your copy under `Assets/Samples`. Duplicate
 customized copies first.
@@ -221,12 +221,12 @@ Flood System
 
 **Expected:**
 
-| Action | Result |
-| --- | --- |
-| Breach below ocean surface, empty room | Inflow into the compartment |
-| Interior level near ocean waterline | Flow approaches zero |
-| Raise interior above ocean (or lower ocean) | Outflow to exterior |
-| Disable **Is Open** or **Boundary Enabled** | No transfer |
+| Action                                      | Result                      |
+| ------------------------------------------- | --------------------------- |
+| Breach below ocean surface, empty room      | Inflow into the compartment |
+| Interior level near ocean waterline         | Flow approaches zero        |
+| Raise interior above ocean (or lower ocean) | Outflow to exterior         |
+| Disable **Is Open** or **Boundary Enabled** | No transfer                 |
 
 **Do not use `FloodSource` for this.** Sources ignore pressure equilibrium.
 Exterior exchange must use `ExternalFluidBoundary` + `FloodConnection`.
@@ -381,6 +381,9 @@ setup, then enter Play Mode.
 submerged views tint. Press **T** in the sample to tilt the room — the
 waterline follows `SurfacePlane`, not world Y. Tune look settings with the
 [underwater look cheat sheet](#tune-underwater-look-symptom--where-to-click).
+If you are new to URP setup, follow
+[Appendix A - Beginner setup for Scenario 9](#appendix-a---beginner-setup-for-scenario-9)
+for a click-by-click checklist and recommended starting values.
 
 ### Scenario 10 — Local ingress presentation vs instant bulk surface
 
@@ -416,6 +419,132 @@ surface remains. Disabling the presenter must not change
 `FloodVolume.CurrentVolume`. Full details:
 [Local ingress presentation](local-ingress.md).
 
+## Appendix A - Beginner setup for Scenario 9
+
+Use this appendix when you want a literal, first-time setup flow for
+first-person waterline crossing and underwater tint/fog in URP.
+
+### Before you start
+
+1. Confirm your project already uses **Universal Render Pipeline**.
+2. Confirm Flooding package files are visible under
+   `Packages/com.rabbidwolf.com.kyle.flooding`.
+3. If this is your first test, import the **First Person Flooding** sample
+   from Package Manager so you can verify expected behavior quickly.
+
+### Step 1 - Open the sample scene
+
+1. In the Project window, open
+   `Assets/Samples/Flooding/0.10.0/First Person Flooding`.
+2. Double-click `FirstPersonFlooding.unity`.
+3. Press Play once to verify baseline behavior (room fills over time), then
+   stop Play Mode.
+
+### Step 2 - Find and configure the active URP Asset
+
+1. Go to **Edit > Project Settings > Graphics**.
+2. In **Scriptable Render Pipeline Settings**, click the URP Asset reference
+   to ping/select it in the Project window.
+3. With that URP Asset selected, in Inspector:
+   - Enable **Depth Texture**.
+   - Leave other options unchanged for now.
+
+If **Scriptable Render Pipeline Settings** is empty, the project is not
+currently using URP. Assign a URP Asset first, then continue.
+
+### Step 3 - Find the URP Renderer used by that URP Asset
+
+1. Keep the URP Asset selected.
+2. In Inspector, find its Renderer reference (commonly in a list where index 0
+   is the default renderer).
+3. Click that renderer asset to select it.
+
+This renderer asset is where you add **Flood Underwater Renderer Feature**.
+
+### Step 4 - Add Flood Underwater Renderer Feature
+
+1. With the URP Renderer asset selected, scroll to **Renderer Features**.
+2. Click **Add Renderer Feature**.
+3. Choose **Flood Underwater Renderer Feature**.
+
+If you do not see it:
+
+- Confirm URP is installed and active.
+- Confirm scripts finished compiling.
+- Confirm package version includes the URP module.
+
+### Step 5 - Configure the renderer feature fields
+
+Select the newly added **Flood Underwater Renderer Feature** and set:
+
+1. **Material**: assign package material
+   `Packages/com.rabbidwolf.com.kyle.flooding/Materials/FloodUnderwater`.
+2. **Render Pass Event**: **Before Rendering Post Processing**.
+3. **Waterline Softness Meters**: start at `0.03`.
+
+Recommended starting values:
+
+- `Material`: `FloodUnderwater` (package default shader).
+- `Render Pass Event`: `Before Rendering Post Processing`.
+- `Waterline Softness Meters`: `0.03`.
+
+When to change them:
+
+- Increase **Waterline Softness Meters** (for example `0.05`-`0.08`) if the
+  crossing line looks too sharp.
+- Decrease it (for example `0.01`-`0.02`) if the crossing band looks too wide.
+- Keep the pass event at default unless your project has a custom post-process
+  chain that requires a different ordering.
+
+### Step 6 - Configure camera tracking and underwater effect
+
+1. Select the player camera (usually `Main Camera` in the sample).
+2. Add component **Flood Camera Tracker** if missing.
+3. Add component **Flood Underwater Camera Effect** if missing.
+4. On **Flood Underwater Camera Effect**:
+   - Assign **Profile** to `FirstPersonUnderwaterProfile` (sample) or your own
+     `Flood Underwater Profile`.
+   - Leave **Tracker** empty if tracker is on the same camera.
+
+### Step 7 - First verification pass
+
+1. Enter Play Mode.
+2. Stand above water and look at geometry crossing the waterline.
+3. Wait for flood level to rise and cross camera height.
+4. Confirm:
+   - Partial underwater tint appears while only part of the view is below the
+     solved plane.
+   - Full-view tint/fog appears when camera is submerged.
+   - Pressing **T** (sample) tilts the room and waterline follows flood surface
+     orientation (not world Y).
+
+### Step 8 - Quick fixes when effect is missing
+
+Check these in order:
+
+1. URP Asset has **Depth Texture** enabled.
+2. Active URP Renderer includes **Flood Underwater Renderer Feature**.
+3. Feature **Material** is assigned to
+   `Packages/com.rabbidwolf.com.kyle.flooding/Materials/FloodUnderwater`.
+4. Camera has **Flood Camera Tracker** and **Flood Underwater Camera Effect**.
+5. Underwater effect **Profile** is assigned.
+6. Camera is inside or below a valid flood volume surface during Play Mode.
+
+### Step 9 - Beginner-safe tuning values
+
+Use these as conservative defaults before artistic tuning:
+
+- Profile **Distortion Strength**: `0.008` (lower toward `0.003` if too wavy).
+- Profile **Distortion Speed**: `0.35`.
+- Profile **Transition Duration**: `0.15`-`0.30` seconds.
+- Renderer feature **Waterline Softness Meters**: `0.03`.
+- Tracker **Enter/Exit Water Threshold Meters**: keep defaults unless you see
+  rapid toggling near the surface.
+
+After this baseline works, use
+[Tune underwater look (symptom -> where to click)](#tune-underwater-look-symptom--where-to-click)
+for artistic adjustments.
+
 ## Quick references
 
 ### Prefab chooser
@@ -445,18 +574,18 @@ Built-in, HDRP, or a custom pipeline.
 
 ### Feature → scenario map
 
-| Feature | Start here |
-| --- | --- |
-| Prefab room + leak | [Path A](#path-a--prefab-smoke-test-about-60-seconds) / [Scenario 1](#scenario-1--single-room-filling-from-a-leak) |
-| Doorway between rooms | [Scenario 2](#scenario-2--two-rooms-equalizing-through-a-doorway) |
-| Ocean / lake breach | [Scenario 3](#scenario-3--hull-breach-against-an-ocean-waterline) |
-| Custom floor outline | [Scenario 4](#scenario-4--non-rectangular-floor-plan-extruded-polygon) |
-| Sloped / curved interior | [Scenario 5](#scenario-5--sloped-or-uneven-interior-baked-data) |
-| Rigidbody mass response | [Scenario 6](#scenario-6--flood-mass-affecting-a-vessel-rigidbody) |
-| Flow VFX / SFX | [Scenario 7](#scenario-7--flow-visuals-and-audio) |
-| Debug overlays | [Scenario 8](#scenario-8--scene-view-diagnostics-while-tuning) |
-| First-person waterline / underwater FX | [Scenario 9](#scenario-9--first-person-camera-through-a-rising-flood) |
-| Local ingress stream / spread | [Scenario 10](#scenario-10--local-ingress-presentation-vs-instant-bulk-surface) |
+| Feature                                | Start here                                                                                                         |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Prefab room + leak                     | [Path A](#path-a--prefab-smoke-test-about-60-seconds) / [Scenario 1](#scenario-1--single-room-filling-from-a-leak) |
+| Doorway between rooms                  | [Scenario 2](#scenario-2--two-rooms-equalizing-through-a-doorway)                                                  |
+| Ocean / lake breach                    | [Scenario 3](#scenario-3--hull-breach-against-an-ocean-waterline)                                                  |
+| Custom floor outline                   | [Scenario 4](#scenario-4--non-rectangular-floor-plan-extruded-polygon)                                             |
+| Sloped / curved interior               | [Scenario 5](#scenario-5--sloped-or-uneven-interior-baked-data)                                                    |
+| Rigidbody mass response                | [Scenario 6](#scenario-6--flood-mass-affecting-a-vessel-rigidbody)                                                 |
+| Flow VFX / SFX                         | [Scenario 7](#scenario-7--flow-visuals-and-audio)                                                                  |
+| Debug overlays                         | [Scenario 8](#scenario-8--scene-view-diagnostics-while-tuning)                                                     |
+| First-person waterline / underwater FX | [Scenario 9](#scenario-9--first-person-camera-through-a-rising-flood)                                              |
+| Local ingress stream / spread          | [Scenario 10](#scenario-10--local-ingress-presentation-vs-instant-bulk-surface)                                    |
 
 ### Sample import
 
@@ -1191,14 +1320,14 @@ if (result.IsSubmerged)
 }
 ```
 
-| API | Meaning |
-| --- | --- |
-| `ContainsPoint(worldPoint)` | Inside floodable geometry |
-| `IsPointSubmerged(worldPoint)` | Inside geometry and below the current surface plane |
-| `QueryPoint(worldPoint)` | Combined result: inside, submerged, submersion depth (m), signed surface distance (m), closest surface point, surface normal |
-| `CurrentVolume` | Authoritative water volume (m³) |
-| `FillPercentage` | Normalized fill from 0 to 1 |
-| `SurfacePlane` / `LocalSurfacePlane` | Current solved free surface |
+| API                                  | Meaning                                                                                                                      |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `ContainsPoint(worldPoint)`          | Inside floodable geometry                                                                                                    |
+| `IsPointSubmerged(worldPoint)`       | Inside geometry and below the current surface plane                                                                          |
+| `QueryPoint(worldPoint)`             | Combined result: inside, submerged, submersion depth (m), signed surface distance (m), closest surface point, surface normal |
+| `CurrentVolume`                      | Authoritative water volume (m³)                                                                                              |
+| `FillPercentage`                     | Normalized fill from 0 to 1                                                                                                  |
+| `SurfacePlane` / `LocalSurfacePlane` | Current solved free surface                                                                                                  |
 
 Contract:
 
@@ -1252,14 +1381,14 @@ presentation-only: it never advances simulation and does not render.
 
 ### Public state
 
-| Property | Meaning |
-| --- | --- |
-| `ActiveVolume` | Volume currently driving tracker state |
-| `IsInsideFloodVolume` | Viewpoint inside `ActiveVolume` geometry |
-| `IsUnderwater` | Latched underwater state after hysteresis |
-| `SurfaceSignedDistanceMeters` | Positive above, zero on, negative below |
-| `SubmersionDepthMeters` | Non-negative depth when submerged |
-| `CurrentQuery` | Latest `FloodQueryResult` against `ActiveVolume` |
+| Property                      | Meaning                                          |
+| ----------------------------- | ------------------------------------------------ |
+| `ActiveVolume`                | Volume currently driving tracker state           |
+| `IsInsideFloodVolume`         | Viewpoint inside `ActiveVolume` geometry         |
+| `IsUnderwater`                | Latched underwater state after hysteresis        |
+| `SurfaceSignedDistanceMeters` | Positive above, zero on, negative below          |
+| `SubmersionDepthMeters`       | Non-negative depth when submerged                |
+| `CurrentQuery`                | Latest `FloodQueryResult` against `ActiveVolume` |
 
 Events (C#): `EnteredFloodVolume`, `ExitedFloodVolume`, `EnteredWater`,
 `ExitedWater`, `ActiveVolumeChanged`.
@@ -1305,16 +1434,16 @@ across cameras and scenes.
 2. Name the asset (for example `DefaultUnderwaterProfile`).
 3. Select the asset and tune Inspector fields:
 
-| Field | Unit / notes |
-| --- | --- |
-| Shallow Tint Color | Near-surface underwater tint (RGBA) |
-| Deep Tint Color | Tint at full effect depth and deeper |
-| Full Effect Depth | Meters of submersion for full strength |
-| Fog Density | Dimensionless fog build-up scale |
-| Maximum Fog Strength | 0–1 fog cap |
-| Saturation / Contrast | Color grading multipliers (`1` = unchanged) |
-| Distortion Strength / Speed | Subtle UV distortion amplitude and Hz |
-| Transition Duration | Seconds for enter/exit smoothing |
+| Field                       | Unit / notes                                |
+| --------------------------- | ------------------------------------------- |
+| Shallow Tint Color          | Near-surface underwater tint (RGBA)         |
+| Deep Tint Color             | Tint at full effect depth and deeper        |
+| Full Effect Depth           | Meters of submersion for full strength      |
+| Fog Density                 | Dimensionless fog build-up scale            |
+| Maximum Fog Strength        | 0–1 fog cap                                 |
+| Saturation / Contrast       | Color grading multipliers (`1` = unchanged) |
+| Distortion Strength / Speed | Subtle UV distortion amplitude and Hz       |
+| Transition Duration         | Seconds for enter/exit smoothing            |
 
 Defaults are restrained for playable underwater looks. Assign the asset to URP
 or audio consumers when those modules are present. Helper methods
@@ -1334,13 +1463,13 @@ references URP assemblies.
 
 Flooding installs into Built-in or HDRP projects without requiring URP:
 
-| Feature | Without URP | With URP |
-| --- | --- | --- |
-| Simulation, geometry, connections | Yes | Yes |
-| `FloodCameraTracker`, hysteresis, sticky volumes | Yes | Yes |
-| Underwater audio / telemetry | Yes | Yes |
-| `FloodUnderwaterCameraEffect` / renderer feature / waterline shader | No (assembly excluded) | Yes |
-| Included `Floodwater` / `FloodUnderwater` materials | Assign your own materials | Package materials work |
+| Feature                                                             | Without URP               | With URP               |
+| ------------------------------------------------------------------- | ------------------------- | ---------------------- |
+| Simulation, geometry, connections                                   | Yes                       | Yes                    |
+| `FloodCameraTracker`, hysteresis, sticky volumes                    | Yes                       | Yes                    |
+| Underwater audio / telemetry                                        | Yes                       | Yes                    |
+| `FloodUnderwaterCameraEffect` / renderer feature / waterline shader | No (assembly excluded)    | Yes                    |
+| Included `Floodwater` / `FloodUnderwater` materials                 | Assign your own materials | Package materials work |
 
 Do **not** add Universal RP as a mandatory package dependency just to use
 Flooding simulation. Add URP only when you want the underwater camera pass.
@@ -1420,19 +1549,19 @@ Hover any Inspector **field label** (not only the value box) to read the
 
 ### Symptom → asset → field
 
-| If it looks… | Select | Field | Typical fix |
-| --- | --- | --- | --- |
-| Too wavy / busy refraction | **Flood Underwater Profile** | **Distortion Strength** | Lower toward `0`–`0.003` (default `0.008`). `0` disables waviness. |
-| Waves animate too fast | Same profile | **Distortion Speed** | Lower (default `0.35`). |
-| Tint too strong near surface | Same profile | **Shallow Tint Color** alpha / RGB | Reduce alpha or desaturate. |
-| Deep water too dark / opaque | Same profile | **Deep Tint Color**, **Full Effect Depth** | Soften deep tint or increase full-effect depth (meters). |
-| Fog too thick / too thin | Same profile | **Fog Density**, **Maximum Fog Strength** | Lower density/max for clearer water. URP fog follows optical path along the view ray (sideways looks fog more than straight down). |
-| Color grading odd | Same profile | **Saturation**, **Contrast** | `1` = unchanged; keep near `0.8`–`1.1`. |
-| Enter/exit snaps | Same profile | **Transition Duration** | Raise slightly (seconds). |
-| Waterline edge too hard / soft | **URP Renderer** → **Flood Underwater Renderer Feature** | **Waterline Softness Meters** | Default `0.03`; raise for a wider blend band. |
-| Effect never appears | URP Asset / Renderer / camera | Depth Texture; feature material; camera **Profile** | See [URP underwater camera effects](#urp-underwater-camera-effects). |
-| Underwater latch flickers | **Flood Camera Tracker** | **Enter/Exit Water Threshold Meters** | Widen the band (more negative enter, more positive exit). |
-| Audio not muffled | **Flood Underwater Audio** | **Audio Mixer**, parameter names, cutoffs | Expose mixer params; see [Underwater audio](#underwater-audio-audiomixer). |
+| If it looks…                   | Select                                                   | Field                                               | Typical fix                                                                                                                        |
+| ------------------------------ | -------------------------------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Too wavy / busy refraction     | **Flood Underwater Profile**                             | **Distortion Strength**                             | Lower toward `0`–`0.003` (default `0.008`). `0` disables waviness.                                                                 |
+| Waves animate too fast         | Same profile                                             | **Distortion Speed**                                | Lower (default `0.35`).                                                                                                            |
+| Tint too strong near surface   | Same profile                                             | **Shallow Tint Color** alpha / RGB                  | Reduce alpha or desaturate.                                                                                                        |
+| Deep water too dark / opaque   | Same profile                                             | **Deep Tint Color**, **Full Effect Depth**          | Soften deep tint or increase full-effect depth (meters).                                                                           |
+| Fog too thick / too thin       | Same profile                                             | **Fog Density**, **Maximum Fog Strength**           | Lower density/max for clearer water. URP fog follows optical path along the view ray (sideways looks fog more than straight down). |
+| Color grading odd              | Same profile                                             | **Saturation**, **Contrast**                        | `1` = unchanged; keep near `0.8`–`1.1`.                                                                                            |
+| Enter/exit snaps               | Same profile                                             | **Transition Duration**                             | Raise slightly (seconds).                                                                                                          |
+| Waterline edge too hard / soft | **URP Renderer** → **Flood Underwater Renderer Feature** | **Waterline Softness Meters**                       | Default `0.03`; raise for a wider blend band.                                                                                      |
+| Effect never appears           | URP Asset / Renderer / camera                            | Depth Texture; feature material; camera **Profile** | See [URP underwater camera effects](#urp-underwater-camera-effects).                                                               |
+| Underwater latch flickers      | **Flood Camera Tracker**                                 | **Enter/Exit Water Threshold Meters**               | Widen the band (more negative enter, more positive exit).                                                                          |
+| Audio not muffled              | **Flood Underwater Audio**                               | **Audio Mixer**, parameter names, cutoffs           | Expose mixer params; see [Underwater audio](#underwater-audio-audiomixer).                                                         |
 
 Presentation settings never change flood simulation volume or flow.
 
@@ -1918,4 +2047,3 @@ cell clipping, open-mesh rejection, and a deterministic 512-cell solver guard.
   after the manager has simulated a tick. In Edit Mode, the opening, endpoint,
   and static geometry aids can still draw, but live flow diagnostics remain
   zero or retain no runtime calculation.
-

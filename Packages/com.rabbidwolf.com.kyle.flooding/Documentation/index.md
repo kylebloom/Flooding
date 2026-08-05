@@ -45,6 +45,19 @@ Practical step-by-step setup lives in the
 3. Component field reference, scripting, upgrades, and troubleshooting in the
    same document.
 
+Deep per-component docs:
+
+- [Component guides hub](components/README.md)
+- [FloodSimulationManager](components/flood-simulation-manager.md)
+- [FloodVolume](components/flood-volume.md)
+- [FloodRegion](components/flood-region.md)
+- [FloodSource](components/flood-source.md)
+- [FloodSink](components/flood-sink.md)
+- [FloodConnection](components/flood-connection.md)
+- [ExternalFluidBoundary](components/external-fluid-boundary.md)
+- [FloodCameraTracker](components/flood-camera-tracker.md)
+- [Flood underwater URP stack](components/flood-underwater-urp.md)
+
 Camera / underwater presentation (optional):
 
 - [Track a camera](editor-workflow.md#track-a-camera-or-viewpoint-against-flood-volumes)
@@ -69,19 +82,19 @@ a transparent material compatible with your render pipeline.
 
 ### Scenario cheat sheet
 
-| I want to… | Do this |
-| --- | --- |
-| Fill one room from a pipe/leak | [Scenario 1](editor-workflow.md#scenario-1--single-room-filling-from-a-leak) |
-| Connect two rooms with a door | [Scenario 2](editor-workflow.md#scenario-2--two-rooms-equalizing-through-a-doorway) |
-| Flood from an ocean/lake waterline | [Scenario 3](editor-workflow.md#scenario-3--hull-breach-against-an-ocean-waterline) |
-| Use a custom floor outline | [Scenario 4](editor-workflow.md#scenario-4--non-rectangular-floor-plan-extruded-polygon) |
-| Bake a sloped/curved interior | [Scenario 5](editor-workflow.md#scenario-5--sloped-or-uneven-interior-baked-data) |
-| Drive Rigidbody mass from water | [Scenario 6](editor-workflow.md#scenario-6--flood-mass-affecting-a-vessel-rigidbody) |
-| Add flow VFX or SFX | [Scenario 7](editor-workflow.md#scenario-7--flow-visuals-and-audio) |
-| Debug surfaces and flow in Scene view | [Scenario 8](editor-workflow.md#scenario-8--scene-view-diagnostics-while-tuning) |
-| First-person waterline / underwater FX | [Scenario 9](editor-workflow.md#scenario-9--first-person-camera-through-a-rising-flood) |
-| Localized breach/leak ingress visuals | [Scenario 10](editor-workflow.md#scenario-10--local-ingress-presentation-vs-instant-bulk-surface) / [Local ingress](local-ingress.md) |
-| Soften wavy underwater look | [Tune underwater look](editor-workflow.md#tune-underwater-look-symptom--where-to-click) |
+| I want to…                             | Do this                                                                                                                               |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Fill one room from a pipe/leak         | [Scenario 1](editor-workflow.md#scenario-1--single-room-filling-from-a-leak)                                                          |
+| Connect two rooms with a door          | [Scenario 2](editor-workflow.md#scenario-2--two-rooms-equalizing-through-a-doorway)                                                   |
+| Flood from an ocean/lake waterline     | [Scenario 3](editor-workflow.md#scenario-3--hull-breach-against-an-ocean-waterline)                                                   |
+| Use a custom floor outline             | [Scenario 4](editor-workflow.md#scenario-4--non-rectangular-floor-plan-extruded-polygon)                                              |
+| Bake a sloped/curved interior          | [Scenario 5](editor-workflow.md#scenario-5--sloped-or-uneven-interior-baked-data)                                                     |
+| Drive Rigidbody mass from water        | [Scenario 6](editor-workflow.md#scenario-6--flood-mass-affecting-a-vessel-rigidbody)                                                  |
+| Add flow VFX or SFX                    | [Scenario 7](editor-workflow.md#scenario-7--flow-visuals-and-audio)                                                                   |
+| Debug surfaces and flow in Scene view  | [Scenario 8](editor-workflow.md#scenario-8--scene-view-diagnostics-while-tuning)                                                      |
+| First-person waterline / underwater FX | [Scenario 9](editor-workflow.md#scenario-9--first-person-camera-through-a-rising-flood)                                               |
+| Localized breach/leak ingress visuals  | [Scenario 10](editor-workflow.md#scenario-10--local-ingress-presentation-vs-instant-bulk-surface) / [Local ingress](local-ingress.md) |
+| Soften wavy underwater look            | [Tune underwater look](editor-workflow.md#tune-underwater-look-symptom--where-to-click)                                               |
 
 ## Units and ownership
 
@@ -124,13 +137,13 @@ finite volume deltas, then publishes state.
 In **Window > Package Management > Package Manager**, select **Flooding**, open
 **Samples**, and import:
 
-| Sample | Import path | Demonstrates |
-| --- | --- | --- |
+| Sample                 | Import path                                             | Demonstrates                                                          |
+| ---------------------- | ------------------------------------------------------- | --------------------------------------------------------------------- |
 | Flood Mass Integration | `Assets/Samples/Flooding/0.10.0/Flood Mass Integration` | Cutaway barge: visible water, COM markers, roll/pitch from flood mass |
-| Baked Geometry | `Assets/Samples/Flooding/0.10.0/Baked Geometry` | Curved hull bake, cell viz, free surface |
-| Connected Compartments | `Assets/Samples/Flooding/0.10.0/Connected Compartments` | Conserved doorway equalization |
-| Hull Breach | `Assets/Samples/Flooding/0.10.0/Hull Breach` | Ocean waterline ↔ compartment exchange |
-| First Person Flooding | `Assets/Samples/Flooding/0.10.0/First Person Flooding` | Rising flood, waterline crossing, URP underwater FX |
+| Baked Geometry         | `Assets/Samples/Flooding/0.10.0/Baked Geometry`         | Curved hull bake, cell viz, free surface                              |
+| Connected Compartments | `Assets/Samples/Flooding/0.10.0/Connected Compartments` | Conserved doorway equalization                                        |
+| Hull Breach            | `Assets/Samples/Flooding/0.10.0/Hull Breach`            | Ocean waterline ↔ compartment exchange                                |
+| First Person Flooding  | `Assets/Samples/Flooding/0.10.0/First Person Flooding`  | Rising flood, waterline crossing, URP underwater FX                   |
 
 Each imported scene is authored and editable before Play Mode. `Samples~` in
 the package is authoritative; re-import can overwrite `Assets/Samples` copies.
@@ -180,13 +193,13 @@ The package is a pre-1.0 gameplay prototype. The flooding vocabulary through
 `0.13.0` is in place (`FloodSource` / `FloodConnection` / `FloodSink` /
 `FloodVolume` plus presentation). Remaining publish milestones:
 
-| Milestone | Goal |
-| --- | --- |
-| **0.14** | Complex multi-compartment stress sample |
-| **0.15** | Authoring / debug UX pass |
-| **0.16** | Performance / profiling pass |
-| **0.9x / RC** | API stabilization + docs |
-| **1.0** | Stable gameplay-ready package |
+| Milestone     | Goal                                    |
+| ------------- | --------------------------------------- |
+| **0.14**      | Complex multi-compartment stress sample |
+| **0.15**      | Authoring / debug UX pass               |
+| **0.16**      | Performance / profiling pass            |
+| **0.9x / RC** | API stabilization + docs                |
+| **1.0**       | Stable gameplay-ready package           |
 
 Full checklists and 1.0 non-goals live in the repository
 [Path to 1.0](https://github.com/kylebloom/Flooding/blob/main/docs/IMPLEMENTATION_PLAN.md#path-to-10--gameplay-ready-package)

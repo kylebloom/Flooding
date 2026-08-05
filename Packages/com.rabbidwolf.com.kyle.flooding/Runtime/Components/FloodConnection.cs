@@ -440,6 +440,20 @@ namespace Kyle.Flooding
                 return false;
             }
 
+            var regionA = EffectiveFluidBoundary.ResolveRegion(
+                boundaryA as FloodVolume);
+            var regionB = EffectiveFluidBoundary.ResolveRegion(
+                boundaryB as FloodVolume);
+
+            if (regionA != null && regionA == regionB)
+            {
+                message =
+                    $"FloodConnection \"{name}\" resolves both endpoints to "
+                    + $"FloodRegion \"{regionA.name}\".\n\n"
+                    + "FloodConnection may only connect independently simulated regions.";
+                return false;
+            }
+
             var externalA = boundaryA is ExternalFluidBoundary;
             var externalB = boundaryB is ExternalFluidBoundary;
 
@@ -521,9 +535,12 @@ namespace Kyle.Flooding
             sideA.TryGet(out var boundaryA);
             sideB.TryGet(out var boundaryB);
 
+            var idA = ResolveSnapshotBoundaryId(boundaryA);
+            var idB = ResolveSnapshotBoundaryId(boundaryB);
+
             if (
-                !snapshots.TryGetValue(boundaryA.BoundaryId, out snapshotA)
-                || !snapshots.TryGetValue(boundaryB.BoundaryId, out snapshotB)
+                !snapshots.TryGetValue(idA, out snapshotA)
+                || !snapshots.TryGetValue(idB, out snapshotB)
                 || !snapshotA.IsEnabled
                 || !snapshotB.IsEnabled
                 || snapshotA.Owner != manager
@@ -543,9 +560,23 @@ namespace Kyle.Flooding
                 return false;
             }
 
-            finiteA = boundaryA as FloodVolume;
-            finiteB = boundaryB as FloodVolume;
+            finiteA = EffectiveFluidBoundary.ResolveCommitVolume(
+                boundaryA as FloodVolume);
+            finiteB = EffectiveFluidBoundary.ResolveCommitVolume(
+                boundaryB as FloodVolume);
             return true;
+        }
+
+        private static FluidBoundaryId ResolveSnapshotBoundaryId(
+            IFluidBoundary boundary)
+        {
+            if (boundary is FloodVolume volume)
+            {
+                var commit = EffectiveFluidBoundary.ResolveCommitVolume(volume);
+                return commit != null ? commit.BoundaryId : boundary.BoundaryId;
+            }
+
+            return boundary.BoundaryId;
         }
 
         private void MigrateLegacyEndpoints()

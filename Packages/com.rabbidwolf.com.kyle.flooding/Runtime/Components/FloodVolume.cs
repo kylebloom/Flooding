@@ -6,7 +6,9 @@ using UnityEngine.Serialization;
 namespace Kyle.Flooding
 {
     /// <summary>
-    /// Owns the flooding state and authored geometry for one scene compartment.
+    /// Authors floodable geometry for one scene compartment. Standalone volumes
+    /// also own water state; region members delegate water state to their
+    /// <see cref="FloodRegion"/>.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FloodVolume : MonoBehaviour, IMassContributor, IFluidBoundary
@@ -17,7 +19,7 @@ namespace Kyle.Flooding
         [Header("Simulation")]
 
         [SerializeField]
-        [Tooltip("Manager that advances and publishes this volume. If unassigned, the nearest parent manager is used.")]
+        [Tooltip("Manager that advances and publishes this volume. If unassigned, the nearest parent manager is used. When this volume is a FloodRegion member, water mutations resolve to the region.")]
         private FloodSimulationManager simulationManager;
 
         [Header("Floodable Space")]
@@ -65,7 +67,7 @@ namespace Kyle.Flooding
         [Header("Initial State")]
 
         [SerializeField]
-        [Tooltip("Water volume present when Play Mode begins, in cubic meters. Values above capacity are clamped.")]
+        [Tooltip("Water volume present when Play Mode begins, in cubic meters. Values above capacity are clamped. Ignored while this volume is a FloodRegion member — use FloodRegion Initial Volume instead.")]
         [Min(0f)]
         private float initialVolume;
 
@@ -74,6 +76,7 @@ namespace Kyle.Flooding
         [FormerlySerializedAs("initialWaterHeight")]
         private float legacyInitialWaterHeight = -1f;
 
+        private FloodRegion owningRegion;
         private IFloodVolumeGeometry geometry;
         private FloodSimulation simulation;
         private FloodState previousState;
@@ -87,10 +90,14 @@ namespace Kyle.Flooding
 
         /// <summary>
         /// Gets or sets the manager that advances and publishes this volume.
+        /// Region members report their owning region's manager.
         /// </summary>
         public FloodSimulationManager SimulationManager
         {
-            get => simulationManager;
+            get =>
+                owningRegion != null
+                    ? owningRegion.SimulationManager ?? simulationManager
+                    : simulationManager;
             set => SetSimulationManager(value);
         }
 
@@ -158,101 +165,138 @@ namespace Kyle.Flooding
 
         /// <summary>
         /// Gets the authored initial water volume in cubic meters.
+        /// Ignored while this volume is a <see cref="FloodRegion"/> member.
         /// </summary>
-        public float InitialVolume => initialVolume;
+        public float InitialVolume =>
+            owningRegion != null ? owningRegion.InitialVolume : initialVolume;
 
         /// <summary>
         /// Gets the configured water density in kilograms per cubic meter.
         /// </summary>
         public float WaterDensity => waterDensity;
 
+        /// <summary>
+        /// Gets the region that owns this volume's water state, if any.
+        /// </summary>
+        public FloodRegion OwningRegion => owningRegion;
+
+        /// <summary>
+        /// Gets whether this volume is a member of a <see cref="FloodRegion"/>.
+        /// </summary>
+        public bool IsRegionMember => owningRegion != null;
+
         /// <inheritdoc />
         public FluidBoundaryId BoundaryId => FluidBoundaryId.FromObject(this);
 
         /// <inheritdoc />
-        public bool IsBoundaryEnabled => isActiveAndEnabled;
+        public bool IsBoundaryEnabled =>
+            isActiveAndEnabled
+            && (owningRegion == null || owningRegion.IsBoundaryEnabled);
 
         /// <summary>
         /// Gets the equivalent level-fill height in meters. A tilted surface
         /// does not generally pass through this local-Y value.
         /// </summary>
         public float CurrentHeight =>
-            simulation == null
-                ? 0f
-                : (float)simulation.CurrentHeight;
+            owningRegion != null
+                ? owningRegion.CurrentHeight
+                : simulation == null
+                    ? 0f
+                    : (float)simulation.CurrentHeight;
 
         /// <summary>
         /// Gets the current water volume in cubic meters.
         /// </summary>
         public float CurrentVolume =>
-            simulation == null
-                ? 0f
-                : (float)simulation.CurrentVolume;
+            owningRegion != null
+                ? owningRegion.CurrentVolume
+                : simulation == null
+                    ? 0f
+                    : (float)simulation.CurrentVolume;
 
         /// <summary>
         /// Gets the compartment capacity in cubic meters.
+        /// Region members report the owning region's capacity.
         /// </summary>
         public float MaximumVolume =>
-            simulation == null
-                ? (float)(Geometry?.Capacity ?? 0d)
-                : (float)simulation.MaximumVolume;
+            owningRegion != null
+                ? owningRegion.MaximumVolume
+                : simulation == null
+                    ? (float)(Geometry?.Capacity ?? 0d)
+                    : (float)simulation.MaximumVolume;
 
         /// <summary>
         /// Gets the normalized fill percentage from zero to one.
         /// </summary>
         public float FillPercentage =>
-            simulation == null
-                ? 0f
-                : (float)simulation.FillPercentage;
+            owningRegion != null
+                ? owningRegion.FillPercentage
+                : simulation == null
+                    ? 0f
+                    : (float)simulation.FillPercentage;
 
         /// <summary>
         /// Gets the current water mass in kilograms.
         /// </summary>
         public double WaterMass =>
-            (simulation?.CurrentVolume ?? 0d) * waterDensity;
+            owningRegion != null
+                ? owningRegion.WaterMass
+                : (simulation?.CurrentVolume ?? 0d) * waterDensity;
 
         /// <summary>
         /// Gets the current world-space water surface plane.
+        /// Region members expose the shared region plane.
         /// </summary>
         public Plane SurfacePlane =>
-            geometry == null
-                ? new Plane(transform.up, transform.position)
-                : FloodPlaneUtility.LocalToWorld(
-                    transform,
-                    ResolveSurfaceSolution().LocalSurfacePlane);
+            owningRegion != null
+                ? owningRegion.SurfacePlane
+                : geometry == null
+                    ? new Plane(transform.up, transform.position)
+                    : FloodPlaneUtility.LocalToWorld(
+                        transform,
+                        ResolveSurfaceSolution().LocalSurfacePlane);
 
         /// <summary>
         /// Gets the solved water surface plane in compartment-local space.
+        /// Region members expose the plane in region-local space.
         /// </summary>
         public Plane LocalSurfacePlane =>
-            geometry == null
-                ? new Plane(Vector3.up, Vector3.zero)
-                : ResolveSurfaceSolution().LocalSurfacePlane;
+            owningRegion != null
+                ? owningRegion.LocalSurfacePlane
+                : geometry == null
+                    ? new Plane(Vector3.up, Vector3.zero)
+                    : ResolveSurfaceSolution().LocalSurfacePlane;
 
         /// <summary>
         /// Gets the signed solved volume error in cubic meters.
         /// </summary>
         public double SurfaceVolumeError =>
-            geometry == null
+            owningRegion != null
                 ? 0d
-                : ResolveSurfaceSolution().VolumeError;
+                : geometry == null
+                    ? 0d
+                    : ResolveSurfaceSolution().VolumeError;
 
         /// <summary>
         /// Gets the iterations used by the latest surface solve.
         /// </summary>
         public int SurfaceSolveIterations =>
-            geometry == null
+            owningRegion != null
                 ? 0
-                : ResolveSurfaceSolution().Iterations;
+                : geometry == null
+                    ? 0
+                    : ResolveSurfaceSolution().Iterations;
 
         /// <summary>
         /// Gets the current world-space center of mass of the water.
         /// </summary>
         public Vector3 WaterCenterOfMassWorld =>
-            geometry == null
-                ? transform.position
-                : transform.TransformPoint(
-                    ResolveSurfaceSolution().Submersion.Centroid);
+            owningRegion != null
+                ? owningRegion.WaterCenterOfMassWorld
+                : geometry == null
+                    ? transform.position
+                    : transform.TransformPoint(
+                        ResolveSurfaceSolution().Submersion.Centroid);
 
         double IMassContributor.Mass => WaterMass;
 
@@ -287,9 +331,10 @@ namespace Kyle.Flooding
 
         /// <summary>
         /// Queries submersion and surface data for a world-space sample point.
-        /// Values are derived from this volume's current authoritative state at
-        /// the moment of the call. The query is read-only and never advances,
-        /// reconciles, or publishes simulation state.
+        /// Containment uses this volume's authored geometry. Water depth and
+        /// surface data use the owning <see cref="FloodRegion"/> when bound,
+        /// otherwise this volume's own state. The query is read-only and never
+        /// advances, reconciles, or publishes simulation state.
         /// </summary>
         public FloodQueryResult QueryPoint(Vector3 worldPoint)
         {
@@ -298,6 +343,8 @@ namespace Kyle.Flooding
                 && activeGeometry.ContainsLocalPoint(
                     transform.InverseTransformPoint(worldPoint));
 
+            // Outside this volume's authored geometry: not inside / not submerged,
+            // even if the point lies in another member of the same region.
             var surfacePlane = SurfacePlane;
             // Unity Plane distance is positive in the normal direction. Flood
             // surface normals point out of the water, so positive distance means
@@ -337,6 +384,25 @@ namespace Kyle.Flooding
         private void Awake()
         {
             MigrateLegacyInitialHeight();
+
+            if (owningRegion != null)
+            {
+                if (!TryCreateAuthoredGeometry(out geometry, out var message))
+                {
+                    Debug.LogError(
+                        $"FloodVolume '{name}' has invalid geometry: {message}",
+                        this);
+                    enabled = false;
+                    return;
+                }
+
+                simulation = null;
+                previousState = CaptureState();
+                hasPreviousState = true;
+                ResolveManagerRegistration();
+                return;
+            }
+
             if (!InitializeSimulation())
                 return;
 
@@ -475,6 +541,9 @@ namespace Kyle.Flooding
         /// <returns>The requested, accepted, and rejected volume change.</returns>
         public VolumeChangeResult AddWater(float cubicMeters)
         {
+            if (owningRegion != null)
+                return owningRegion.AddWater(cubicMeters);
+
             return simulation == null
                 ? CreateUnavailableResult(Math.Max(0f, cubicMeters))
                 : simulation.AddVolume(cubicMeters);
@@ -487,6 +556,9 @@ namespace Kyle.Flooding
         /// <returns>The requested, accepted, and rejected volume change.</returns>
         public VolumeChangeResult RemoveWater(float cubicMeters)
         {
+            if (owningRegion != null)
+                return owningRegion.RemoveWater(cubicMeters);
+
             return simulation == null
                 ? CreateUnavailableResult(-Math.Max(0f, cubicMeters))
                 : simulation.RemoveVolume(cubicMeters);
@@ -499,6 +571,14 @@ namespace Kyle.Flooding
             float cubicMetersPerSecond,
             float deltaTime)
         {
+            if (owningRegion != null)
+            {
+                var requested =
+                    Math.Max(0f, cubicMetersPerSecond)
+                    * Math.Max(0f, deltaTime);
+                return owningRegion.AddWater((float)requested);
+            }
+
             return simulation == null
                 ? CreateUnavailableResult(
                     Math.Max(0f, cubicMetersPerSecond)
@@ -516,6 +596,14 @@ namespace Kyle.Flooding
             float cubicMetersPerSecond,
             float deltaTime)
         {
+            if (owningRegion != null)
+            {
+                var requested =
+                    Math.Max(0f, cubicMetersPerSecond)
+                    * Math.Max(0f, deltaTime);
+                return owningRegion.RemoveWater((float)requested);
+            }
+
             return simulation == null
                 ? CreateUnavailableResult(
                     -Math.Max(0f, cubicMetersPerSecond)
@@ -572,6 +660,9 @@ namespace Kyle.Flooding
 
         private FloodState CaptureState()
         {
+            if (owningRegion != null)
+                return owningRegion.CaptureMemberFacadeState(this);
+
             var volume = simulation?.CurrentVolume ?? 0d;
             var capacity = simulation?.MaximumVolume ?? MaximumVolume;
             var height = simulation?.CurrentHeight ?? 0d;
@@ -652,9 +743,13 @@ namespace Kyle.Flooding
         public FluidBoundarySnapshot CaptureBoundarySnapshot()
         {
             var state = CurrentState;
+            var manager =
+                owningRegion != null
+                    ? owningRegion.SimulationManager ?? simulationManager
+                    : simulationManager;
             return new FluidBoundarySnapshot(
                 BoundaryId,
-                simulationManager,
+                manager,
                 state.SurfacePlane,
                 waterDensity,
                 hasFiniteSupply: true,
@@ -667,6 +762,12 @@ namespace Kyle.Flooding
 
         internal void ApplyManagedVolumeDelta(double cubicMeters)
         {
+            if (owningRegion != null)
+            {
+                owningRegion.ApplyManagedVolumeDelta(cubicMeters);
+                return;
+            }
+
             if (cubicMeters > 0d)
                 simulation?.AddVolume(cubicMeters);
             else if (cubicMeters < 0d)
@@ -675,7 +776,128 @@ namespace Kyle.Flooding
 
         internal void PublishManagedState()
         {
+            if (owningRegion != null)
+            {
+                // Primary commit participant triggers region publish (deduped).
+                if (owningRegion.IsCommitParticipant(this))
+                    owningRegion.PublishManagedState();
+                return;
+            }
+
             PublishStateChanges();
+        }
+
+        internal void PublishManagedStateFromRegion()
+        {
+            PublishStateChanges();
+        }
+
+        internal FloodState CaptureDelegatedRegionState(FloodRegion region)
+        {
+            if (region == null || geometry == null)
+                return default;
+
+            var volume = region.GetAuthoritativeVolume();
+            var capacity = region.MaximumVolume;
+            var height = region.CurrentHeight;
+            var fillPercentage = region.FillPercentage;
+
+            // One-member parity: solve against this volume's geometry/transform.
+            var gravity =
+                region.SimulationManager == null
+                    ? Physics.gravity
+                    : region.SimulationManager.ActiveGravity;
+            Vector3 localSurfaceNormal;
+
+            if (IsFinite(gravity)
+                && gravity.sqrMagnitude
+                    >= FloodGeometryTolerances.MinimumGravityMagnitude
+                        * FloodGeometryTolerances.MinimumGravityMagnitude)
+            {
+                localSurfaceNormal =
+                    FloodPlaneUtility.WorldNormalToLocal(
+                        transform,
+                        -gravity.normalized);
+                lastValidLocalSurfaceNormal = localSurfaceNormal;
+                hasLastValidSurfaceNormal = true;
+            }
+            else
+            {
+                localSurfaceNormal = hasLastValidSurfaceNormal
+                    ? lastValidLocalSurfaceNormal
+                    : Vector3.up;
+            }
+
+            if (!(hasCachedSurfaceSolution
+                && cachedSurfaceVolume.Equals(volume)
+                && (cachedSurfaceNormal - localSurfaceNormal).sqrMagnitude
+                    <= FloodGeometryTolerances.PlaneNormal
+                        * FloodGeometryTolerances.PlaneNormal))
+            {
+                cachedSurfaceSolution = FloodSurfaceSolver.Solve(
+                    geometry,
+                    localSurfaceNormal,
+                    volume);
+                cachedSurfaceVolume = volume;
+                cachedSurfaceNormal = localSurfaceNormal;
+                hasCachedSurfaceSolution = true;
+            }
+
+            var surfacePlane = FloodPlaneUtility.LocalToWorld(
+                transform,
+                cachedSurfaceSolution.LocalSurfacePlane);
+            var centerOfMass = transform.TransformPoint(
+                cachedSurfaceSolution.Submersion.Centroid);
+
+            return new FloodState(
+                volume,
+                capacity,
+                height,
+                fillPercentage,
+                volume <= 0d,
+                volume >= capacity,
+                surfacePlane,
+                volume * waterDensity,
+                centerOfMass);
+        }
+
+        internal void BindOwningRegion(FloodRegion region)
+        {
+            if (region == null)
+                throw new ArgumentNullException(nameof(region));
+
+            if (owningRegion != null && owningRegion != region)
+            {
+                Debug.LogError(
+                    $"FloodVolume '{name}' is already a member of FloodRegion "
+                    + $"'{owningRegion.name}' and cannot also join '{region.name}'.",
+                    this);
+                return;
+            }
+
+            owningRegion = region;
+            simulation = null;
+            hasCachedSurfaceSolution = false;
+
+            if (geometry == null)
+                TryCreateAuthoredGeometry(out geometry, out _);
+        }
+
+        internal void UnbindOwningRegion(FloodRegion region)
+        {
+            if (owningRegion != region)
+                return;
+
+            owningRegion = null;
+            hasCachedSurfaceSolution = false;
+
+            // Static topology: volumes are not expected to regain independent
+            // simulation after unbind during Play Mode.
+            if (Application.isPlaying && enabled)
+            {
+                if (TryCreateAuthoredGeometry(out geometry, out _))
+                    simulation = FloodSimulationFactory.Create(geometry, 0d);
+            }
         }
 
         internal void UseManagerIfUnset(FloodSimulationManager manager)
@@ -709,7 +931,7 @@ namespace Kyle.Flooding
 
         private void PublishStateChanges()
         {
-            if (simulation == null)
+            if (simulation == null && owningRegion == null)
                 return;
 
             var currentState = CaptureState();
@@ -845,22 +1067,13 @@ namespace Kyle.Flooding
             IFloodVolumeGeometry sourceGeometry,
             double volume)
         {
-            var height = Math.Max(
-                MinimumDimension,
-                sourceGeometry.LocalBounds.size.y);
-            return new FloodSimulation(
-                GetEquivalentFloorArea(sourceGeometry),
-                height,
-                volume);
+            return FloodSimulationFactory.Create(sourceGeometry, volume);
         }
 
         private static double GetEquivalentFloorArea(
             IFloodVolumeGeometry sourceGeometry)
         {
-            var height = Math.Max(
-                MinimumDimension,
-                sourceGeometry.LocalBounds.size.y);
-            return sourceGeometry.Capacity / height;
+            return FloodSimulationFactory.GetEquivalentFloorArea(sourceGeometry);
         }
 
         private void DrawPolygonGizmo()

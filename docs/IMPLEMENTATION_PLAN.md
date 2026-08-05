@@ -44,7 +44,7 @@ This document remains authoritative for feature-phase delivery.
 
 ## Current status
 
-- Current milestone: **Phase 17 / 0.14 complex multi-compartment stress sample next**
+- Current milestone: **Phase 16R FloodRegion composition landed (tests pending open-Editor regression); Phase 17 stress sample next**
 - Overall package status: **Gameplay-consumable simulation prototype**
 - Simulation vocabulary complete for v1 flooding gameplay:
   `FloodSource` (add), `FloodConnection` (transfer + `OpenFraction`),
@@ -64,17 +64,27 @@ the same regression suites remain pending.
 
 ## Agreed architectural boundaries
 
-1. `FloodVolume` owns and exposes compartment water state.
-2. Simulation code determines volume transfers and derived water state.
-3. Geometry implementations answer capacity, submerged-volume, centroid, and
-   surface-intersection queries.
-4. Presentation components consume simulation state without mutating it.
-5. Connections calculate flow; they do not directly commit transfers.
-6. A simulation manager evaluates a shared snapshot and commits all transfers
-   simultaneously.
-7. Flooding reports mass contributions but does not control buoyancy, vessel
+1. `FloodVolume` authors floodable geometry and exposes gameplay queries.
+   Standalone volumes own water state; region members delegate water state to
+   their `FloodRegion`.
+2. `FloodRegion` owns independently simulated / equilibrium water state for
+   one or more explicit member volumes (`InitialVolume`, `CurrentVolume`,
+   shared surface plane).
+3. Simulation code determines volume transfers and derived water state.
+4. Geometry implementations answer capacity, submerged-volume, centroid, and
+   surface-intersection queries. Region unions use `CompositeFloodGeometry`
+   with pluggable strategies (analytic two-box prototype; occupancy bake later).
+5. Presentation components consume simulation state without mutating it.
+   Composed regions use region-level surface presentation, not stacked member
+   renderers.
+6. Connections calculate flow between independently simulated regions; they do
+   not directly commit transfers. Same-region endpoints are an authoring error.
+7. A simulation manager evaluates a shared snapshot and commits all transfers
+   simultaneously. Mutations targeting a member volume resolve to the owning
+   region via effective-boundary resolution.
+8. Flooding reports mass contributions but does not control buoyancy, vessel
    movement, sinking, roll, or pitch.
-8. Exterior water is represented as a fluid boundary, not as an arbitrary
+9. Exterior water is represented as a fluid boundary, not as an arbitrary
    water generator.
 
 ## Phase 0 — Stabilize the package
@@ -525,6 +535,45 @@ Acceptance criteria:
 - [x] Conservation uses applied sink volume.
 - [x] No egress anchors, destinations, power, or intake physics in the package.
 
+## Phase 16R — FloodRegion composition (0.14.x)
+
+Goal: allow multiple explicit `FloodVolume` members to compose one independently
+simulated region with correct union capacity and continuous first-person
+presentation, without automatic overlap-based merging.
+
+Core model:
+
+```text
+FloodVolume = authored floodable geometry
+FloodRegion = independently simulated / equilibrium body of water
+FloodConnection = hydraulic restriction between FloodRegions
+FloodSimulationManager = orchestration / conservation
+```
+
+- [x] Phase A — Ownership: `FloodRegion`, one-member parity, `InitialVolume`,
+  effective-boundary resolution, manager/public API compatibility.
+- [x] Phase B — `CompositeFloodGeometry` + `TwoBoxAnalyticUnionStrategy`
+  (prototype only; not long-term IE architecture).
+- [x] Phase C — Two-member end-to-end: region queries, region-level surface
+  renderer, source/sink/connection routing, same-region connection ERROR,
+  tilt tests.
+- [x] Phase D — Design only: region-local occupancy / `FloodRegionData` bake
+  documented in `docs/FLOOD_REGION_OCCUPANCY_DESIGN.md`.
+  No runtime mesh CSG; no silent analytic voxelization.
+
+Acceptance criteria (vertical slice):
+
+- [x] One-member region behaviorally matches standalone `FloodVolume` (tests added).
+- [x] Two-member union capacity; overlap and partial-fill counted once (Edit Mode).
+- [x] Face-touching continuity accepted; disconnected members validated.
+- [x] One region-owned `CurrentVolume` and one equilibrium `SurfacePlane`.
+- [x] Member `ContainsPoint` = member geometry; water/depth from region.
+- [x] Continuous region-level surface via `FloodRegionSurfaceRenderer`.
+- [ ] Standalone volume and existing connection regressions pass (Unity suite
+  pending — project locked by open Editor).
+- [x] Rotated/tilted region preserves gravity-aligned surface (Play Mode test).
+- [x] Same-region `FloodConnection` is an authoring error.
+
 ## Path to 1.0 — gameplay-ready package
 
 Publishing roadmap after the core flooding vocabulary landed. Version numbers
@@ -536,6 +585,7 @@ mark delivery sequence; SemVer may insert patch releases between milestones.
 | **0.12** | Runtime flow-control / opening controls (`OpenFraction`) | [x] Phase 15 complete |
 | **0.13** | Pumps / drains / sinks (`FloodSink`) | [x] Phase 16 complete |
 | **0.14** | Complex multi-compartment stress sample | [ ] Phase 17 |
+| **0.14.x** | FloodRegion composition (ownership → two-box union → region surface) | [~] Phase 16R |
 | **0.15** | Authoring / debug UX pass | [ ] Phase 18 |
 | **0.16** | Performance / profiling pass | [ ] Phase 19 |
 | **0.9x / RC** | API stabilization + docs freeze candidate | [ ] Phase 20 |

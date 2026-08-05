@@ -58,26 +58,66 @@ execution, transforms, or physics.
 
 ## State ownership
 
-`FloodSimulation` owns authoritative compartment volume and capacity clamping.
+`FloodSimulation` owns authoritative water volume and capacity clamping.
 It has no dependency on GameObjects or presentation.
 
-`FloodVolume` owns the `FloodSimulation` instance for one scene compartment. It
-also owns an immutable `IFloodVolumeGeometry` and converts simulation, geometry,
-and transform data into an immutable `FloodState`.
+### Standalone volumes
 
-It caches the latest `FloodSurfaceSolution` by authoritative volume and local
-surface normal. World transform changes reuse local clipped geometry when
-possible while still producing updated world-space state.
+When a `FloodVolume` is not a member of a `FloodRegion`, it owns the
+`FloodSimulation` instance for one scene compartment. It also owns an immutable
+`IFloodVolumeGeometry` and converts simulation, geometry, and transform data
+into an immutable `FloodState`.
+
+### Flood regions (composed equilibrium bodies)
+
+```text
+FloodVolume              = authored floodable geometry (+ gameplay query facade)
+FloodRegion              = independently simulated / equilibrium body of water
+FloodConnection          = hydraulic restriction between FloodRegions
+FloodSimulationManager   = orchestration / conservation
+```
+
+`FloodRegion` owns `FloodSimulation`, `InitialVolume`, and the derived free
+surface for one independently solved water body composed from one or more
+explicit member `FloodVolume`s. Membership is authoring truth; geometry
+validates spatial continuity (overlap or face-sharing within tolerance) but
+never invents membership. Topology is static at enable/load — opening a door
+changes `FloodConnection` flow and does not merge regions.
+
+Member volumes keep spatial identity (`ContainsPoint` uses member geometry).
+`QueryPoint` on a member uses member containment and the owning region's shared
+water state. Region queries use composite-union containment.
+
+`FloodRegion.InitialVolume` is authoritative for members. Member
+`initialVolume` fields are inactive while membership is bound.
+
+Sources, sinks, connections, and gameplay mutations that target a member volume
+resolve through `EffectiveFluidBoundary.Resolve` to the owning region when
+present. A `FloodConnection` whose endpoints resolve to the same region is an
+authoring error.
+
+Composite geometry is consumed through `CompositeFloodGeometry` with pluggable
+union strategies (`TwoBoxAnalyticUnionStrategy` for the two-rectangle
+prototype; region-local occupancy / `FloodRegionData` bake as the eventual
+general path). Inclusion-exclusion is not the long-term region architecture.
+Do not silently voxelize analytic volumes. See
+`docs/FLOOD_REGION_OCCUPANCY_DESIGN.md` for the bake design.
+
+### Shared caching and queries
+
+Volumes and regions cache the latest `FloodSurfaceSolution` by authoritative
+volume and local surface normal. World transform changes reuse local clipped
+geometry when possible while still producing updated world-space state.
 
 Consumers receive snapshots. They must not mutate simulation internals.
 
 Gameplay point queries (`ContainsPoint`, `IsPointSubmerged`, `QueryPoint`) are
-read-only compositions over the same live authoritative volume, geometry
-containment, and cached surface plane. They never enter the manager tick path
-and never publish events. `FloodQueryResult.SurfaceSignedDistanceMeters` exposes
-the plane distance sign convention (positive above, negative below) without
-changing `SubmersionDepthMeters`. Containment for analytic prisms is exact;
-baked geometry containment uses occupancy cells and exposes
+read-only compositions over live authoritative water state, geometry
+containment, and the cached surface plane. They never enter the manager tick
+path and never publish events. `FloodQueryResult.SurfaceSignedDistanceMeters`
+exposes the plane distance sign convention (positive above, negative below)
+without changing `SubmersionDepthMeters`. Containment for analytic prisms is
+exact; baked geometry containment uses occupancy cells and exposes
 `FloodContainmentPrecision.BakeApproximation` on the geometry contract.
 
 ## Mutation contract

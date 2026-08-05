@@ -42,6 +42,7 @@ namespace Kyle.Flooding
         private Vector3 customGravity = new(0f, -9.81f, 0f);
 
         private readonly List<FloodVolume> volumes = new();
+        private readonly List<FloodRegion> regions = new();
         private readonly List<ExternalFluidBoundary> externalBoundaries = new();
         private readonly List<FloodSource> sources = new();
         private readonly List<FloodSink> sinks = new();
@@ -263,6 +264,18 @@ namespace Kyle.Flooding
                 volumes.Remove(volume);
         }
 
+        internal void Register(FloodRegion region)
+        {
+            if (region != null && !regions.Contains(region))
+                regions.Add(region);
+        }
+
+        internal void Unregister(FloodRegion region)
+        {
+            if (region != null)
+                regions.Remove(region);
+        }
+
         internal void Register(ExternalFluidBoundary boundary)
         {
             if (boundary != null && !externalBoundaries.Contains(boundary))
@@ -313,6 +326,11 @@ namespace Kyle.Flooding
 
         private void RegisterHierarchyComponents()
         {
+            var childRegions = GetComponentsInChildren<FloodRegion>(true);
+
+            foreach (var region in childRegions)
+                region.UseManagerIfUnset(this);
+
             var childVolumes = GetComponentsInChildren<FloodVolume>(true);
 
             foreach (var volume in childVolumes)
@@ -343,6 +361,7 @@ namespace Kyle.Flooding
         private void RemoveMissingRegistrations()
         {
             volumes.RemoveAll(volume => volume == null);
+            regions.RemoveAll(region => region == null);
             externalBoundaries.RemoveAll(boundary => boundary == null);
             sources.RemoveAll(source => source == null);
             sinks.RemoveAll(sink => sink == null);
@@ -354,16 +373,22 @@ namespace Kyle.Flooding
             boundarySnapshots.Clear();
             volumeSnapshots.Clear();
 
+            foreach (var region in regions)
+                region.BeginTick();
+
             foreach (var volume in volumes)
             {
                 if (
-                    volume.isActiveAndEnabled
-                    && volume.SimulationManager == this)
+                    !volume.isActiveAndEnabled
+                    || volume.SimulationManager != this
+                    || !IsWaterCommitParticipant(volume))
                 {
-                    var snapshot = volume.CaptureBoundarySnapshot();
-                    boundarySnapshots[snapshot.BoundaryId] = snapshot;
-                    volumeSnapshots[volume] = volume.CurrentState;
+                    continue;
                 }
+
+                var snapshot = volume.CaptureBoundarySnapshot();
+                boundarySnapshots[snapshot.BoundaryId] = snapshot;
+                volumeSnapshots[volume] = volume.CurrentState;
             }
 
             foreach (var boundary in externalBoundaries)
@@ -393,11 +418,14 @@ namespace Kyle.Flooding
                         this,
                         deltaTime,
                         out var target,
-                        out var requestedVolume)
-                    || !volumeSnapshots.ContainsKey(target))
+                        out var requestedVolume))
                 {
                     continue;
                 }
+
+                target = EffectiveFluidBoundary.ResolveCommitVolume(target);
+                if (target == null || !volumeSnapshots.ContainsKey(target))
+                    continue;
 
                 configuredInflowRequests.Add(
                     new ConfiguredFlowRequest(source, null, target, requestedVolume));
@@ -422,11 +450,14 @@ namespace Kyle.Flooding
                         this,
                         deltaTime,
                         out var target,
-                        out var requestedVolume)
-                    || !volumeSnapshots.ContainsKey(target))
+                        out var requestedVolume))
                 {
                     continue;
                 }
+
+                target = EffectiveFluidBoundary.ResolveCommitVolume(target);
+                if (target == null || !volumeSnapshots.ContainsKey(target))
+                    continue;
 
                 configuredOutflowRequests.Add(
                     new ConfiguredFlowRequest(null, sink, target, requestedVolume));
@@ -655,6 +686,9 @@ namespace Kyle.Flooding
         {
             foreach (var volume in volumes)
             {
+                if (!IsWaterCommitParticipant(volume))
+                    continue;
+
                 if (volumeDeltas.TryGetValue(volume, out var delta))
                     volume.ApplyManagedVolumeDelta(delta);
             }
@@ -667,6 +701,12 @@ namespace Kyle.Flooding
                 if (volumeSnapshots.ContainsKey(volume))
                     volume.PublishManagedState();
             }
+        }
+
+        private static bool IsWaterCommitParticipant(FloodVolume volume)
+        {
+            var region = volume.OwningRegion;
+            return region == null || region.IsCommitParticipant(volume);
         }
 
         private FloodTickMetrics BuildTickMetrics()
