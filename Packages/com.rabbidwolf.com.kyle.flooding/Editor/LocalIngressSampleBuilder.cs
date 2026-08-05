@@ -42,6 +42,8 @@ namespace Kyle.Flooding.Editor
                 return false;
             }
 
+            var softParticleTexture = CreateSoftParticleTexture();
+
             var wallMaterial = CreateLitMaterial(
                 "Room Walls",
                 new Color(0.52f, 0.54f, 0.58f, 1f),
@@ -57,11 +59,13 @@ namespace Kyle.Flooding.Editor
             var localWaterMaterial = CreateIngressMaterial(
                 "Local Ingress Water",
                 "Kyle/Flooding/Ingress Patch",
-                new Color(0.2f, 0.55f, 0.9f, 0.55f));
+                new Color(0.16f, 0.52f, 0.88f, 0.62f),
+                configurePatch: true);
             var streamMaterial = CreateIngressMaterial(
                 "Ingress Stream",
                 "Kyle/Flooding/Ingress Jet",
-                new Color(0.35f, 0.72f, 0.98f, 0.78f));
+                new Color(0.38f, 0.74f, 0.98f, 0.82f),
+                configurePatch: false);
             var openingMaterial = CreateLitMaterial(
                 "Breach Opening",
                 new Color(0.2f, 0.85f, 0.35f, 1f),
@@ -70,6 +74,22 @@ namespace Kyle.Flooding.Editor
                 "Ocean Surface",
                 new Color(0.05f, 0.35f, 0.7f, 0.4f),
                 transparent: true);
+
+            var dropletMaterial = CreateSoftParticleMaterial(
+                "Ingress Droplet Particle",
+                softParticleTexture,
+                new Color(0.78f, 0.9f, 1f, 0.85f),
+                additive: false);
+            var mistMaterial = CreateSoftParticleMaterial(
+                "Ingress Mist Particle",
+                softParticleTexture,
+                new Color(0.85f, 0.93f, 1f, 0.35f),
+                additive: true);
+            var foamParticleMaterial = CreateSoftParticleMaterial(
+                "Ingress Foam Particle",
+                softParticleTexture,
+                new Color(0.95f, 0.98f, 1f, 0.8f),
+                additive: false);
 
             var profilePath = Path.Combine(
                     SampleFolder,
@@ -88,26 +108,38 @@ namespace Kyle.Flooding.Editor
                     profilePath);
             }
 
-            profile.LocalSpreadSpeed = 0.9f;
-            profile.MaximumLocalRadius = 4.5f;
+            // Showcase-tuned presentation values (not generic defaults).
+            profile.LocalSpreadSpeed = 1.05f;
+            profile.MaximumLocalRadius = 4.8f;
             profile.SettlingDurationSeconds = 1f;
             profile.ConvergenceDurationSeconds = 5f;
             profile.MinimumFlowRate = 0.01f;
             profile.MaximumSimultaneousPatches = 8;
             profile.FloorOffsetMeters = 0.015f;
-            profile.JetInitialSpeed = 5.5f;
-            profile.JetLifetimeSeconds = 0.65f;
-            profile.JetWidthMeters = 0.16f;
-            profile.JetTaper = 0.3f;
-            profile.JetGravityInfluence = 1.1f;
-            profile.JetTurbulence = 0.45f;
-            profile.JetUvFlowSpeed = 3f;
-            profile.DirectionalStretch = 0.95f;
+            profile.JetInitialSpeed = 6.2f;
+            profile.JetLifetimeSeconds = 0.72f;
+            profile.JetWidthMeters = 0.22f;
+            profile.JetTaper = 0.34f;
+            profile.JetGravityInfluence = 1.15f;
+            profile.JetTurbulence = 0.8f;
+            profile.JetUvFlowSpeed = 4.2f;
+            profile.DirectionalStretch = 1.05f;
             profile.DirectionalRelaxation = 0.5f;
-            profile.EdgeNoiseStrength = 0.4f;
-            profile.RippleStrength = 0.16f;
-            profile.SplashEmissionMultiplier = 1.25f;
-            profile.FoamStrength = 0.5f;
+            profile.EdgeNoiseScale = 2.8f;
+            profile.EdgeNoiseStrength = 0.52f;
+            profile.EdgeSoftness = 0.22f;
+            profile.RippleStrength = 0.3f;
+            profile.RippleSpeed = 2.1f;
+            profile.SplashEmissionMultiplier = 1.65f;
+            profile.SplashDropletSpeed = 2.7f;
+            profile.SplashDropletSize = 1.2f;
+            profile.FoamColor = new Color(0.92f, 0.97f, 1f, 1f);
+            profile.FoamStrength = 0.88f;
+            profile.FoamEdgeWidth = 0.24f;
+            profile.FoamNoiseScale = 5.2f;
+            profile.FoamScrollSpeed = 0.9f;
+            profile.SprayMistThreshold = 0.32f;
+            profile.FoamBurstThreshold = 0.18f;
             EditorUtility.SetDirty(profile);
 
             EditorSceneManager.NewScene(
@@ -225,7 +257,14 @@ namespace Kyle.Flooding.Editor
             stream.StreamMaterial = streamMaterial;
             stream.FloorPlane = floor.transform;
             stream.SimulationManager = manager;
-            stream.SplashParticles = CreateSplashParticles(streamObject.transform);
+            AssignImpactLayers(
+                stream,
+                CreateImpactHierarchy(
+                    streamObject.transform,
+                    dropletMaterial,
+                    mistMaterial,
+                    foamParticleMaterial,
+                    majorScale: true));
 
             var adjacentObject = new GameObject("Adjacent Flooded Room");
             adjacentObject.transform.SetParent(root.transform, false);
@@ -268,6 +307,21 @@ namespace Kyle.Flooding.Editor
             leak.FlowRate = 0.05f;
             leak.IsActive = false;
 
+            var leakStreamObject = new GameObject("Leak Stream");
+            leakStreamObject.transform.SetParent(leakObject.transform, false);
+            var leakStream = leakStreamObject.AddComponent<FloodIngressStreamPresenter>();
+            leakStream.StreamMaterial = streamMaterial;
+            leakStream.FloorPlane = floor.transform;
+            leakStream.SimulationManager = manager;
+            AssignImpactLayers(
+                leakStream,
+                CreateImpactHierarchy(
+                    leakStreamObject.transform,
+                    dropletMaterial,
+                    mistMaterial,
+                    foamParticleMaterial,
+                    majorScale: false));
+
             var presenterObject = new GameObject("Local Ingress Presenter");
             presenterObject.transform.SetParent(volumeObject.transform, false);
             var presenter = presenterObject.AddComponent<FloodLocalIngressPresenter>();
@@ -281,9 +335,10 @@ namespace Kyle.Flooding.Editor
 
             var serializedPresenter = new SerializedObject(presenter);
             var streamsProperty = serializedPresenter.FindProperty("streamPresenters");
-            streamsProperty.arraySize = 2;
+            streamsProperty.arraySize = 3;
             streamsProperty.GetArrayElementAtIndex(0).objectReferenceValue = stream;
             streamsProperty.GetArrayElementAtIndex(1).objectReferenceValue = null;
+            streamsProperty.GetArrayElementAtIndex(2).objectReferenceValue = leakStream;
             serializedPresenter.ApplyModifiedPropertiesWithoutUndo();
 
             var serializedBootstrap = new SerializedObject(bootstrap);
@@ -302,20 +357,22 @@ namespace Kyle.Flooding.Editor
                 .objectReferenceValue = surfaceRenderer;
             serializedBootstrap.ApplyModifiedPropertiesWithoutUndo();
 
+            // First-person showcase framing toward the primary breach impact zone.
             var cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
             var camera = cameraObject.AddComponent<Camera>();
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(0.1f, 0.12f, 0.15f, 1f);
-            cameraObject.transform.position = new Vector3(-3.2f, 1.6f, 2.4f);
-            cameraObject.transform.rotation = Quaternion.Euler(12f, 140f, 0f);
+            cameraObject.transform.position = new Vector3(-2.35f, 1.35f, 1.55f);
+            cameraObject.transform.rotation = Quaternion.Euler(8f, 148f, 0f);
             cameraObject.AddComponent<AudioListener>();
 
             var lightObject = new GameObject("Directional Light");
             var light = lightObject.AddComponent<Light>();
             light.type = LightType.Directional;
-            light.intensity = 1.15f;
-            lightObject.transform.rotation = Quaternion.Euler(35f, -35f, 0f);
+            light.intensity = 1.25f;
+            light.color = new Color(1f, 0.98f, 0.94f, 1f);
+            lightObject.transform.rotation = Quaternion.Euler(38f, -40f, 0f);
 
             var scenePath = Path.Combine(SampleFolder, "LocalIngress.unity")
                 .Replace('\\', '/');
@@ -378,6 +435,14 @@ namespace Kyle.Flooding.Editor
                 "Breach Opening.mat.meta",
                 "Ocean Surface.mat",
                 "Ocean Surface.mat.meta",
+                "Ingress Soft Particle.png",
+                "Ingress Soft Particle.png.meta",
+                "Ingress Droplet Particle.mat",
+                "Ingress Droplet Particle.mat.meta",
+                "Ingress Mist Particle.mat",
+                "Ingress Mist Particle.mat.meta",
+                "Ingress Foam Particle.mat",
+                "Ingress Foam Particle.mat.meta",
             };
 
             foreach (var fileName in fileNames)
@@ -419,10 +484,138 @@ namespace Kyle.Flooding.Editor
             return cube;
         }
 
+        private static Texture2D CreateSoftParticleTexture()
+        {
+            const int size = 64;
+            var path = Path.Combine(SampleFolder, "Ingress Soft Particle.png")
+                .Replace('\\', '/');
+
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false)
+            {
+                name = "Ingress Soft Particle",
+                wrapMode = TextureWrapMode.Clamp,
+                filterMode = FilterMode.Bilinear,
+            };
+
+            var center = (size - 1) * 0.5f;
+            for (var y = 0; y < size; y++)
+            {
+                for (var x = 0; x < size; x++)
+                {
+                    var dx = (x - center) / center;
+                    var dy = (y - center) / center;
+                    var r = Mathf.Sqrt((dx * dx) + (dy * dy));
+                    var a = Mathf.Pow(Mathf.Clamp01(1f - r), 2.4f);
+                    tex.SetPixel(x, y, new Color(1f, 1f, 1f, a));
+                }
+            }
+
+            tex.Apply(false, false);
+            File.WriteAllBytes(path, tex.EncodeToPNG());
+            Object.DestroyImmediate(tex);
+
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
+            if (AssetImporter.GetAtPath(path) is TextureImporter importer)
+            {
+                importer.textureType = TextureImporterType.Default;
+                importer.alphaIsTransparency = true;
+                importer.mipmapEnabled = true;
+                importer.wrapMode = TextureWrapMode.Clamp;
+                importer.filterMode = FilterMode.Bilinear;
+                importer.SaveAndReimport();
+            }
+
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        }
+
+        private static Material CreateSoftParticleMaterial(
+            string name,
+            Texture2D softTexture,
+            Color color,
+            bool additive)
+        {
+            var shader = Shader.Find("Universal Render Pipeline/Particles/Unlit")
+                ?? Shader.Find("Particles/Standard Unlit")
+                ?? Shader.Find("Sprites/Default");
+            var material = new Material(shader)
+            {
+                name = name,
+            };
+
+            ConfigureTransparentParticleMaterial(material, softTexture, color, additive);
+
+            var path = Path.Combine(SampleFolder, name + ".mat").Replace('\\', '/');
+            var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (existing != null)
+            {
+                existing.shader = shader;
+                ConfigureTransparentParticleMaterial(
+                    existing,
+                    softTexture,
+                    color,
+                    additive);
+                EditorUtility.SetDirty(existing);
+                return existing;
+            }
+
+            AssetDatabase.CreateAsset(material, path);
+            return AssetDatabase.LoadAssetAtPath<Material>(path);
+        }
+
+        private static void ConfigureTransparentParticleMaterial(
+            Material material,
+            Texture2D softTexture,
+            Color color,
+            bool additive)
+        {
+            if (material.HasProperty("_BaseMap") && softTexture != null)
+                material.SetTexture("_BaseMap", softTexture);
+            if (material.HasProperty("_MainTex") && softTexture != null)
+                material.SetTexture("_MainTex", softTexture);
+
+            if (material.HasProperty("_BaseColor"))
+                material.SetColor("_BaseColor", color);
+            if (material.HasProperty("_Color"))
+                material.SetColor("_Color", color);
+            material.color = color;
+
+            if (material.HasProperty("_Surface"))
+                material.SetFloat("_Surface", 1f);
+            if (material.HasProperty("_Blend"))
+                material.SetFloat("_Blend", additive ? 1f : 0f);
+            if (material.HasProperty("_ZWrite"))
+                material.SetFloat("_ZWrite", 0f);
+            if (material.HasProperty("_SrcBlend"))
+            {
+                material.SetFloat(
+                    "_SrcBlend",
+                    (float)(additive ? BlendMode.SrcAlpha : BlendMode.SrcAlpha));
+            }
+
+            if (material.HasProperty("_DstBlend"))
+            {
+                material.SetFloat(
+                    "_DstBlend",
+                    (float)(additive
+                        ? BlendMode.One
+                        : BlendMode.OneMinusSrcAlpha));
+            }
+
+            material.SetOverrideTag("RenderType", "Transparent");
+            material.renderQueue = (int)RenderQueue.Transparent;
+            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            if (additive)
+                material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
+            else
+                material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            material.DisableKeyword("_ALPHATEST_ON");
+        }
+
         private static Material CreateIngressMaterial(
             string name,
             string preferredShaderName,
-            Color color)
+            Color color,
+            bool configurePatch)
         {
             var shader = Shader.Find(preferredShaderName)
                 ?? Shader.Find("Universal Render Pipeline/Lit")
@@ -434,6 +627,27 @@ namespace Kyle.Flooding.Editor
                 color = color,
             };
 
+            ConfigureIngressMaterial(material, color, configurePatch);
+
+            var path = Path.Combine(SampleFolder, name + ".mat").Replace('\\', '/');
+            var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (existing != null)
+            {
+                existing.shader = shader;
+                ConfigureIngressMaterial(existing, color, configurePatch);
+                EditorUtility.SetDirty(existing);
+                return existing;
+            }
+
+            AssetDatabase.CreateAsset(material, path);
+            return AssetDatabase.LoadAssetAtPath<Material>(path);
+        }
+
+        private static void ConfigureIngressMaterial(
+            Material material,
+            Color color,
+            bool configurePatch)
+        {
             if (material.HasProperty("_Surface"))
             {
                 material.SetFloat("_Surface", 1f);
@@ -447,23 +661,46 @@ namespace Kyle.Flooding.Editor
                 material.SetColor("_BaseColor", color);
             if (material.HasProperty("_Opacity"))
                 material.SetFloat("_Opacity", color.a);
+            material.color = color;
 
-            var path = Path.Combine(SampleFolder, name + ".mat").Replace('\\', '/');
-            var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
-            if (existing != null)
+            if (configurePatch)
             {
-                existing.shader = shader;
-                existing.color = color;
-                if (existing.HasProperty("_BaseColor"))
-                    existing.SetColor("_BaseColor", color);
-                if (existing.HasProperty("_Opacity"))
-                    existing.SetFloat("_Opacity", color.a);
-                EditorUtility.SetDirty(existing);
-                return existing;
+                if (material.HasProperty("_FoamColor"))
+                    material.SetColor("_FoamColor", new Color(0.92f, 0.97f, 1f, 1f));
+                if (material.HasProperty("_FoamStrength"))
+                    material.SetFloat("_FoamStrength", 0.85f);
+                if (material.HasProperty("_FoamEdgeWidth"))
+                    material.SetFloat("_FoamEdgeWidth", 0.24f);
+                if (material.HasProperty("_FoamNoiseScale"))
+                    material.SetFloat("_FoamNoiseScale", 5.2f);
+                if (material.HasProperty("_FoamScrollSpeed"))
+                    material.SetFloat("_FoamScrollSpeed", 0.9f);
+                if (material.HasProperty("_EdgeNoiseStrength"))
+                    material.SetFloat("_EdgeNoiseStrength", 0.52f);
+                if (material.HasProperty("_RippleStrength"))
+                    material.SetFloat("_RippleStrength", 0.3f);
+                if (material.HasProperty("_RippleSpeed"))
+                    material.SetFloat("_RippleSpeed", 2.1f);
+                if (material.HasProperty("_NormalStrength"))
+                    material.SetFloat("_NormalStrength", 0.65f);
+                if (material.HasProperty("_FlowMotion"))
+                    material.SetFloat("_FlowMotion", 1.0f);
             }
-
-            AssetDatabase.CreateAsset(material, path);
-            return AssetDatabase.LoadAssetAtPath<Material>(path);
+            else
+            {
+                if (material.HasProperty("_Turbulence"))
+                    material.SetFloat("_Turbulence", 0.8f);
+                if (material.HasProperty("_FlowSpeed"))
+                    material.SetFloat("_FlowSpeed", 4.2f);
+                if (material.HasProperty("_EdgeFade"))
+                    material.SetFloat("_EdgeFade", 0.3f);
+                if (material.HasProperty("_AlphaBreakup"))
+                    material.SetFloat("_AlphaBreakup", 0.5f);
+                if (material.HasProperty("_FoamHighlight"))
+                    material.SetFloat("_FoamHighlight", 0.4f);
+                if (material.HasProperty("_FresnelIntensity"))
+                    material.SetFloat("_FresnelIntensity", 0.6f);
+            }
         }
 
         private static Material CreateLitMaterial(
@@ -493,33 +730,165 @@ namespace Kyle.Flooding.Editor
                 material.SetColor("_BaseColor", color);
 
             var path = Path.Combine(SampleFolder, name + ".mat").Replace('\\', '/');
+            var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (existing != null)
+            {
+                existing.shader = shader;
+                existing.color = color;
+                if (transparent && existing.HasProperty("_Surface"))
+                {
+                    existing.SetFloat("_Surface", 1f);
+                    existing.SetFloat("_Blend", 0f);
+                    existing.SetOverrideTag("RenderType", "Transparent");
+                    existing.renderQueue = (int)RenderQueue.Transparent;
+                    existing.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                }
+
+                if (existing.HasProperty("_BaseColor"))
+                    existing.SetColor("_BaseColor", color);
+                EditorUtility.SetDirty(existing);
+                return existing;
+            }
+
             AssetDatabase.CreateAsset(material, path);
             return AssetDatabase.LoadAssetAtPath<Material>(path);
         }
 
-        private static ParticleSystem CreateSplashParticles(Transform parent)
+        private readonly struct ImpactLayers
         {
-            var splashObject = new GameObject("Impact Splash");
-            splashObject.transform.SetParent(parent, false);
-            var particles = splashObject.AddComponent<ParticleSystem>();
+            public readonly ParticleSystem Droplets;
+            public readonly ParticleSystem SprayMist;
+            public readonly ParticleSystem FoamBurst;
+
+            public ImpactLayers(
+                ParticleSystem droplets,
+                ParticleSystem sprayMist,
+                ParticleSystem foamBurst)
+            {
+                Droplets = droplets;
+                SprayMist = sprayMist;
+                FoamBurst = foamBurst;
+            }
+        }
+
+        private static void AssignImpactLayers(
+            FloodIngressStreamPresenter stream,
+            ImpactLayers layers)
+        {
+            stream.DropletParticles = layers.Droplets;
+            stream.SprayMistParticles = layers.SprayMist;
+            stream.FoamBurstParticles = layers.FoamBurst;
+        }
+
+        private static ImpactLayers CreateImpactHierarchy(
+            Transform parent,
+            Material dropletMaterial,
+            Material mistMaterial,
+            Material foamMaterial,
+            bool majorScale)
+        {
+            var root = new GameObject("FloodIngressImpact");
+            root.transform.SetParent(parent, false);
+
+            var rateScale = majorScale ? 1f : 0.35f;
+            var sizeScale = majorScale ? 1f : 0.7f;
+
+            var droplets = CreateLayerParticles(
+                root.transform,
+                "Droplets",
+                dropletMaterial,
+                lifetime: 0.55f,
+                startSpeed: 2.4f,
+                startSize: 0.1f * sizeScale,
+                startColor: new Color(0.8f, 0.92f, 1f, 0.8f),
+                gravity: 1.05f,
+                maxParticles: majorScale ? 96 : 40,
+                rate: 42f * rateScale,
+                coneAngle: 26f,
+                coneRadius: 0.1f,
+                stretched: true,
+                velocityScale: 0.1f,
+                lengthScale: 2.6f);
+
+            var mist = CreateLayerParticles(
+                root.transform,
+                "SprayMist",
+                mistMaterial,
+                lifetime: 0.35f,
+                startSpeed: 1.1f,
+                startSize: 0.24f * sizeScale,
+                startColor: new Color(0.88f, 0.94f, 1f, 0.28f),
+                gravity: 0.15f,
+                maxParticles: majorScale ? 64 : 24,
+                rate: 48f * rateScale,
+                coneAngle: 42f,
+                coneRadius: 0.14f,
+                stretched: false,
+                velocityScale: 0f,
+                lengthScale: 1f);
+
+            var foam = CreateLayerParticles(
+                root.transform,
+                "FoamBurst",
+                foamMaterial,
+                lifetime: 0.7f,
+                startSpeed: 0.65f,
+                startSize: 0.32f * sizeScale,
+                startColor: new Color(0.95f, 0.98f, 1f, 0.75f),
+                gravity: 0.05f,
+                maxParticles: majorScale ? 48 : 16,
+                rate: 28f * rateScale,
+                coneAngle: 60f,
+                coneRadius: 0.16f,
+                stretched: false,
+                velocityScale: 0f,
+                lengthScale: 1f,
+                sizeOverLifetimeExpand: true);
+
+            return new ImpactLayers(droplets, mist, foam);
+        }
+
+        private static ParticleSystem CreateLayerParticles(
+            Transform parent,
+            string name,
+            Material material,
+            float lifetime,
+            float startSpeed,
+            float startSize,
+            Color startColor,
+            float gravity,
+            int maxParticles,
+            float rate,
+            float coneAngle,
+            float coneRadius,
+            bool stretched,
+            float velocityScale,
+            float lengthScale,
+            bool sizeOverLifetimeExpand = false)
+        {
+            var particleObject = new GameObject(name);
+            particleObject.transform.SetParent(parent, false);
+            var particles = particleObject.AddComponent<ParticleSystem>();
+
             var main = particles.main;
             main.loop = true;
             main.playOnAwake = false;
-            main.startLifetime = 0.45f;
-            main.startSpeed = 1.8f;
-            main.startSize = 0.07f;
-            main.startColor = new Color(0.85f, 0.92f, 1f, 0.65f);
+            main.startLifetime = lifetime;
+            main.startSpeed = startSpeed;
+            main.startSize = startSize;
+            main.startColor = startColor;
             main.simulationSpace = ParticleSystemSimulationSpace.World;
-            main.gravityModifier = 0.85f;
-            main.maxParticles = 128;
+            main.gravityModifier = gravity;
+            main.maxParticles = maxParticles;
+            main.scalingMode = ParticleSystemScalingMode.Hierarchy;
 
             var emission = particles.emission;
-            emission.rateOverTime = 28f;
+            emission.rateOverTime = rate;
 
             var shape = particles.shape;
             shape.shapeType = ParticleSystemShapeType.Cone;
-            shape.angle = 22f;
-            shape.radius = 0.08f;
+            shape.angle = coneAngle;
+            shape.radius = coneRadius;
 
             var colorOverLifetime = particles.colorOverLifetime;
             colorOverLifetime.enabled = true;
@@ -528,27 +897,43 @@ namespace Kyle.Flooding.Editor
                 new[]
                 {
                     new GradientColorKey(Color.white, 0f),
-                    new GradientColorKey(new Color(0.7f, 0.85f, 1f), 1f),
+                    new GradientColorKey(
+                        new Color(0.75f, 0.88f, 1f),
+                        1f),
                 },
                 new[]
                 {
-                    new GradientAlphaKey(0.7f, 0f),
+                    new GradientAlphaKey(Mathf.Clamp01(startColor.a), 0f),
+                    new GradientAlphaKey(Mathf.Clamp01(startColor.a * 0.55f), 0.35f),
                     new GradientAlphaKey(0f, 1f),
                 });
             colorOverLifetime.color = gradient;
 
-            var renderer = splashObject.GetComponent<ParticleSystemRenderer>();
-            renderer.renderMode = ParticleSystemRenderMode.Billboard;
-            var particleShader = Shader.Find("Universal Render Pipeline/Particles/Unlit")
-                ?? Shader.Find("Particles/Standard Unlit")
-                ?? Shader.Find("Sprites/Default");
-            if (particleShader != null)
+            if (sizeOverLifetimeExpand)
             {
-                renderer.sharedMaterial = new Material(particleShader)
-                {
-                    color = new Color(0.85f, 0.92f, 1f, 0.7f),
-                };
+                var sizeOverLifetime = particles.sizeOverLifetime;
+                sizeOverLifetime.enabled = true;
+                sizeOverLifetime.size = new ParticleSystem.MinMaxCurve(
+                    1f,
+                    AnimationCurve.EaseInOut(0f, 0.55f, 1f, 1.35f));
             }
+
+            var renderer = particleObject.GetComponent<ParticleSystemRenderer>();
+            if (stretched)
+            {
+                renderer.renderMode = ParticleSystemRenderMode.Stretch;
+                renderer.velocityScale = velocityScale;
+                renderer.lengthScale = lengthScale;
+                renderer.cameraVelocityScale = 0f;
+            }
+            else
+            {
+                renderer.renderMode = ParticleSystemRenderMode.Billboard;
+            }
+
+            renderer.sharedMaterial = material;
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
 
             particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             return particles;

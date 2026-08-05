@@ -37,14 +37,30 @@ meters remain exclusively on `FloodVolume`.
 | --- | --- |
 | Jet | Procedural tapered tube deformed on a ballistic curve (`FloodIngressJetMesh`) |
 | Gravity | `FloodSimulationManager.ActiveGravity` (fallback `Physics.gravity`) |
-| Jet motion | URP `Kyle/Flooding/Ingress Jet` scroll/turbulence, or Lit/color fallback |
-| Splash | Pooled `ParticleSystem` at predicted floor impact |
+| Jet motion | URP `Kyle/Flooding/Ingress Jet` (dual-layer flow noise, soft edges, Fresnel/specular, alpha breakup), or Lit/color fallback |
+| Impact layers | Pooled hierarchy `FloodIngressImpact` → `Droplets` / `SprayMist` / `FoamBurst` |
+| Droplets | Soft-alpha stretched billboards; ballistic, gravity-influenced |
+| Spray mist | Soft billboards; medium+ flow only (`Spray Mist Threshold`) |
+| Foam burst | Near-floor whitewater particles; scales with foam/splash strength |
 | Floor spread | One logical patch → up to 3 deterministic visual lobes, directional stretch |
-| Patch look | URP `Kyle/Flooding/Ingress Patch` irregular mask/ripples/foam, or Lit fallback |
+| Patch look | URP `Kyle/Flooding/Ingress Patch` irregular mask, moving normals, edge foam band, ripples — or Lit fallback |
 
-Expected cost per active ingress: ~1 jet draw + ≤3 patch draws + 1 particle system;
-cheap vertex updates on a reused ~50-vert jet mesh; no per-frame Instantiate or
-scene search.
+Assembly split:
+
+| Assembly | Owns |
+| --- | --- |
+| `Kyle.Flooding.Runtime` | Sampler, presentation state, presenters, jet/disc meshes, profile, generic particle hooks |
+| `Kyle.Flooding.URP` | Polished ingress jet/patch shaders and other URP visual helpers |
+
+The included Local Ingress sample intentionally uses the URP backend for showcase
+quality. Built-in/HDRP keep the ballistic mesh and soft particle materials with
+Lit/Particles fallbacks where shaders are unavailable.
+
+Expected cost per active major ingress: single-digit to low-teens draw calls
+(1 jet + ≤3 patch lobes + up to 3 particle systems), with bounded particle counts
+(typically well under ~200 concurrent for a tuned major breach). Cheap vertex
+updates on a reused jet mesh; no per-frame Instantiate, Destroy, or runtime
+texture generation.
 
 ## Setup in the Unity Editor
 
@@ -53,6 +69,10 @@ scene search.
 1. **Assets > Create > Flooding > Flood Ingress Presentation Profile**
 2. Tune lifecycle size, **Jet**, **Directional Spread**, **Splash**, and **Foam**
    groups, plus flow→stream/spread/splash curves.
+3. Foam fields (`Foam Color`, `Foam Strength`, `Foam Edge Width`,
+   `Foam Noise Scale`, `Foam Scroll Speed`) drive the URP patch edge band.
+4. `Spray Mist Threshold` / `Foam Burst Threshold` gate the secondary impact
+   particle layers.
 
 ### 2. Configure presentation anchors
 
@@ -80,15 +100,32 @@ Simulation ignores `Ingress Anchor`.
      **up** is the floor normal
    - **Patch Material** — transparent water-compatible material
    - **Connections** / **Sources** — explicit providers (preferred)
-4. Optionally add **Flood Ingress Stream Presenter** children (jet + splash) and
-   assign them in **Stream Presenters** (index-aligned: connections first, then
-   sources). Prefer materials using `Kyle/Flooding/Ingress Jet` and
+4. Optionally add **Flood Ingress Stream Presenter** children (jet + impact
+   layers) and assign them in **Stream Presenters** (index-aligned: connections
+   first, then sources). Prefer materials using `Kyle/Flooding/Ingress Jet` and
    `Kyle/Flooding/Ingress Patch` under URP.
+
+### 4. Configure impact particle layers
+
+On each `Flood Ingress Stream Presenter`:
+
+1. Create a child `FloodIngressImpact` (optional organizational root).
+2. Add three `ParticleSystem` children:
+   - **Droplets** — stretched billboard, soft circular alpha texture, gravity
+   - **SprayMist** — soft billboard, low opacity, wider cone
+   - **FoamBurst** — white/light cyan billboard near the floor, expands/fades
+3. Assign them to **Droplet Particles**, **Spray Mist Particles**, and
+   **Foam Burst Particles**.
+4. Use transparent URP Particles/Unlit (or equivalent) with a soft radial alpha
+   texture. Do **not** use opaque textureless quads or Cube mesh particles for
+   water spray.
+
+`Splash Particles` remains a compatibility alias for **Droplet Particles**.
 
 Auto-discover (when enabled) runs only on enable / `RefreshProviders()`, never
 every frame.
 
-### 4. Keep the bulk surface
+### 5. Keep the bulk surface
 
 Leave `FloodCubeSurfaceRenderer` / other `FloodSurfaceRenderer` components in
 place. Early ingress is locally dominant; after convergence the bulk surface
@@ -132,13 +169,15 @@ Configurable **Floor Offset** reduces Z-fighting.
 | --- | --- |
 | CFD / particles-as-fluid | Not used |
 | Patch count | Bounded (`Maximum Simultaneous Patches`, default 8) |
+| Particle counts | Bounded per layer (`maxParticles` authored on each system) |
 | Allocations | Fixed sample/patch/disc arrays; shared unit-disc mesh; MPB color updates |
 | Scene search | Explicit lists; one-time discover only |
 | Instantiate/Destroy | Disc slots pooled under the presenter; no per-frame spawn |
-| Draw calls | One disc mesh renderer per active patch + optional stream mesh |
+| Draw calls | Jet + patch lobes + up to 3 impact particle systems per active stream |
 
-Expected cost for a typical compartment: a handful of transparent quads/discs and
-simple LateUpdate sampling/math.
+Expected cost for a typical compartment: a handful of transparent draws and
+simple LateUpdate sampling/math. Aim for single-digit / low-teens draw calls per
+active major ingress rather than optimizing below that at the expense of look.
 
 ## Limitations (v1)
 
@@ -147,7 +186,7 @@ simple LateUpdate sampling/math.
 - Local patches do **not** affect `QueryPoint` / gameplay depth.
 - Residual visual overlap with the bulk surface can appear during mid-handoff.
 - Complex ramps/stairs may need custom presentation.
-- Splash is deliberately simple (stream + optional particle emission scaling).
+- Polished jet/patch appearance is URP-first; other pipelines use simpler fallbacks.
 
 ## Sample
 

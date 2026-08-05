@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="2" result="Passed" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-08-05 00:23:13Z" end-time="2026-08-05 00:23:13Z" duration="0.2095325">
+  <test-suite type="TestSuite" id="1094" name="Flooding" fullname="Flooding" runstate="Runnable" testcasecount="68" result="Passed" start-time="2026-08-05 00:23:13Z" end-time="2026-08-05 00:23:13Z" duration="0.209533" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1080" name="Kyle.Flooding.Tests.PlayMode.dll" fullname="C:/Users/kyleb/Flooding/Library/ScriptAssemblies/Kyle.Flooding.Tests.PlayMode.dll" runstate="Runnable" testcasecount="66" result="Passed" start-time="2026-08-05 00:23:13Z" end-time="2026-08-05 00:23:13Z" duration="0.186537" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="31588" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1081" name="Kyle" fullname="Kyle" runstate="Runnable" testcasecount="66" result="Passed" start-time="2026-08-05 00:23:13Z" end-time="2026-08-05 00:23:13Z" duration="0.183560" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1082" name="Flooding" fullname="Kyle.Flooding" runstate="Runnable" testcasecount="66" result="Passed" start-time="2026-08-05 00:23:13Z" end-time="2026-08-05 00:23:13Z" duration="0.181160" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1083" name="Tests" fullname="Kyle.Flooding.Tests" runstate="Runnable" testcasecount="66" result="Passed" start-time="2026-08-05 00:23:13Z" end-time="2026-08-05 00:23:13Z" duration="0.179485" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1033" name="FloodLocalIngressPresenterTests" fullname="Kyle.Flooding.Tests.FloodLocalIngressPresenterTests" classname="Kyle.Flooding.Tests.FloodLocalIngressPresenterTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-08-05 00:23:13Z" end-time="2026-08-05 00:23:13Z" duration="0.175246" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1034" name="Presenter_DoesNotMutateAuthoritativeVolume" fullname="Kyle.Flooding.Tests.FloodLocalIngressPresenterTests.Presenter_DoesNotMutateAuthoritativeVolume" methodname="Presenter_DoesNotMutateAuthoritativeVolume" classname="Kyle.Flooding.Tests.FloodLocalIngressPresenterTests" runstate="Runnable" seed="1431668308" result="Passed" start-time="2026-08-05 00:23:13Z" end-time="2026-08-05 00:23:13Z" duration="0.123042" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1035" name="Presenter_ReversedConnectionUpdatesDestinationIngressOnly" fullname="Kyle.Flooding.Tests.FloodLocalIngressPresenterTests.Presenter_ReversedConnectionUpdatesDestinationIngressOnly" methodname="Presenter_ReversedConnectionUpdatesDestinationIngressOnly" classname="Kyle.Flooding.Tests.FloodLocalIngressPresenterTests" runstate="Runnable" seed="348786541" result="Passed" start-time="2026-08-05 00:23:13Z" end-time="2026-08-05 00:23:13Z" duration="0.024879" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: C:/Users/kyleb/AppData/LocalLow/DefaultCompany/Flooding\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

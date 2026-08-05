@@ -403,11 +403,16 @@ press **I** to toggle local ingress ON/OFF.
    assign **Volume**, **Profile**, **Floor Plane** (position + up = floor
    normal), **Patch Material**, and explicit **Connections** / **Sources**.
 5. Optionally add **Flood Ingress Stream Presenter** at the breach and list it
-   under **Stream Presenters**.
+   under **Stream Presenters**. Assign layered impact particles
+   (**Droplet** / **Spray Mist** / **Foam Burst**) with soft-alpha materials —
+   not opaque textureless quads.
+6. Under URP, prefer **Patch Material** / jet materials using
+   `Kyle/Flooding/Ingress Patch` and `Kyle/Flooding/Ingress Jet`.
 
-**Expected:** Early inflow shows a stream and expanding shallow disc near the
-ingress; after settling/convergence the local opacity fades while the
-authoritative bulk surface remains. Disabling the presenter must not change
+**Expected:** Early inflow shows a turbulent jet, soft droplets/mist, visible
+impact foam, and an expanding irregular shallow patch with a foam rim; after
+settling/convergence the local opacity fades while the authoritative bulk
+surface remains. Disabling the presenter must not change
 `FloodVolume.CurrentVolume`. Full details:
 [Local ingress presentation](local-ingress.md).
 

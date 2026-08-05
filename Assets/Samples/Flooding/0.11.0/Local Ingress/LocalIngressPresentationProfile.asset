@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f028aa74d014ba39e901c6c19fb4df8, type: 3}
   m_Name: LocalIngressPresentationProfile
   m_EditorClassIdentifier: Kyle.Flooding.Runtime::Kyle.Flooding.FloodIngressPresentationProfile
-  localSpreadSpeed: 0.9
-  maximumLocalRadius: 4.5
+  localSpreadSpeed: 1.05
+  maximumLocalRadius: 4.8
   initialPoolDepth: 0.04
   settlingDurationSeconds: 1
   convergenceDurationSeconds: 5
@@ -94,22 +94,27 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  jetInitialSpeed: 5.5
-  jetLifetimeSeconds: 0.65
-  jetWidthMeters: 0.16
-  jetTaper: 0.3
-  jetGravityInfluence: 1.1
-  jetTurbulence: 0.45
-  jetUvFlowSpeed: 3
-  directionalStretch: 0.95
+  jetInitialSpeed: 6.2
+  jetLifetimeSeconds: 0.72
+  jetWidthMeters: 0.22
+  jetTaper: 0.34
+  jetGravityInfluence: 1.15
+  jetTurbulence: 0.8
+  jetUvFlowSpeed: 4.2
+  directionalStretch: 1.05
   directionalRelaxation: 0.5
-  edgeNoiseScale: 2.4
-  edgeNoiseStrength: 0.4
-  edgeSoftness: 0.18
-  rippleStrength: 0.16
-  rippleSpeed: 1.4
-  splashEmissionMultiplier: 1.25
-  splashDropletSpeed: 2.2
-  splashDropletSize: 1
-  foamStrength: 0.5
-  foamEdgeWidth: 0.12
+  edgeNoiseScale: 2.8
+  edgeNoiseStrength: 0.52
+  edgeSoftness: 0.22
+  rippleStrength: 0.3
+  rippleSpeed: 2.1
+  splashEmissionMultiplier: 1.65
+  splashDropletSpeed: 2.7
+  splashDropletSize: 1.2
+  foamColor: {r: 0.92, g: 0.97, b: 1, a: 1}
+  foamStrength: 0.88
+  foamEdgeWidth: 0.24
+  foamNoiseScale: 5.2
+  foamScrollSpeed: 0.9
+  sprayMistThreshold: 0.32
+  foamBurstThreshold: 0.18

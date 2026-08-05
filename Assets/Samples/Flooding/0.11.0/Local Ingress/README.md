@@ -1,9 +1,9 @@
 # Local Ingress sample
 
-This Unity 6.5 sample compares **instant bulk free-surface presentation** with
-**local ingress presentation**: a curved jet enters from a breach, impacts the
-floor with splash, and spreads as irregular shallow water before converging to
-the authoritative room-wide surface.
+This Unity 6.5 **URP showcase** compares **instant bulk free-surface
+presentation** with **local ingress presentation**: a turbulent jet enters from
+a breach, impacts the floor with droplets/spray/foam, and spreads as irregular
+shallow water before converging to the authoritative room-wide surface.
 
 Local ingress does **not** change flood simulation semantics. Total water volume,
 transfers, and gameplay queries remain owned by `FloodVolume`.
@@ -25,22 +25,26 @@ If the scene/materials need rebuilding after a package update:
 
 ### Major breach (default / key **3**)
 
-1. Water emerges from the hull opening as a tapered jet.
-2. The jet curves under gravity toward the floor.
-3. Impact produces a visible splash.
-4. Shallow water spreads directionally away from the impact with irregular,
-   moving edges (not a perfect circle).
-5. Over several seconds the local layer fades as the bulk free surface takes
+1. Water blasts from the hull opening as a continuous turbulent jet.
+2. Surface detail and soft edges move along the jet (not a flat transparent beam).
+3. Droplets separate at impact; soft spray/mist adds scale.
+4. Obvious whitewater/foam at the impact zone.
+5. Shallow water spreads directionally with irregular, moving edges and a foam
+   rim — not a static blue disc.
+6. Over several seconds the local layer fades as the bulk free surface takes
    over.
+
+No cube-shaped splash particles. No obviously rectangular water beam.
 
 ### Medium breach (**2**)
 
-Clearly visible stream, impact, and directional shallow spread — less violent
-than major.
+Visible jet, splash, and moderate foam — less violent than major; mist is
+present but lighter.
 
 ### Tiny leak (**1**)
 
-Narrow trickle, minimal splash, small local puddle.
+Ceiling trickle with few droplets, essentially no major foam, small shallow
+patch.
 
 ### Stop flow (**O**)
 
@@ -64,14 +68,23 @@ equilibrium visuals for the same solver state.
 ## Visual stack
 
 - Procedural ballistic jet mesh (`FloodIngressStreamPresenter`)
-- Optional URP shaders: `Kyle/Flooding/Ingress Jet`, `Kyle/Flooding/Ingress Patch`
-- Pooled impact `ParticleSystem`
-- Multi-lobe irregular floor spread from one logical patch per provider
+- URP shaders: `Kyle/Flooding/Ingress Jet`, `Kyle/Flooding/Ingress Patch`
+- Layered impact particles under `FloodIngressImpact`:
+  - `Droplets` (stretched soft billboards)
+  - `SprayMist` (soft additive mist)
+  - `FoamBurst` (near-floor whitewater)
+- Soft radial particle texture (`Ingress Soft Particle.png`)
+- Multi-lobe irregular floor spread with edge foam from one logical patch per
+  provider
+
+Approximate Major Breach cost: single-digit / low-teens draw calls for the
+primary ingress (jet + ≤3 patch lobes + 3 particle systems), with bounded
+particle budgets (Droplets ≤96, SprayMist ≤64, FoamBurst ≤48).
 
 ## Limitations (v1)
 
 - Not CFD; local patches are a visual proxy only.
 - Local patches do not affect `QueryPoint` / gameplay depth.
 - Residual overlap with the bulk surface can appear during mid-handoff.
-- Rich jet/patch shaders require URP; Built-in/HDRP keep ballistic mesh + Lit
-  transparent fallback.
+- Rich jet/patch shaders require URP; Built-in/HDRP keep ballistic mesh + Lit /
+  Particles transparent fallbacks.

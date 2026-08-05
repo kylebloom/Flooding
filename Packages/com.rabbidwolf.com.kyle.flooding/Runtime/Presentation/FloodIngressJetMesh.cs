@@ -8,8 +8,8 @@ namespace Kyle.Flooding
     /// </summary>
     public sealed class FloodIngressJetMesh
     {
-        public const int DefaultRadialSegments = 8;
-        public const int DefaultLengthSegments = 7;
+        public const int DefaultRadialSegments = 12;
+        public const int DefaultLengthSegments = 10;
 
         private readonly int radialSegments;
         private readonly int lengthSegments;

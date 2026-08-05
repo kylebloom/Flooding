@@ -446,6 +446,9 @@ volume.
 - [x] Final regression: Edit Mode 104/104 and Play Mode 66/66 passed
   (Unity 6000.5.6f1), including 14 ingress Edit Mode and 2 presenter Play Mode
   tests.
+- [x] URP visual-quality pass: layered impact particles (droplets/mist/foam),
+  upgraded jet/patch shaders with edge foam, showcase-tuned Local Ingress
+  sample (simulation/state architecture unchanged).
 
 Acceptance criteria:
 
@@ -456,6 +459,8 @@ Acceptance criteria:
 - One provider updates one patch across frames; stop transitions through
   settle/converge without popping.
 - Core runtime remains free of URP dependencies for local ingress.
+- URP showcase aims for single-digit / low-teens draw calls per active major
+  ingress with bounded particle counts; no CFD.
 
 ## Documentation roadmap
 

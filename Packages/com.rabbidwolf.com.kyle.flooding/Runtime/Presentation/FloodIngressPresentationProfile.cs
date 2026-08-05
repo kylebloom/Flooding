@@ -180,14 +180,38 @@ namespace Kyle.Flooding
         [Header("Foam")]
 
         [SerializeField]
+        [Tooltip("Foam tint applied near irregular patch edges and impact cues.")]
+        private Color foamColor = new(0.9f, 0.95f, 1f, 1f);
+
+        [SerializeField]
         [Tooltip("Shader foam intensity near irregular patch edges and impact cues.")]
         [Range(0f, 1f)]
         private float foamStrength = 0.45f;
 
         [SerializeField]
         [Tooltip("Normalized radial width of the foam rim on local patches.")]
-        [Range(0.01f, 0.4f)]
+        [Range(0.01f, 0.5f)]
         private float foamEdgeWidth = 0.12f;
+
+        [SerializeField]
+        [Tooltip("Spatial scale of foam breakup noise along the patch rim.")]
+        [Min(0.01f)]
+        private float foamNoiseScale = 4.5f;
+
+        [SerializeField]
+        [Tooltip("Scroll speed of foam noise along the patch rim in cycles per second.")]
+        [Min(0f)]
+        private float foamScrollSpeed = 0.65f;
+
+        [SerializeField]
+        [Tooltip("Normalized splash strength below which spray-mist emission stays off.")]
+        [Range(0f, 1f)]
+        private float sprayMistThreshold = 0.35f;
+
+        [SerializeField]
+        [Tooltip("Normalized splash strength below which foam-burst emission stays minimal.")]
+        [Range(0f, 1f)]
+        private float foamBurstThreshold = 0.2f;
 
         public float LocalSpreadSpeed
         {
@@ -394,6 +418,12 @@ namespace Kyle.Flooding
             set => splashDropletSize = Mathf.Max(0f, value);
         }
 
+        public Color FoamColor
+        {
+            get => foamColor;
+            set => foamColor = value;
+        }
+
         public float FoamStrength
         {
             get => foamStrength;
@@ -403,7 +433,31 @@ namespace Kyle.Flooding
         public float FoamEdgeWidth
         {
             get => foamEdgeWidth;
-            set => foamEdgeWidth = Mathf.Clamp(value, 0.01f, 0.4f);
+            set => foamEdgeWidth = Mathf.Clamp(value, 0.01f, 0.5f);
+        }
+
+        public float FoamNoiseScale
+        {
+            get => foamNoiseScale;
+            set => foamNoiseScale = Mathf.Max(0.01f, value);
+        }
+
+        public float FoamScrollSpeed
+        {
+            get => foamScrollSpeed;
+            set => foamScrollSpeed = Mathf.Max(0f, value);
+        }
+
+        public float SprayMistThreshold
+        {
+            get => sprayMistThreshold;
+            set => sprayMistThreshold = Mathf.Clamp01(value);
+        }
+
+        public float FoamBurstThreshold
+        {
+            get => foamBurstThreshold;
+            set => foamBurstThreshold = Mathf.Clamp01(value);
         }
 
         public float EvaluateNormalizedStrength(float flowRateCubicMetersPerSecond)
@@ -481,7 +535,11 @@ namespace Kyle.Flooding
             splashDropletSpeed = SanitizeNonNegative(splashDropletSpeed, 2.2f);
             splashDropletSize = SanitizeNonNegative(splashDropletSize, 1f);
             foamStrength = Mathf.Clamp01(foamStrength);
-            foamEdgeWidth = Mathf.Clamp(foamEdgeWidth, 0.01f, 0.4f);
+            foamEdgeWidth = Mathf.Clamp(foamEdgeWidth, 0.01f, 0.5f);
+            foamNoiseScale = Mathf.Max(0.01f, SanitizeNonNegative(foamNoiseScale, 4.5f));
+            foamScrollSpeed = SanitizeNonNegative(foamScrollSpeed, 0.65f);
+            sprayMistThreshold = Mathf.Clamp01(sprayMistThreshold);
+            foamBurstThreshold = Mathf.Clamp01(foamBurstThreshold);
 
             flowToStreamScale ??= AnimationCurve.Linear(0f, 0.15f, 1f, 1f);
             flowToSpreadSpeed ??= AnimationCurve.Linear(0f, 0.35f, 1f, 1f);

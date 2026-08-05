@@ -520,7 +520,8 @@ Migration must not reinterpret a height value directly as cubic meters.
 - Optional focused baked-data free-surface presentation.
 - Optional connection flow visuals and connection/source/volume audio consumers.
 - Optional local ingress stream/spread presentation converging to the bulk
-  free surface (visual proxy only).
+  free surface (visual proxy only), including optional URP jet/patch shaders,
+  shader edge foam, and layered impact particle systems.
 
 ## Current non-goals
 
@@ -534,6 +535,7 @@ Migration must not reinterpret a height value directly as cubic meters.
   authoritative simulation behavior. Local ingress presentation may approximate
   early localized spread visually without becoming a second fluid solver.
 - CFD, SPH/FLIP, collision-based spray/foam, or pressure-shaped local surfaces.
-- Bundled audio clips, particle assets, foam, or spray content. Presentation
-  components expose authored slots for project-supplied assets.
+- Large bundled VFX libraries. Presentation components expose authored slots;
+  the Local Ingress URP sample may ship a minimal soft-particle texture and
+  materials for showcase quality.
 

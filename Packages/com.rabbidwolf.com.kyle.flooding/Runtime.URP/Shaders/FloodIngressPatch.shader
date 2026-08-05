@@ -5,13 +5,21 @@ Shader "Kyle/Flooding/Ingress Patch"
         _BaseColor ("Base Color", Color) = (0.18, 0.5, 0.82, 0.55)
         _Opacity ("Opacity", Range(0, 1)) = 0.55
         _Strength ("Strength", Range(0, 1)) = 1
-        _EdgeNoiseScale ("Edge Noise Scale", Float) = 2.4
-        _EdgeNoiseStrength ("Edge Noise Strength", Range(0, 1)) = 0.35
-        _EdgeSoftness ("Edge Softness", Range(0.01, 0.5)) = 0.18
-        _RippleStrength ("Ripple Strength", Range(0, 1)) = 0.12
-        _RippleSpeed ("Ripple Speed", Float) = 1.4
-        _FoamStrength ("Foam Strength", Range(0, 1)) = 0.45
-        _FoamEdgeWidth ("Foam Edge Width", Range(0.01, 0.4)) = 0.12
+        _EdgeNoiseScale ("Edge Noise Scale", Float) = 2.8
+        _EdgeNoiseStrength ("Edge Noise Strength", Range(0, 1)) = 0.45
+        _EdgeSoftness ("Edge Softness", Range(0.01, 0.5)) = 0.2
+        _RippleStrength ("Ripple Strength", Range(0, 1)) = 0.22
+        _RippleSpeed ("Ripple Speed", Float) = 1.8
+        _FoamColor ("Foam Color", Color) = (0.9, 0.95, 1.0, 1)
+        _FoamStrength ("Foam Strength", Range(0, 1)) = 0.75
+        _FoamEdgeWidth ("Foam Edge Width", Range(0.01, 0.5)) = 0.18
+        _FoamNoiseScale ("Foam Noise Scale", Float) = 4.5
+        _FoamScrollSpeed ("Foam Scroll Speed", Float) = 0.65
+        _FresnelPower ("Fresnel Power", Range(0.5, 8)) = 3.2
+        _FresnelIntensity ("Fresnel Intensity", Range(0, 2)) = 0.4
+        _SpecularIntensity ("Specular Intensity", Range(0, 2)) = 0.35
+        _NormalStrength ("Normal Strength", Range(0, 2)) = 0.55
+        _FlowMotion ("Flow Motion", Float) = 0.85
         _Stretch ("Stretch", Vector) = (1, 1, 0, 0)
         _FlowDirection ("Flow Direction", Vector) = (0, 0, 1, 0)
     }
@@ -49,8 +57,16 @@ Shader "Kyle/Flooding/Ingress Patch"
                 float _EdgeSoftness;
                 float _RippleStrength;
                 float _RippleSpeed;
+                float4 _FoamColor;
                 float _FoamStrength;
                 float _FoamEdgeWidth;
+                float _FoamNoiseScale;
+                float _FoamScrollSpeed;
+                float _FresnelPower;
+                float _FresnelIntensity;
+                float _SpecularIntensity;
+                float _NormalStrength;
+                float _FlowMotion;
                 float4 _Stretch;
                 float4 _FlowDirection;
             CBUFFER_END
@@ -66,6 +82,7 @@ Shader "Kyle/Flooding/Ingress Patch"
                 float4 positionCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
                 float3 positionWS : TEXCOORD1;
+                float3 viewDirWS : TEXCOORD2;
             };
 
             float Hash21(float2 p)
@@ -87,16 +104,30 @@ Shader "Kyle/Flooding/Ingress Patch"
                 return lerp(lerp(a, b, u.x), lerp(c, d, u.x), u.y);
             }
 
+            float Fbm(float2 p)
+            {
+                float v = 0.0;
+                float a = 0.5;
+                v += ValueNoise(p) * a;
+                p = p * 2.1 + 13.7;
+                a *= 0.5;
+                v += ValueNoise(p) * a;
+                return v;
+            }
+
             Varyings Vert(Attributes input)
             {
                 Varyings output;
                 float3 pos = input.positionOS.xyz;
                 float2 centered = input.uv * 2.0 - 1.0;
-                float ripple = sin((centered.x + centered.y) * 8.0 + _Time.y * _RippleSpeed * 6.283185);
-                pos.y += ripple * _RippleStrength * 0.03 * _Strength;
-                output.positionCS = TransformObjectToHClip(pos);
+                float ripple = sin((centered.x * 7.0 + centered.y * 5.0) + _Time.y * _RippleSpeed * 6.283185);
+                float ripple2 = sin((centered.x * -4.0 + centered.y * 9.0) + _Time.y * _RippleSpeed * 4.1);
+                pos.y += (ripple * 0.65 + ripple2 * 0.35) * _RippleStrength * 0.04 * _Strength;
+                float3 positionWS = TransformObjectToWorld(pos);
+                output.positionCS = TransformWorldToHClip(positionWS);
                 output.uv = input.uv;
-                output.positionWS = TransformObjectToWorld(pos);
+                output.positionWS = positionWS;
+                output.viewDirWS = GetWorldSpaceNormalizeViewDir(positionWS);
                 return output;
             }
 
@@ -110,21 +141,51 @@ Shader "Kyle/Flooding/Ingress Patch"
                 aligned.y /= stretch.x;
 
                 float radial = length(aligned);
-                float noise = ValueNoise(aligned * _EdgeNoiseScale + _Time.y * 0.15);
-                float edge = radial + (noise - 0.5) * _EdgeNoiseStrength;
+                float edgeNoise = Fbm(aligned * _EdgeNoiseScale + _Time.y * 0.2);
+                float edge = radial + (edgeNoise - 0.5) * _EdgeNoiseStrength;
                 float mask = 1.0 - smoothstep(1.0 - _EdgeSoftness, 1.0, edge);
                 clip(mask - 0.001);
 
-                float foamBand = smoothstep(1.0 - _FoamEdgeWidth - _EdgeSoftness, 1.0 - _FoamEdgeWidth * 0.25, edge);
-                float foam = foamBand * _FoamStrength * _Strength;
+                float2 flowUv = aligned;
+                flowUv += flow * (_Time.y * _FlowMotion * 0.15);
+                float n1 = Fbm(flowUv * 3.5 + _Time.y * _RippleSpeed * 0.25);
+                float n2 = Fbm(flowUv * 6.2 - float2(_Time.y * _RippleSpeed * 0.18, 0.0) + 8.3);
+                float surface = lerp(n1, n2, 0.5);
 
-                float ripple = 0.5 + 0.5 * sin((aligned.x * 9.0 + aligned.y * 7.0) + _Time.y * _RippleSpeed * 6.283185);
-                float3 color = lerp(_BaseColor.rgb * 0.85, _BaseColor.rgb * 1.1, ripple);
-                color = lerp(color, float3(0.85, 0.92, 0.98), foam);
+                float foamBand = smoothstep(
+                    1.0 - _FoamEdgeWidth - _EdgeSoftness,
+                    1.0 - _FoamEdgeWidth * 0.2,
+                    edge);
+                float2 foamUv = aligned * _FoamNoiseScale;
+                foamUv += float2(_Time.y * _FoamScrollSpeed, -_Time.y * _FoamScrollSpeed * 0.7);
+                float foamNoise = Fbm(foamUv);
+                float foamDetail = saturate((foamNoise - 0.35) * 2.2);
+                float foam = foamBand * foamDetail * _FoamStrength * _Strength;
+
+                float3 normalTS = normalize(float3(
+                    (n1 - 0.5) * _NormalStrength,
+                    1.0,
+                    (n2 - 0.5) * _NormalStrength));
+                float3 normalWS = normalize(float3(normalTS.x, normalTS.y, normalTS.z));
+
+                float3 viewDir = normalize(input.viewDirWS);
+                float ndotv = saturate(dot(normalWS, viewDir));
+                float fresnel = pow(1.0 - ndotv, _FresnelPower) * _FresnelIntensity * mask;
+
+                float3 lightDir = normalize(float3(0.25, 0.9, 0.2));
+                float3 halfDir = normalize(lightDir + viewDir);
+                float spec = pow(saturate(dot(normalWS, halfDir)), 56.0) * _SpecularIntensity * mask;
+
+                float ripplePulse = 0.5 + 0.5 * sin((aligned.x * 10.0 + aligned.y * 8.0) + _Time.y * _RippleSpeed * 6.283185);
+                float3 waterColor = lerp(_BaseColor.rgb * 0.78, _BaseColor.rgb * 1.15, surface);
+                waterColor = lerp(waterColor, waterColor * 1.08, ripplePulse * _RippleStrength);
+                waterColor = lerp(waterColor, _FoamColor.rgb, saturate(foam));
+                waterColor += fresnel * float3(0.65, 0.82, 1.0);
+                waterColor += spec * float3(0.95, 0.98, 1.0);
 
                 float alpha = _BaseColor.a * _Opacity * _Strength * mask;
-                alpha = saturate(alpha + foam * 0.15);
-                return half4(color, alpha);
+                alpha = saturate(alpha + foam * 0.55 + fresnel * 0.1);
+                return half4(waterColor, alpha);
             }
             ENDHLSL
         }

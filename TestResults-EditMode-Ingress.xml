@@ -1,0 +1,729 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="107" result="Passed" total="107" passed="107" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-08-05 01:26:19Z" end-time="2026-08-05 01:26:20Z" duration="0.9512393">
+  <test-suite type="TestSuite" id="1000" name="Flooding" fullname="Flooding" runstate="Runnable" testcasecount="107" result="Passed" start-time="2026-08-05 01:26:19Z" end-time="2026-08-05 01:26:20Z" duration="0.951239" total="107" passed="107" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1128" name="Kyle.Flooding.Tests.Editor.dll" fullname="C:/Users/kyleb/Flooding/Library/ScriptAssemblies/Kyle.Flooding.Tests.Editor.dll" runstate="Runnable" testcasecount="107" result="Passed" start-time="2026-08-05 01:26:19Z" end-time="2026-08-05 01:26:20Z" duration="0.907470" total="107" passed="107" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="27988" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1129" name="Kyle" fullname="Kyle" runstate="Runnable" testcasecount="107" result="Passed" start-time="2026-08-05 01:26:19Z" end-time="2026-08-05 01:26:20Z" duration="0.902481" total="107" passed="107" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1130" name="Flooding" fullname="Kyle.Flooding" runstate="Runnable" testcasecount="107" result="Passed" start-time="2026-08-05 01:26:19Z" end-time="2026-08-05 01:26:20Z" duration="0.898348" total="107" passed="107" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1131" name="Tests" fullname="Kyle.Flooding.Tests" runstate="Runnable" testcasecount="107" result="Passed" start-time="2026-08-05 01:26:19Z" end-time="2026-08-05 01:26:20Z" duration="0.894354" total="107" passed="107" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1001" name="BakedFloodGeometryTests" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-08-05 01:26:19Z" end-time="2026-08-05 01:26:20Z" duration="0.582343" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1011" name="Authoring_DetectsStaleFingerprint" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.Authoring_DetectsStaleFingerprint" methodname="Authoring_DetectsStaleFingerprint" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="1470554249" result="Passed" start-time="2026-08-05 01:26:19Z" end-time="2026-08-05 01:26:19Z" duration="0.075932" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1005" name="BakedData_ClonesInputAndReportsApproximationIndicator" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.BakedData_ClonesInputAndReportsApproximationIndicator" methodname="BakedData_ClonesInputAndReportsApproximationIndicator" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="968736476" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.016317" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1004" name="BakedData_EvaluateArbitraryPlaneDeterministically" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.BakedData_EvaluateArbitraryPlaneDeterministically" methodname="BakedData_EvaluateArbitraryPlaneDeterministically" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="420623054" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.022975" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1007" name="BakedData_WithoutPresentationBoundary_FallsBackToVoxelContours" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.BakedData_WithoutPresentationBoundary_FallsBackToVoxelContours" methodname="BakedData_WithoutPresentationBoundary_FallsBackToVoxelContours" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="1672706453" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.011381" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1006" name="BakedData_WithPresentationBoundary_UsesBoundarySurfaceNotVoxelPatches" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.BakedData_WithPresentationBoundary_UsesBoundarySurfaceNotVoxelPatches" methodname="BakedData_WithPresentationBoundary_UsesBoundarySurfaceNotVoxelPatches" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="129472363" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.013735" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1003" name="BakedRuntimeImplementation_IsNotPublic" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.BakedRuntimeImplementation_IsNotPublic" methodname="BakedRuntimeImplementation_IsNotPublic" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="715986380" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000696" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1010" name="ClosedMesh_WithDuplicatedSeamVertices_IsAccepted" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.ClosedMesh_WithDuplicatedSeamVertices_IsAccepted" methodname="ClosedMesh_WithDuplicatedSeamVertices_IsAccepted" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="1541916123" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.019796" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1002" name="GeometryMode_AppendsBakeWithoutChangingExistingValues" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.GeometryMode_AppendsBakeWithoutChangingExistingValues" methodname="GeometryMode_AppendsBakeWithoutChangingExistingValues" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="1136270705" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001579" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1009" name="OpenSourceMesh_IsRejectedBeforeBake" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.OpenSourceMesh_IsRejectedBeforeBake" methodname="OpenSourceMesh_IsRejectedBeforeBake" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="1438328552" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.007537" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1008" name="SurfaceSolver_HasDeterministicWorkGuardFor512Cells" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.SurfaceSolver_HasDeterministicWorkGuardFor512Cells" methodname="SurfaceSolver_HasDeterministicWorkGuardFor512Cells" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="1029479476" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.351122" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1012" name="FloodCameraUnderwaterHysteresisTests" fullname="Kyle.Flooding.Tests.FloodCameraUnderwaterHysteresisTests" classname="Kyle.Flooding.Tests.FloodCameraUnderwaterHysteresisTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.007362" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1013" name="Dry_DoesNotEnter_UntilAtOrBelowEnterThreshold" fullname="Kyle.Flooding.Tests.FloodCameraUnderwaterHysteresisTests.Dry_DoesNotEnter_UntilAtOrBelowEnterThreshold" methodname="Dry_DoesNotEnter_UntilAtOrBelowEnterThreshold" classname="Kyle.Flooding.Tests.FloodCameraUnderwaterHysteresisTests" runstate="Runnable" seed="1230360302" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000921" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1016" name="OnSurfaceBand_PreservesLatchedState" fullname="Kyle.Flooding.Tests.FloodCameraUnderwaterHysteresisTests.OnSurfaceBand_PreservesLatchedState" methodname="OnSurfaceBand_PreservesLatchedState" classname="Kyle.Flooding.Tests.FloodCameraUnderwaterHysteresisTests" runstate="Runnable" seed="129443636" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000630" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1015" name="OutsideVolume_AlwaysClearsUnderwater" fullname="Kyle.Flooding.Tests.FloodCameraUnderwaterHysteresisTests.OutsideVolume_AlwaysClearsUnderwater" methodname="OutsideVolume_AlwaysClearsUnderwater" classname="Kyle.Flooding.Tests.FloodCameraUnderwaterHysteresisTests" runstate="Runnable" seed="730965938" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000717" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1014" name="Underwater_DoesNotExit_UntilAtOrAboveExitThreshold" fullname="Kyle.Flooding.Tests.FloodCameraUnderwaterHysteresisTests.Underwater_DoesNotExit_UntilAtOrAboveExitThreshold" methodname="Underwater_DoesNotExit_UntilAtOrAboveExitThreshold" classname="Kyle.Flooding.Tests.FloodCameraUnderwaterHysteresisTests" runstate="Runnable" seed="371270604" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000884" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1017" name="FloodContainmentTests" fullname="Kyle.Flooding.Tests.FloodContainmentTests" classname="Kyle.Flooding.Tests.FloodContainmentTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.015941" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1020" name="BakedGeometry_UsesOccupiedCellApproximation" fullname="Kyle.Flooding.Tests.FloodContainmentTests.BakedGeometry_UsesOccupiedCellApproximation" methodname="BakedGeometry_UsesOccupiedCellApproximation" classname="Kyle.Flooding.Tests.FloodContainmentTests" runstate="Runnable" seed="1219732836" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.003297" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1019" name="ExtrudedPolygon_ContainsConcaveFootprintExactly" fullname="Kyle.Flooding.Tests.FloodContainmentTests.ExtrudedPolygon_ContainsConcaveFootprintExactly" methodname="ExtrudedPolygon_ContainsConcaveFootprintExactly" classname="Kyle.Flooding.Tests.FloodContainmentTests" runstate="Runnable" seed="1496821452" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.009302" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1018" name="RectangularPrism_ReportsExactContainment" fullname="Kyle.Flooding.Tests.FloodContainmentTests.RectangularPrism_ReportsExactContainment" methodname="RectangularPrism_ReportsExactContainment" classname="Kyle.Flooding.Tests.FloodContainmentTests" runstate="Runnable" seed="1028215548" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000652" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1021" name="FloodDiagnosticMathTests" fullname="Kyle.Flooding.Tests.FloodDiagnosticMathTests" classname="Kyle.Flooding.Tests.FloodDiagnosticMathTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.007426" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1023" name="CombineWaterMass_EmptyStatesUseDiagnosticOrigin" fullname="Kyle.Flooding.Tests.FloodDiagnosticMathTests.CombineWaterMass_EmptyStatesUseDiagnosticOrigin" methodname="CombineWaterMass_EmptyStatesUseDiagnosticOrigin" classname="Kyle.Flooding.Tests.FloodDiagnosticMathTests" runstate="Runnable" seed="1313843320" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002627" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1022" name="CombineWaterMass_UsesDeterministicMassWeightedCenter" fullname="Kyle.Flooding.Tests.FloodDiagnosticMathTests.CombineWaterMass_UsesDeterministicMassWeightedCenter" methodname="CombineWaterMass_UsesDeterministicMassWeightedCenter" classname="Kyle.Flooding.Tests.FloodDiagnosticMathTests" runstate="Runnable" seed="110428334" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000696" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1024" name="ResolveFlowDirection_PrefersAppliedRate" fullname="Kyle.Flooding.Tests.FloodDiagnosticMathTests.ResolveFlowDirection_PrefersAppliedRate" methodname="ResolveFlowDirection_PrefersAppliedRate" classname="Kyle.Flooding.Tests.FloodDiagnosticMathTests" runstate="Runnable" seed="753917335" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001098" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1025" name="ResolveFlowDirection_UsesRequestedRateWhenNothingApplied" fullname="Kyle.Flooding.Tests.FloodDiagnosticMathTests.ResolveFlowDirection_UsesRequestedRateWhenNothingApplied" methodname="ResolveFlowDirection_UsesRequestedRateWhenNothingApplied" classname="Kyle.Flooding.Tests.FloodDiagnosticMathTests" runstate="Runnable" seed="1256715920" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000468" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1026" name="FloodFlowCalculatorTests" fullname="Kyle.Flooding.Tests.FloodFlowCalculatorTests" classname="Kyle.Flooding.Tests.FloodFlowCalculatorTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.014211" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1031" name="Calculate_DryOpeningProducesNoFlow" fullname="Kyle.Flooding.Tests.FloodFlowCalculatorTests.Calculate_DryOpeningProducesNoFlow" methodname="Calculate_DryOpeningProducesNoFlow" classname="Kyle.Flooding.Tests.FloodFlowCalculatorTests" runstate="Runnable" seed="722825863" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001699" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1027" name="Calculate_EqualHeadsProduceNoFlow" fullname="Kyle.Flooding.Tests.FloodFlowCalculatorTests.Calculate_EqualHeadsProduceNoFlow" methodname="Calculate_EqualHeadsProduceNoFlow" classname="Kyle.Flooding.Tests.FloodFlowCalculatorTests" runstate="Runnable" seed="1284490583" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001160" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1032" name="Calculate_HeadWithinToleranceProducesNoFlow" fullname="Kyle.Flooding.Tests.FloodFlowCalculatorTests.Calculate_HeadWithinToleranceProducesNoFlow" methodname="Calculate_HeadWithinToleranceProducesNoFlow" classname="Kyle.Flooding.Tests.FloodFlowCalculatorTests" runstate="Runnable" seed="1386052607" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000682" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-suite type="ParameterizedMethod" id="1036" name="Calculate_RejectsInvalidDischargeCoefficient" fullname="Kyle.Flooding.Tests.FloodFlowCalculatorTests.Calculate_RejectsInvalidDischargeCoefficient" classname="Kyle.Flooding.Tests.FloodFlowCalculatorTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.005436" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1033" name="Calculate_RejectsInvalidDischargeCoefficient(-0.1d)" fullname="Kyle.Flooding.Tests.FloodFlowCalculatorTests.Calculate_RejectsInvalidDischargeCoefficient(-0.1d)" methodname="Calculate_RejectsInvalidDischargeCoefficient" classname="Kyle.Flooding.Tests.FloodFlowCalculatorTests" runstate="Runnable" seed="464976172" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002409" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1034" name="Calculate_RejectsInvalidDischargeCoefficient(1.1d)" fullname="Kyle.Flooding.Tests.FloodFlowCalculatorTests.Calculate_RejectsInvalidDischargeCoefficient(1.1d)" methodname="Calculate_RejectsInvalidDischargeCoefficient" classname="Kyle.Flooding.Tests.FloodFlowCalculatorTests" runstate="Runnable" seed="1103994602" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000524" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1035" name="Calculate_RejectsInvalidDischargeCoefficient(double.NaN)" fullname="Kyle.Flooding.Tests.FloodFlowCalculatorTests.Calculate_RejectsInvalidDischargeCoefficient(double.NaN)" methodname="Calculate_RejectsInvalidDischargeCoefficient" classname="Kyle.Flooding.Tests.FloodFlowCalculatorTests" runstate="Runnable" seed="49633491" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000402" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-case id="1029" name="Calculate_ReversesWhenSideBHasGreaterHead" fullname="Kyle.Flooding.Tests.FloodFlowCalculatorTests.Calculate_ReversesWhenSideBHasGreaterHead" methodname="Calculate_ReversesWhenSideBHasGreaterHead" classname="Kyle.Flooding.Tests.FloodFlowCalculatorTests" runstate="Runnable" seed="1805537826" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000660" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1028" name="Calculate_UsesCentroidHeadForOrificeFlow" fullname="Kyle.Flooding.Tests.FloodFlowCalculatorTests.Calculate_UsesCentroidHeadForOrificeFlow" methodname="Calculate_UsesCentroidHeadForOrificeFlow" classname="Kyle.Flooding.Tests.FloodFlowCalculatorTests" runstate="Runnable" seed="178603362" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000696" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1030" name="Calculate_UsesPartiallySubmergedOpeningArea" fullname="Kyle.Flooding.Tests.FloodFlowCalculatorTests.Calculate_UsesPartiallySubmergedOpeningArea" methodname="Calculate_UsesPartiallySubmergedOpeningArea" classname="Kyle.Flooding.Tests.FloodFlowCalculatorTests" runstate="Runnable" seed="500363944" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000484" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1037" name="FloodFluidTolerancesTests" fullname="Kyle.Flooding.Tests.FloodFluidTolerancesTests" classname="Kyle.Flooding.Tests.FloodFluidTolerancesTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.003879" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1038" name="DensitiesMatch_AcceptsNearlyEqualFreshWaterValues" fullname="Kyle.Flooding.Tests.FloodFluidTolerancesTests.DensitiesMatch_AcceptsNearlyEqualFreshWaterValues" methodname="DensitiesMatch_AcceptsNearlyEqualFreshWaterValues" classname="Kyle.Flooding.Tests.FloodFluidTolerancesTests" runstate="Runnable" seed="1728466525" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000801" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1039" name="DensitiesMatch_RejectsMateriallyDifferentValues" fullname="Kyle.Flooding.Tests.FloodFluidTolerancesTests.DensitiesMatch_RejectsMateriallyDifferentValues" methodname="DensitiesMatch_RejectsMateriallyDifferentValues" classname="Kyle.Flooding.Tests.FloodFluidTolerancesTests" runstate="Runnable" seed="1543180115" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000438" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1040" name="NearlyEqual_UsesAbsoluteToleranceNearZero" fullname="Kyle.Flooding.Tests.FloodFluidTolerancesTests.NearlyEqual_UsesAbsoluteToleranceNearZero" methodname="NearlyEqual_UsesAbsoluteToleranceNearZero" classname="Kyle.Flooding.Tests.FloodFluidTolerancesTests" runstate="Runnable" seed="390113842" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000455" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1041" name="FloodGeometryTests" fullname="Kyle.Flooding.Tests.FloodGeometryTests" classname="Kyle.Flooding.Tests.FloodGeometryTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.034310" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1047" name="ClockwisePolygon_IsAcceptedAndNormalized" fullname="Kyle.Flooding.Tests.FloodGeometryTests.ClockwisePolygon_IsAcceptedAndNormalized" methodname="ClockwisePolygon_IsAcceptedAndNormalized" classname="Kyle.Flooding.Tests.FloodGeometryTests" runstate="Runnable" seed="1407685602" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001241" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1046" name="ConcavePolygon_HasStableAreaCentroidAndFill" fullname="Kyle.Flooding.Tests.FloodGeometryTests.ConcavePolygon_HasStableAreaCentroidAndFill" methodname="ConcavePolygon_HasStableAreaCentroidAndFill" classname="Kyle.Flooding.Tests.FloodGeometryTests" runstate="Runnable" seed="1246254087" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.013114" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1045" name="ConcavePolygon_TiltedSolvePreservesTargetVolume" fullname="Kyle.Flooding.Tests.FloodGeometryTests.ConcavePolygon_TiltedSolvePreservesTargetVolume" methodname="ConcavePolygon_TiltedSolvePreservesTargetVolume" classname="Kyle.Flooding.Tests.FloodGeometryTests" runstate="Runnable" seed="855452948" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.005735" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1049" name="DuplicatePolygonPoint_IsRejectedWithPointIndices" fullname="Kyle.Flooding.Tests.FloodGeometryTests.DuplicatePolygonPoint_IsRejectedWithPointIndices" methodname="DuplicatePolygonPoint_IsRejectedWithPointIndices" classname="Kyle.Flooding.Tests.FloodGeometryTests" runstate="Runnable" seed="1449749983" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000781" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1042" name="Rectangle_EvaluatesHorizontalSubmersion" fullname="Kyle.Flooding.Tests.FloodGeometryTests.Rectangle_EvaluatesHorizontalSubmersion" methodname="Rectangle_EvaluatesHorizontalSubmersion" classname="Kyle.Flooding.Tests.FloodGeometryTests" runstate="Runnable" seed="15587612" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001973" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1043" name="Rectangle_EvaluatesTiltedPlaneExactly" fullname="Kyle.Flooding.Tests.FloodGeometryTests.Rectangle_EvaluatesTiltedPlaneExactly" methodname="Rectangle_EvaluatesTiltedPlaneExactly" classname="Kyle.Flooding.Tests.FloodGeometryTests" runstate="Runnable" seed="1462885849" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002010" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1048" name="SelfIntersectingPolygon_IsRejectedWithActionableMessage" fullname="Kyle.Flooding.Tests.FloodGeometryTests.SelfIntersectingPolygon_IsRejectedWithActionableMessage" methodname="SelfIntersectingPolygon_IsRejectedWithActionableMessage" classname="Kyle.Flooding.Tests.FloodGeometryTests" runstate="Runnable" seed="705746464" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001442" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1044" name="SurfaceSolver_MatchesRequestedVolumeForTiltedRectangle" fullname="Kyle.Flooding.Tests.FloodGeometryTests.SurfaceSolver_MatchesRequestedVolumeForTiltedRectangle" methodname="SurfaceSolver_MatchesRequestedVolumeForTiltedRectangle" classname="Kyle.Flooding.Tests.FloodGeometryTests" runstate="Runnable" seed="498739945" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.003683" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1050" name="FloodIngressPresentationTests" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" testcasecount="17" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.091890" total="17" passed="17" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1066" name="JetMesh_DeformsWithGravityAndReportsFloorImpact" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.JetMesh_DeformsWithGravityAndReportsFloorImpact" methodname="JetMesh_DeformsWithGravityAndReportsFloorImpact" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="211806562" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.007919" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1056" name="PresentationState_CreatesPatchAboveMinimumFlow" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.PresentationState_CreatesPatchAboveMinimumFlow" methodname="PresentationState_CreatesPatchAboveMinimumFlow" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="2117881255" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.009820" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1064" name="PresentationState_DirectionalStretchElongatesMajorAxisWhileGrowing" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.PresentationState_DirectionalStretchElongatesMajorAxisWhileGrowing" methodname="PresentationState_DirectionalStretchElongatesMajorAxisWhileGrowing" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="2091318741" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002252" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1065" name="PresentationState_DirectionalStretchRelaxesAfterStop" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.PresentationState_DirectionalStretchRelaxesAfterStop" methodname="PresentationState_DirectionalStretchRelaxesAfterStop" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="965691173" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002127" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1062" name="PresentationState_DoesNotMutateFloodVolume" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.PresentationState_DoesNotMutateFloodVolume" methodname="PresentationState_DoesNotMutateFloodVolume" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="697283003" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.004100" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1060" name="PresentationState_HandoffProgressesDuringConvergence" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.PresentationState_HandoffProgressesDuringConvergence" methodname="PresentationState_HandoffProgressesDuringConvergence" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="1671773990" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002411" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1055" name="PresentationState_IgnoresFlowBelowMinimum" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.PresentationState_IgnoresFlowBelowMinimum" methodname="PresentationState_IgnoresFlowBelowMinimum" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="910793130" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001485" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1058" name="PresentationState_RadiusIncreasesWhileGrowing" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.PresentationState_RadiusIncreasesWhileGrowing" methodname="PresentationState_RadiusIncreasesWhileGrowing" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="253211775" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002304" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1061" name="PresentationState_RespectsMaximumPatchesAndProviderOwnership" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.PresentationState_RespectsMaximumPatchesAndProviderOwnership" methodname="PresentationState_RespectsMaximumPatchesAndProviderOwnership" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="697535302" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002693" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1057" name="PresentationState_SameProviderUpdatesOnePatch" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.PresentationState_SameProviderUpdatesOnePatch" methodname="PresentationState_SameProviderUpdatesOnePatch" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="2120325586" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002578" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1059" name="PresentationState_StopTransitionsThroughSettlingAndConvergingWithoutPopping" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.PresentationState_StopTransitionsThroughSettlingAndConvergingWithoutPopping" methodname="PresentationState_StopTransitionsThroughSettlingAndConvergingWithoutPopping" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="488431458" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.006063" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1063" name="PresentationState_UsesFloorNormalNotWorldY" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.PresentationState_UsesFloorNormalNotWorldY" methodname="PresentationState_UsesFloorNormalNotWorldY" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="1309386424" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002556" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1067" name="Profile_EvaluateNormalizedStrength_UsesThresholds" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.Profile_EvaluateNormalizedStrength_UsesThresholds" methodname="Profile_EvaluateNormalizedStrength_UsesThresholds" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="119430092" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.007795" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1052" name="Sampler_Connection_PositiveFlow_SelectsSideBAndForward" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.Sampler_Connection_PositiveFlow_SelectsSideBAndForward" methodname="Sampler_Connection_PositiveFlow_SelectsSideBAndForward" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="1694249444" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.013958" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1053" name="Sampler_Connection_ReversedFlow_SelectsSideAAndFlipsDirection" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.Sampler_Connection_ReversedFlow_SelectsSideAAndFlipsDirection" methodname="Sampler_Connection_ReversedFlow_SelectsSideAAndFlipsDirection" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="1080400159" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002859" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1054" name="Sampler_Connection_UsesIngressAnchorOverOpeningCenter" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.Sampler_Connection_UsesIngressAnchorOverOpeningCenter" methodname="Sampler_Connection_UsesIngressAnchorOverOpeningCenter" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="2141046624" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.004067" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1051" name="Sampler_Source_MapsTargetPositionDirectionAndRate" fullname="Kyle.Flooding.Tests.FloodIngressPresentationTests.Sampler_Source_MapsTargetPositionDirectionAndRate" methodname="Sampler_Source_MapsTargetPositionDirectionAndRate" classname="Kyle.Flooding.Tests.FloodIngressPresentationTests" runstate="Runnable" seed="1195761276" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.004861" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1068" name="FloodMassAggregationTests" fullname="Kyle.Flooding.Tests.FloodMassAggregationTests" classname="Kyle.Flooding.Tests.FloodMassAggregationTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.025174" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1071" name="Combine_NegativeMass_Throws" fullname="Kyle.Flooding.Tests.FloodMassAggregationTests.Combine_NegativeMass_Throws" methodname="Combine_NegativeMass_Throws" classname="Kyle.Flooding.Tests.FloodMassAggregationTests" runstate="Runnable" seed="151095099" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.006376" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1069" name="Combine_UsesMassWeightedWorldCenter" fullname="Kyle.Flooding.Tests.FloodMassAggregationTests.Combine_UsesMassWeightedWorldCenter" methodname="Combine_UsesMassWeightedWorldCenter" classname="Kyle.Flooding.Tests.FloodMassAggregationTests" runstate="Runnable" seed="433344881" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002365" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1070" name="Combine_ZeroMass_ReturnsEmptyContribution" fullname="Kyle.Flooding.Tests.FloodMassAggregationTests.Combine_ZeroMass_ReturnsEmptyContribution" methodname="Combine_ZeroMass_ReturnsEmptyContribution" classname="Kyle.Flooding.Tests.FloodMassAggregationTests" runstate="Runnable" seed="1544408422" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001639" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1072" name="FloodMeshPlaneIntersectionTests" fullname="Kyle.Flooding.Tests.FloodMeshPlaneIntersectionTests" classname="Kyle.Flooding.Tests.FloodMeshPlaneIntersectionTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.016411" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1074" name="IntersectMesh_AngledPlane_ReturnsClosedOnPlaneContour" fullname="Kyle.Flooding.Tests.FloodMeshPlaneIntersectionTests.IntersectMesh_AngledPlane_ReturnsClosedOnPlaneContour" methodname="IntersectMesh_AngledPlane_ReturnsClosedOnPlaneContour" classname="Kyle.Flooding.Tests.FloodMeshPlaneIntersectionTests" runstate="Runnable" seed="490603674" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.004620" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1076" name="IntersectMesh_FullyCoplanarTriangle_ProducesNoSegment" fullname="Kyle.Flooding.Tests.FloodMeshPlaneIntersectionTests.IntersectMesh_FullyCoplanarTriangle_ProducesNoSegment" methodname="IntersectMesh_FullyCoplanarTriangle_ProducesNoSegment" classname="Kyle.Flooding.Tests.FloodMeshPlaneIntersectionTests" runstate="Runnable" seed="937605762" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001396" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1073" name="IntersectMesh_HorizontalPlane_OnHexPrism_ReturnsSixSidedContour" fullname="Kyle.Flooding.Tests.FloodMeshPlaneIntersectionTests.IntersectMesh_HorizontalPlane_OnHexPrism_ReturnsSixSidedContour" methodname="IntersectMesh_HorizontalPlane_OnHexPrism_ReturnsSixSidedContour" classname="Kyle.Flooding.Tests.FloodMeshPlaneIntersectionTests" runstate="Runnable" seed="1145375082" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002281" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1075" name="IntersectMesh_TwoWells_ReturnsTwoContours" fullname="Kyle.Flooding.Tests.FloodMeshPlaneIntersectionTests.IntersectMesh_TwoWells_ReturnsTwoContours" methodname="IntersectMesh_TwoWells_ReturnsTwoContours" classname="Kyle.Flooding.Tests.FloodMeshPlaneIntersectionTests" runstate="Runnable" seed="145298059" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.003835" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1077" name="FloodPresentationUtilityTests" fullname="Kyle.Flooding.Tests.FloodPresentationUtilityTests" classname="Kyle.Flooding.Tests.FloodPresentationUtilityTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.005329" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1080" name="FillIntensity_ClampsToUnitInterval" fullname="Kyle.Flooding.Tests.FloodPresentationUtilityTests.FillIntensity_ClampsToUnitInterval" methodname="FillIntensity_ClampsToUnitInterval" classname="Kyle.Flooding.Tests.FloodPresentationUtilityTests" runstate="Runnable" seed="916903201" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000936" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1079" name="FlowIntensity_IncreasesWithFlowRate" fullname="Kyle.Flooding.Tests.FloodPresentationUtilityTests.FlowIntensity_IncreasesWithFlowRate" methodname="FlowIntensity_IncreasesWithFlowRate" classname="Kyle.Flooding.Tests.FloodPresentationUtilityTests" runstate="Runnable" seed="1969707508" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000979" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1078" name="FlowIntensity_ReturnsZeroForIdleFlow" fullname="Kyle.Flooding.Tests.FloodPresentationUtilityTests.FlowIntensity_ReturnsZeroForIdleFlow" methodname="FlowIntensity_ReturnsZeroForIdleFlow" classname="Kyle.Flooding.Tests.FloodPresentationUtilityTests" runstate="Runnable" seed="1176557861" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000981" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1081" name="FloodQueryResultTests" fullname="Kyle.Flooding.Tests.FloodQueryResultTests" classname="Kyle.Flooding.Tests.FloodQueryResultTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.009992" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1086" name="Equals_IncludesSurfaceSignedDistance" fullname="Kyle.Flooding.Tests.FloodQueryResultTests.Equals_IncludesSurfaceSignedDistance" methodname="Equals_IncludesSurfaceSignedDistance" classname="Kyle.Flooding.Tests.FloodQueryResultTests" runstate="Runnable" seed="1130009395" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002721" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1085" name="SubmersionDepth_RemainsZeroWhenBelowPlaneButNotSubmerged" fullname="Kyle.Flooding.Tests.FloodQueryResultTests.SubmersionDepth_RemainsZeroWhenBelowPlaneButNotSubmerged" methodname="SubmersionDepth_RemainsZeroWhenBelowPlaneButNotSubmerged" classname="Kyle.Flooding.Tests.FloodQueryResultTests" runstate="Runnable" seed="205974860" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000980" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1084" name="SurfaceSignedDistance_NegativeMeansBelowSurface" fullname="Kyle.Flooding.Tests.FloodQueryResultTests.SurfaceSignedDistance_NegativeMeansBelowSurface" methodname="SurfaceSignedDistance_NegativeMeansBelowSurface" classname="Kyle.Flooding.Tests.FloodQueryResultTests" runstate="Runnable" seed="720006778" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000928" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1082" name="SurfaceSignedDistance_PositiveMeansAboveSurface" fullname="Kyle.Flooding.Tests.FloodQueryResultTests.SurfaceSignedDistance_PositiveMeansAboveSurface" methodname="SurfaceSignedDistance_PositiveMeansAboveSurface" classname="Kyle.Flooding.Tests.FloodQueryResultTests" runstate="Runnable" seed="1274302982" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000764" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1083" name="SurfaceSignedDistance_ZeroMeansOnSurface" fullname="Kyle.Flooding.Tests.FloodQueryResultTests.SurfaceSignedDistance_ZeroMeansOnSurface" methodname="SurfaceSignedDistance_ZeroMeansOnSurface" classname="Kyle.Flooding.Tests.FloodQueryResultTests" runstate="Runnable" seed="1948260895" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000906" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1087" name="FloodSimulationTests" fullname="Kyle.Flooding.Tests.FloodSimulationTests" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" testcasecount="22" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.038891" total="22" passed="22" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1098" name="AddVolume_ClampsAtCapacity" fullname="Kyle.Flooding.Tests.FloodSimulationTests.AddVolume_ClampsAtCapacity" methodname="AddVolume_ClampsAtCapacity" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="853851741" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001302" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1088" name="Constructor_CalculatesCapacityAndDerivedState" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_CalculatesCapacityAndDerivedState" methodname="Constructor_CalculatesCapacityAndDerivedState" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="631369786" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001407" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-suite type="ParameterizedMethod" id="1097" name="Constructor_ClampsInitialVolume" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_ClampsInitialVolume" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.003709" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1094" name="Constructor_ClampsInitialVolume(-5.0d,0.0d)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_ClampsInitialVolume(-5.0d,0.0d)" methodname="Constructor_ClampsInitialVolume" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="540882524" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001053" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1095" name="Constructor_ClampsInitialVolume(5.0d,5.0d)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_ClampsInitialVolume(5.0d,5.0d)" methodname="Constructor_ClampsInitialVolume" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="31444335" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000438" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1096" name="Constructor_ClampsInitialVolume(25.0d,20.0d)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_ClampsInitialVolume(25.0d,20.0d)" methodname="Constructor_ClampsInitialVolume" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="415498284" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000374" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-case id="1108" name="Constructor_RejectsDimensionsWithInfiniteCapacity" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_RejectsDimensionsWithInfiniteCapacity" methodname="Constructor_RejectsDimensionsWithInfiniteCapacity" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="461043361" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001943" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-suite type="ParameterizedMethod" id="1107" name="Constructor_RejectsNonFiniteValues" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_RejectsNonFiniteValues" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.005611" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1104" name="Constructor_RejectsNonFiniteValues(double.NaN)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_RejectsNonFiniteValues(double.NaN)" methodname="Constructor_RejectsNonFiniteValues" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="333451380" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001266" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1105" name="Constructor_RejectsNonFiniteValues(double.PositiveInfinity)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_RejectsNonFiniteValues(double.PositiveInfinity)" methodname="Constructor_RejectsNonFiniteValues" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="1186352958" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000801" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1106" name="Constructor_RejectsNonFiniteValues(double.NegativeInfinity)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_RejectsNonFiniteValues(double.NegativeInfinity)" methodname="Constructor_RejectsNonFiniteValues" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="646268295" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000532" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="ParameterizedMethod" id="1093" name="Constructor_RejectsNonPositiveDimensions" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_RejectsNonPositiveDimensions" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.005608" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1089" name="Constructor_RejectsNonPositiveDimensions(0.0d,1.0d)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_RejectsNonPositiveDimensions(0.0d,1.0d)" methodname="Constructor_RejectsNonPositiveDimensions" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="95066412" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001012" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1090" name="Constructor_RejectsNonPositiveDimensions(-1.0d,1.0d)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_RejectsNonPositiveDimensions(-1.0d,1.0d)" methodname="Constructor_RejectsNonPositiveDimensions" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="714104499" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000852" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1091" name="Constructor_RejectsNonPositiveDimensions(1.0d,0.0d)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_RejectsNonPositiveDimensions(1.0d,0.0d)" methodname="Constructor_RejectsNonPositiveDimensions" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="669005393" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000617" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1092" name="Constructor_RejectsNonPositiveDimensions(1.0d,-1.0d)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Constructor_RejectsNonPositiveDimensions(1.0d,-1.0d)" methodname="Constructor_RejectsNonPositiveDimensions" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="574469188" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000412" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="ParameterizedMethod" id="1112" name="Mutations_RejectNonFiniteValues" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Mutations_RejectNonFiniteValues" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.005100" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1109" name="Mutations_RejectNonFiniteValues(double.NaN)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Mutations_RejectNonFiniteValues(double.NaN)" methodname="Mutations_RejectNonFiniteValues" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="270561329" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001806" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1110" name="Mutations_RejectNonFiniteValues(double.PositiveInfinity)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Mutations_RejectNonFiniteValues(double.PositiveInfinity)" methodname="Mutations_RejectNonFiniteValues" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="898810447" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000775" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1111" name="Mutations_RejectNonFiniteValues(double.NegativeInfinity)" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Mutations_RejectNonFiniteValues(double.NegativeInfinity)" methodname="Mutations_RejectNonFiniteValues" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="911718665" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000493" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-case id="1103" name="NonPositiveMutations_DoNotChangeVolume" fullname="Kyle.Flooding.Tests.FloodSimulationTests.NonPositiveMutations_DoNotChangeVolume" methodname="NonPositiveMutations_DoNotChangeVolume" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="1845726715" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001420" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1099" name="RemoveVolume_ClampsAtZero" fullname="Kyle.Flooding.Tests.FloodSimulationTests.RemoveVolume_ClampsAtZero" methodname="RemoveVolume_ClampsAtZero" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="1368935038" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001333" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1100" name="SetVolume_ClampsToValidRange" fullname="Kyle.Flooding.Tests.FloodSimulationTests.SetVolume_ClampsToValidRange" methodname="SetVolume_ClampsToValidRange" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="1779644969" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001245" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1101" name="Step_AppliesNetFlowOverTime" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Step_AppliesNetFlowOverTime" methodname="Step_AppliesNetFlowOverTime" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="1165133939" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001197" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1102" name="Step_ClampsNetFlowToCapacity" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Step_ClampsNetFlowToCapacity" methodname="Step_ClampsNetFlowToCapacity" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="446152782" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000669" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1113" name="Step_RejectsNegativeFlowRates" fullname="Kyle.Flooding.Tests.FloodSimulationTests.Step_RejectsNegativeFlowRates" methodname="Step_RejectsNegativeFlowRates" classname="Kyle.Flooding.Tests.FloodSimulationTests" runstate="Runnable" seed="182006206" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001378" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1114" name="FloodUnderwaterProfileTests" fullname="Kyle.Flooding.Tests.FloodUnderwaterProfileTests" classname="Kyle.Flooding.Tests.FloodUnderwaterProfileTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.015470" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1115" name="Defaults_AreRestrainedAndFinite" fullname="Kyle.Flooding.Tests.FloodUnderwaterProfileTests.Defaults_AreRestrainedAndFinite" methodname="Defaults_AreRestrainedAndFinite" classname="Kyle.Flooding.Tests.FloodUnderwaterProfileTests" runstate="Runnable" seed="1109757026" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002571" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1116" name="EvaluateDepthStrength_MapsSubmersionToUnitInterval" fullname="Kyle.Flooding.Tests.FloodUnderwaterProfileTests.EvaluateDepthStrength_MapsSubmersionToUnitInterval" methodname="EvaluateDepthStrength_MapsSubmersionToUnitInterval" classname="Kyle.Flooding.Tests.FloodUnderwaterProfileTests" runstate="Runnable" seed="1142870572" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002001" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1118" name="EvaluateFogStrength_IncreasesWithDepthAndRespectsMaximum" fullname="Kyle.Flooding.Tests.FloodUnderwaterProfileTests.EvaluateFogStrength_IncreasesWithDepthAndRespectsMaximum" methodname="EvaluateFogStrength_IncreasesWithDepthAndRespectsMaximum" classname="Kyle.Flooding.Tests.FloodUnderwaterProfileTests" runstate="Runnable" seed="746895264" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001764" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1117" name="EvaluateTintColor_LerpsShallowToDeepByDepth" fullname="Kyle.Flooding.Tests.FloodUnderwaterProfileTests.EvaluateTintColor_LerpsShallowToDeepByDepth" methodname="EvaluateTintColor_LerpsShallowToDeepByDepth" classname="Kyle.Flooding.Tests.FloodUnderwaterProfileTests" runstate="Runnable" seed="942105424" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002673" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1119" name="PropertySetters_ClampInvalidValues" fullname="Kyle.Flooding.Tests.FloodUnderwaterProfileTests.PropertySetters_ClampInvalidValues" methodname="PropertySetters_ClampInvalidValues" classname="Kyle.Flooding.Tests.FloodUnderwaterProfileTests" runstate="Runnable" seed="408393216" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001757" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1120" name="FluidBoundaryReferenceTests" fullname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests" classname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.014573" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1122" name="TryResolveComponent_AcceptsExternalFluidBoundaryComponent" fullname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests.TryResolveComponent_AcceptsExternalFluidBoundaryComponent" methodname="TryResolveComponent_AcceptsExternalFluidBoundaryComponent" classname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests" runstate="Runnable" seed="1008492347" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.002348" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1123" name="TryResolveComponent_AcceptsFloodVolumeComponent" fullname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests.TryResolveComponent_AcceptsFloodVolumeComponent" methodname="TryResolveComponent_AcceptsFloodVolumeComponent" classname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests" runstate="Runnable" seed="548220062" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001290" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1124" name="TryResolveComponent_AcceptsGameObjectWithExternalFluidBoundary" fullname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests.TryResolveComponent_AcceptsGameObjectWithExternalFluidBoundary" methodname="TryResolveComponent_AcceptsGameObjectWithExternalFluidBoundary" classname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests" runstate="Runnable" seed="140949305" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001941" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1125" name="TryResolveComponent_AcceptsGameObjectWithFloodVolume" fullname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests.TryResolveComponent_AcceptsGameObjectWithFloodVolume" methodname="TryResolveComponent_AcceptsGameObjectWithFloodVolume" classname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests" runstate="Runnable" seed="1403570547" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001269" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1121" name="TryResolveComponent_AcceptsNull" fullname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests.TryResolveComponent_AcceptsNull" methodname="TryResolveComponent_AcceptsNull" classname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests" runstate="Runnable" seed="1371167347" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000879" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1126" name="TryResolveComponent_RejectsGameObjectWithoutBoundary" fullname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests.TryResolveComponent_RejectsGameObjectWithoutBoundary" methodname="TryResolveComponent_RejectsGameObjectWithoutBoundary" classname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests" runstate="Runnable" seed="108936838" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.001073" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1127" name="TryResolveComponent_RejectsUnsupportedComponent" fullname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests.TryResolveComponent_RejectsUnsupportedComponent" methodname="TryResolveComponent_RejectsUnsupportedComponent" classname="Kyle.Flooding.Tests.FluidBoundaryReferenceTests" runstate="Runnable" seed="1356624172" result="Passed" start-time="2026-08-05 01:26:20Z" end-time="2026-08-05 01:26:20Z" duration="0.000946" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: C:/Users/kyleb/AppData/LocalLow/DefaultCompany/Flooding\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

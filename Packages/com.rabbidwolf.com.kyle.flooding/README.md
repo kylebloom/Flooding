@@ -245,9 +245,10 @@ transient simulation or presentation state.
   tilt the room; waterline follows the authoritative surface plane.
 - **Local Ingress** imports to `Assets/Samples/Flooding/0.11.0/Local Ingress`.
   Open `LocalIngress.unity` (rebuild via **Flooding > Internal > Build Local
-  Ingress Sample** if needed). Toggle local ingress with **I** to compare
-  stream/shallow-spread presentation against instant bulk equilibrium visuals.
-  Details: `Documentation/local-ingress.md`.
+  Ingress Sample** if needed). URP showcase with turbulent jet, soft droplet /
+  mist / foam impact layers, and irregular shallow spread with edge foam.
+  Toggle local ingress with **I** to compare against instant bulk equilibrium
+  visuals. Details: `Documentation/local-ingress.md`.
 
 The package folders under `Samples~` are the authoritative sample sources.
 Package Manager copies them into `Assets/Samples` rather than synchronizing

@@ -26,8 +26,11 @@ namespace Kyle.Flooding
         private static readonly int EdgeSoftnessId = Shader.PropertyToID("_EdgeSoftness");
         private static readonly int RippleStrengthId = Shader.PropertyToID("_RippleStrength");
         private static readonly int RippleSpeedId = Shader.PropertyToID("_RippleSpeed");
+        private static readonly int FoamColorId = Shader.PropertyToID("_FoamColor");
         private static readonly int FoamStrengthId = Shader.PropertyToID("_FoamStrength");
         private static readonly int FoamEdgeWidthId = Shader.PropertyToID("_FoamEdgeWidth");
+        private static readonly int FoamNoiseScaleId = Shader.PropertyToID("_FoamNoiseScale");
+        private static readonly int FoamScrollSpeedId = Shader.PropertyToID("_FoamScrollSpeed");
         private static readonly int StretchId = Shader.PropertyToID("_Stretch");
         private static readonly int FlowDirectionId = Shader.PropertyToID("_FlowDirection");
 
@@ -548,10 +551,13 @@ namespace Kyle.Flooding
                     RippleStrengthId,
                     profile.RippleStrength * patch.Strength);
                 propertyBlock.SetFloat(RippleSpeedId, profile.RippleSpeed);
+                propertyBlock.SetColor(FoamColorId, profile.FoamColor);
                 propertyBlock.SetFloat(
                     FoamStrengthId,
                     profile.FoamStrength * patch.Strength);
                 propertyBlock.SetFloat(FoamEdgeWidthId, profile.FoamEdgeWidth);
+                propertyBlock.SetFloat(FoamNoiseScaleId, profile.FoamNoiseScale);
+                propertyBlock.SetFloat(FoamScrollSpeedId, profile.FoamScrollSpeed);
             }
 
             lobe.Renderer.SetPropertyBlock(propertyBlock);

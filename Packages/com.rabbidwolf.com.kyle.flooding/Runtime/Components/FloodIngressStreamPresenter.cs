@@ -1,10 +1,11 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Kyle.Flooding
 {
     /// <summary>
-    /// Presentation-only ballistic water jet and optional impact splash driven by
-    /// an ingress sample. Does not use Rigidbody particles for the primary jet.
+    /// Presentation-only ballistic water jet and layered impact particles driven
+    /// by an ingress sample. Does not use Rigidbody particles for the primary jet.
     /// </summary>
     [DisallowMultipleComponent]
     [AddComponentMenu("Flooding/Flood Ingress Stream Presenter")]
@@ -24,8 +25,17 @@ namespace Kyle.Flooding
         private MeshRenderer streamRenderer;
 
         [SerializeField]
-        [Tooltip("Optional particle system placed at the jet impact region. Emission scales with flow; no collision fluid simulation.")]
-        private ParticleSystem splashParticles;
+        [FormerlySerializedAs("splashParticles")]
+        [Tooltip("Ballistic droplet ParticleSystem at the jet impact region. Prefer stretched soft-alpha billboards. Emission scales with flow.")]
+        private ParticleSystem dropletParticles;
+
+        [SerializeField]
+        [Tooltip("Optional soft spray/mist ParticleSystem for medium and major flow. Leave empty to skip mist.")]
+        private ParticleSystem sprayMistParticles;
+
+        [SerializeField]
+        [Tooltip("Optional whitewater foam-burst ParticleSystem near the impact surface. Leave empty to skip foam particles.")]
+        private ParticleSystem foamBurstParticles;
 
         [SerializeField]
         [Tooltip("Material for the procedural jet. Prefer Kyle/Flooding/Ingress Jet under URP; Lit/transparent materials remain a valid fallback.")]
@@ -56,17 +66,25 @@ namespace Kyle.Flooding
         private MeshFilter meshFilter;
         private Transform streamTransform;
         private MaterialPropertyBlock propertyBlock;
-        private ParticleSystem.MainModule splashMain;
-        private ParticleSystem.EmissionModule splashEmission;
-        private ParticleSystem.ShapeModule splashShape;
-        private float baseParticleRate = 24f;
-        private float baseStartSpeed = 1.5f;
-        private float baseStartSize = 0.08f;
-        private bool hasCachedParticles;
+        private ImpactLayerCache droplets;
+        private ImpactLayerCache sprayMist;
+        private ImpactLayerCache foamBurst;
         private float displayStrength;
         private bool ownsRuntimeMesh;
         private Vector3 lastImpactPoint;
         private bool hasImpact;
+
+        private struct ImpactLayerCache
+        {
+            public ParticleSystem System;
+            public ParticleSystem.MainModule Main;
+            public ParticleSystem.EmissionModule Emission;
+            public ParticleSystem.ShapeModule Shape;
+            public float BaseRate;
+            public float BaseStartSpeed;
+            public float BaseStartSize;
+            public bool Cached;
+        }
 
         /// <summary>
         /// Gets or sets the optional authored jet renderer.
@@ -78,16 +96,50 @@ namespace Kyle.Flooding
         }
 
         /// <summary>
-        /// Gets or sets the optional splash particle system.
+        /// Gets or sets the ballistic droplet particle system (primary splash layer).
+        /// </summary>
+        public ParticleSystem DropletParticles
+        {
+            get => dropletParticles;
+            set
+            {
+                dropletParticles = value;
+                droplets.Cached = false;
+            }
+        }
+
+        /// <summary>
+        /// Compatibility alias for <see cref="DropletParticles"/>.
         /// </summary>
         public ParticleSystem SplashParticles
         {
-            get => splashParticles;
+            get => dropletParticles;
+            set => DropletParticles = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the optional spray/mist particle system.
+        /// </summary>
+        public ParticleSystem SprayMistParticles
+        {
+            get => sprayMistParticles;
             set
             {
-                splashParticles = value;
-                hasCachedParticles = false;
-                CacheParticleDefaults();
+                sprayMistParticles = value;
+                sprayMist.Cached = false;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the optional foam-burst particle system.
+        /// </summary>
+        public ParticleSystem FoamBurstParticles
+        {
+            get => foamBurstParticles;
+            set
+            {
+                foamBurstParticles = value;
+                foamBurst.Cached = false;
             }
         }
 
@@ -142,7 +194,7 @@ namespace Kyle.Flooding
         {
             propertyBlock = new MaterialPropertyBlock();
             EnsureJetVisual();
-            CacheParticleDefaults();
+            CacheImpactLayers();
             ApplyHidden();
         }
 
@@ -184,7 +236,7 @@ namespace Kyle.Flooding
             }
 
             EnsureJetVisual();
-            CacheParticleDefaults();
+            CacheImpactLayers();
 
             var gravity = ResolveGravity() * profile.JetGravityInfluence;
             var speed = profile.JetInitialSpeed * Mathf.Max(displayStrength, 0.05f);
@@ -243,7 +295,7 @@ namespace Kyle.Flooding
             var splashStrength =
                 profile.EvaluateSplashStrength(sample.FlowRateCubicMetersPerSecond)
                 * displayStrength;
-            ApplySplash(profile, splashStrength);
+            ApplyImpactLayers(profile, splashStrength);
         }
 
         /// <summary>
@@ -265,9 +317,9 @@ namespace Kyle.Flooding
             if (streamRenderer != null)
                 streamRenderer.enabled = false;
 
-            if (splashParticles != null && splashParticles.isPlaying)
-                splashParticles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-
+            StopLayer(ref droplets);
+            StopLayer(ref sprayMist);
+            StopLayer(ref foamBurst);
             hasImpact = false;
         }
 
@@ -300,67 +352,181 @@ namespace Kyle.Flooding
             ownsRuntimeMesh = true;
         }
 
-        private void CacheParticleDefaults()
+        private void CacheImpactLayers()
         {
-            if (splashParticles == null || hasCachedParticles)
-                return;
-
-            splashMain = splashParticles.main;
-            splashEmission = splashParticles.emission;
-            splashShape = splashParticles.shape;
-            baseParticleRate = splashEmission.rateOverTime.constant;
-            if (baseParticleRate <= 0f)
-                baseParticleRate = 24f;
-            baseStartSpeed = splashMain.startSpeed.constant;
-            if (baseStartSpeed <= 0f)
-                baseStartSpeed = 1.5f;
-            baseStartSize = splashMain.startSize.constant;
-            if (baseStartSize <= 0f)
-                baseStartSize = 0.08f;
-            hasCachedParticles = true;
+            CacheLayer(ref droplets, dropletParticles, 36f, 2.2f, 0.09f);
+            CacheLayer(ref sprayMist, sprayMistParticles, 40f, 0.9f, 0.22f);
+            CacheLayer(ref foamBurst, foamBurstParticles, 24f, 0.55f, 0.28f);
         }
 
-        private void ApplySplash(
+        private static void CacheLayer(
+            ref ImpactLayerCache cache,
+            ParticleSystem system,
+            float defaultRate,
+            float defaultSpeed,
+            float defaultSize)
+        {
+            if (system == null)
+            {
+                cache = default;
+                return;
+            }
+
+            if (cache.Cached && cache.System == system)
+                return;
+
+            cache.System = system;
+            cache.Main = system.main;
+            cache.Emission = system.emission;
+            cache.Shape = system.shape;
+            cache.BaseRate = cache.Emission.rateOverTime.constant;
+            if (cache.BaseRate <= 0f)
+                cache.BaseRate = defaultRate;
+            cache.BaseStartSpeed = cache.Main.startSpeed.constant;
+            if (cache.BaseStartSpeed <= 0f)
+                cache.BaseStartSpeed = defaultSpeed;
+            cache.BaseStartSize = cache.Main.startSize.constant;
+            if (cache.BaseStartSize <= 0f)
+                cache.BaseStartSize = defaultSize;
+            cache.Cached = true;
+        }
+
+        private void ApplyImpactLayers(
             FloodIngressPresentationProfile profile,
             float splashStrength)
         {
-            if (splashParticles == null)
+            var flowing = splashStrength > 0.02f && hasImpact;
+            var impactRotation = floorPlane != null
+                ? Quaternion.LookRotation(floorPlane.up, Vector3.forward)
+                : Quaternion.identity;
+
+            ApplyDroplets(profile, splashStrength, flowing, impactRotation);
+            ApplySprayMist(profile, splashStrength, flowing, impactRotation);
+            ApplyFoamBurst(profile, splashStrength, flowing, impactRotation);
+        }
+
+        private void ApplyDroplets(
+            FloodIngressPresentationProfile profile,
+            float splashStrength,
+            bool flowing,
+            Quaternion impactRotation)
+        {
+            if (!droplets.Cached)
                 return;
 
-            CacheParticleDefaults();
-            var flowing = splashStrength > 0.02f && hasImpact;
-            splashEmission.enabled = flowing;
-            splashEmission.rateOverTime = flowing
-                ? baseParticleRate
+            var active = flowing;
+            droplets.Emission.enabled = active;
+            droplets.Emission.rateOverTime = active
+                ? droplets.BaseRate
                     * profile.SplashEmissionMultiplier
                     * splashStrength
                 : 0f;
 
-            if (flowing)
+            if (!active)
             {
-                splashParticles.transform.position = lastImpactPoint;
-                if (floorPlane != null)
-                {
-                    splashParticles.transform.rotation = Quaternion.LookRotation(
-                        floorPlane.up,
-                        Vector3.forward);
-                }
-
-                splashMain.startSpeed = baseStartSpeed
-                    * profile.SplashDropletSpeed
-                    * Mathf.Lerp(0.35f, 1.25f, splashStrength);
-                splashMain.startSize = baseStartSize
-                    * profile.SplashDropletSize
-                    * Mathf.Lerp(0.5f, 1.35f, splashStrength);
-                splashShape.angle = Mathf.Lerp(12f, 35f, splashStrength);
-
-                if (!splashParticles.isPlaying)
-                    splashParticles.Play(true);
+                StopLayer(ref droplets);
+                return;
             }
-            else if (splashParticles.isPlaying)
+
+            droplets.System.transform.SetPositionAndRotation(lastImpactPoint, impactRotation);
+            droplets.Main.startSpeed = droplets.BaseStartSpeed
+                * profile.SplashDropletSpeed
+                * Mathf.Lerp(0.35f, 1.35f, splashStrength);
+            droplets.Main.startSize = droplets.BaseStartSize
+                * profile.SplashDropletSize
+                * Mathf.Lerp(0.55f, 1.4f, splashStrength);
+            droplets.Shape.angle = Mathf.Lerp(14f, 38f, splashStrength);
+
+            if (!droplets.System.isPlaying)
+                droplets.System.Play(true);
+        }
+
+        private void ApplySprayMist(
+            FloodIngressPresentationProfile profile,
+            float splashStrength,
+            bool flowing,
+            Quaternion impactRotation)
+        {
+            if (!sprayMist.Cached)
+                return;
+
+            var mistStrength = Mathf.InverseLerp(
+                profile.SprayMistThreshold,
+                1f,
+                splashStrength);
+            var active = flowing && mistStrength > 0.02f;
+            sprayMist.Emission.enabled = active;
+            sprayMist.Emission.rateOverTime = active
+                ? sprayMist.BaseRate
+                    * profile.SplashEmissionMultiplier
+                    * mistStrength
+                : 0f;
+
+            if (!active)
             {
-                splashParticles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+                StopLayer(ref sprayMist);
+                return;
             }
+
+            sprayMist.System.transform.SetPositionAndRotation(lastImpactPoint, impactRotation);
+            sprayMist.Main.startSpeed = sprayMist.BaseStartSpeed
+                * Mathf.Lerp(0.5f, 1.2f, mistStrength);
+            sprayMist.Main.startSize = sprayMist.BaseStartSize
+                * Mathf.Lerp(0.7f, 1.35f, mistStrength);
+            sprayMist.Shape.angle = Mathf.Lerp(28f, 55f, mistStrength);
+
+            if (!sprayMist.System.isPlaying)
+                sprayMist.System.Play(true);
+        }
+
+        private void ApplyFoamBurst(
+            FloodIngressPresentationProfile profile,
+            float splashStrength,
+            bool flowing,
+            Quaternion impactRotation)
+        {
+            if (!foamBurst.Cached)
+                return;
+
+            var foamStrength = Mathf.InverseLerp(
+                profile.FoamBurstThreshold,
+                1f,
+                splashStrength) * profile.FoamStrength;
+            var active = flowing && foamStrength > 0.02f;
+            foamBurst.Emission.enabled = active;
+            foamBurst.Emission.rateOverTime = active
+                ? foamBurst.BaseRate
+                    * profile.SplashEmissionMultiplier
+                    * foamStrength
+                : 0f;
+
+            if (!active)
+            {
+                StopLayer(ref foamBurst);
+                return;
+            }
+
+            foamBurst.System.transform.SetPositionAndRotation(lastImpactPoint, impactRotation);
+            foamBurst.Main.startSpeed = foamBurst.BaseStartSpeed
+                * Mathf.Lerp(0.4f, 1.15f, foamStrength);
+            foamBurst.Main.startSize = foamBurst.BaseStartSize
+                * Mathf.Lerp(0.65f, 1.5f, foamStrength);
+            foamBurst.Shape.angle = Mathf.Lerp(40f, 75f, foamStrength);
+            foamBurst.Shape.radius = Mathf.Lerp(0.08f, 0.22f, foamStrength);
+
+            if (!foamBurst.System.isPlaying)
+                foamBurst.System.Play(true);
+        }
+
+        private static void StopLayer(ref ImpactLayerCache cache)
+        {
+            if (!cache.Cached || cache.System == null)
+                return;
+
+            cache.Emission.enabled = false;
+            cache.Emission.rateOverTime = 0f;
+            if (cache.System.isPlaying)
+                cache.System.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         }
 
         private Vector3 ResolveGravity()
