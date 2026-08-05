@@ -1,7 +1,7 @@
 # Flooding
 
 Flooding is a reusable, gameplay-focused flooding simulation package for Unity
-6.5. The current `0.12.0` prototype models gravity-aligned water volume inside
+6.5. The current `0.13.0` prototype models gravity-aligned water volume inside
 rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
 
 ## Current features
@@ -24,6 +24,7 @@ rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
 - Exact accepted and rejected quantities for volume changes.
 - Fixed-rate simulation with post-commit state publication.
 - Configurable direct inflow through `FloodSource`.
+- Configurable direct removal through `FloodSink` (pumps/drains; manager-mediated).
 - Bidirectional pressure-driven flow through `FloodConnection`.
 - Runtime opening control via `FloodConnection.IsOpen` and `OpenFraction`
   (effective-aperture multiplier for doors, hatches, valves, and damage).

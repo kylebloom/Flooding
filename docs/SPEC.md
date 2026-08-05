@@ -238,11 +238,18 @@ Supported endpoint pairs:
   and participate in the finite-volume accounting identity:
 
 ```text
-after = before + external inflow - external outflow + configured sources
+after = before + external inflow - external outflow
+      + configured sources - configured sinks
 ```
 
+where configured source/sink terms are **applied** volumes after capacity or
+supply scaling, not unconstrained demand.
+
 `FloodSource` remains a configured injection path that does not model pressure
-equilibrium.
+equilibrium. `FloodSink` is the inverse configured removal path: it extracts
+water from a finite `FloodVolume` into nowhere (leaves the simulation), shares
+finite supply with connection outflows, and does not free same-tick capacity for
+inflows.
 
 ## Component events
 

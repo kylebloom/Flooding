@@ -10,6 +10,7 @@ namespace Kyle.Flooding
             double externalInflowVolume,
             double externalOutflowVolume,
             double configuredSourceVolume,
+            double configuredSinkVolume,
             double finiteVolumeBefore,
             double finiteVolumeAfter)
         {
@@ -17,6 +18,7 @@ namespace Kyle.Flooding
             ExternalInflowVolume = externalInflowVolume;
             ExternalOutflowVolume = externalOutflowVolume;
             ConfiguredSourceVolume = configuredSourceVolume;
+            ConfiguredSinkVolume = configuredSinkVolume;
             FiniteVolumeBefore = finiteVolumeBefore;
             FiniteVolumeAfter = finiteVolumeAfter;
         }
@@ -40,10 +42,16 @@ namespace Kyle.Flooding
         public double ExternalOutflowVolume { get; }
 
         /// <summary>
-        /// Gets volume injected by configured <see cref="FloodSource"/>
-        /// components, in cubic meters.
+        /// Gets volume actually injected by configured <see cref="FloodSource"/>
+        /// components after destination-capacity scaling, in cubic meters.
         /// </summary>
         public double ConfiguredSourceVolume { get; }
+
+        /// <summary>
+        /// Gets volume actually removed by configured <see cref="FloodSink"/>
+        /// components after supply scaling, in cubic meters.
+        /// </summary>
+        public double ConfiguredSinkVolume { get; }
 
         /// <summary>
         /// Gets total finite-compartment volume at tick start, in cubic meters.
@@ -59,9 +67,9 @@ namespace Kyle.Flooding
         /// Gets the closed-system conservation residual for finite volumes.
         /// </summary>
         /// <remarks>
-        /// Expected identity:
+        /// Expected identity using applied amounts:
         /// after = before + external inflow - external outflow + configured
-        /// sources.
+        /// sources - configured sinks.
         /// </remarks>
         public double ConservationError =>
             FiniteVolumeAfter
@@ -69,6 +77,7 @@ namespace Kyle.Flooding
                 FiniteVolumeBefore
                 + ExternalInflowVolume
                 - ExternalOutflowVolume
-                + ConfiguredSourceVolume);
+                + ConfiguredSourceVolume
+                - ConfiguredSinkVolume);
     }
 }

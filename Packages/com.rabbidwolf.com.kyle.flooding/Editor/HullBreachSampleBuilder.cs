@@ -12,39 +12,47 @@ namespace Kyle.Flooding.Editor
     /// </summary>
     internal static class HullBreachSampleBuilder
     {
-        private const string SampleFolder =
+        private const string PackageSampleFolder =
             "Packages/com.rabbidwolf.com.kyle.flooding/Samples~/Hull Breach";
 
+        private const string ImportedSampleFolder =
+            "Assets/Samples/Flooding/0.10.0/Hull Breach";
+
         [MenuItem("Flooding/Internal/Build Hull Breach Sample", priority = 2000)]
-        private static void Build()
+        public static void Build()
         {
-            Directory.CreateDirectory(SampleFolder);
+            var sampleFolder = ResolveSampleFolder();
+            Directory.CreateDirectory(sampleFolder);
 
             var bootstrapScript = AssetDatabase.LoadAssetAtPath<MonoScript>(
-                Path.Combine(SampleFolder, "HullBreachBootstrap.cs")
+                Path.Combine(sampleFolder, "HullBreachBootstrap.cs")
                     .Replace('\\', '/'));
             if (bootstrapScript == null || bootstrapScript.GetClass() == null)
             {
                 Debug.LogError(
-                    "HullBreachBootstrap.cs was not found under Samples~/Hull Breach. "
-                    + "Import the sample into Assets/Samples first, or open Unity so "
-                    + "the script meta exists, then rebuild.");
+                    "HullBreachBootstrap.cs was not found under the Hull Breach "
+                    + "sample folder. Import the sample into Assets/Samples first, "
+                    + "or open Unity so the script meta exists, then rebuild.");
                 return;
             }
 
             var wallMaterial = CreateLitMaterial(
+                sampleFolder,
                 "Compartment Walls",
                 new Color(0.55f, 0.58f, 0.62f, 0.35f),
                 transparent: true);
             var waterMaterial = CreateLitMaterial(
+                sampleFolder,
                 "Compartment Water",
                 new Color(0.1f, 0.45f, 0.85f, 0.55f),
                 transparent: true);
             var oceanMaterial = CreateLitMaterial(
+                sampleFolder,
                 "Ocean Surface",
                 new Color(0.05f, 0.35f, 0.7f, 0.4f),
                 transparent: true);
             var openingMaterial = CreateLitMaterial(
+                sampleFolder,
                 "Breach Opening",
                 new Color(0.2f, 0.85f, 0.35f, 1f),
                 transparent: false);
@@ -140,12 +148,23 @@ namespace Kyle.Flooding.Editor
                 new Vector3(1.2f, 1f, 0.05f),
                 openingMaterial);
 
+            var bilgeObject = new GameObject("Bilge Pump Sink");
+            bilgeObject.transform.SetParent(root.transform, false);
+            bilgeObject.transform.position = new Vector3(0f, 0.15f, 0f);
+            var bilgePump = bilgeObject.AddComponent<FloodSink>();
+            bilgePump.SimulationManager = manager;
+            bilgePump.Target = volume;
+            bilgePump.FlowRate = 0.35f;
+            bilgePump.IsActive = false;
+
             var serializedBootstrap = new SerializedObject(bootstrap);
             serializedBootstrap.FindProperty("ocean").objectReferenceValue = ocean;
             serializedBootstrap.FindProperty("compartment").objectReferenceValue =
                 volume;
             serializedBootstrap.FindProperty("breach").objectReferenceValue =
                 connection;
+            serializedBootstrap.FindProperty("bilgePump").objectReferenceValue =
+                bilgePump;
             serializedBootstrap.FindProperty("oceanSurfaceVisual")
                 .objectReferenceValue = oceanVisual.transform;
             serializedBootstrap.ApplyModifiedPropertiesWithoutUndo();
@@ -166,13 +185,35 @@ namespace Kyle.Flooding.Editor
             light.intensity = 1.1f;
             lightObject.transform.rotation = Quaternion.Euler(40f, -30f, 0f);
 
-            var scenePath = Path.Combine(SampleFolder, "HullBreach.unity")
+            var scenePath = Path.Combine(sampleFolder, "HullBreach.unity")
                 .Replace('\\', '/');
             EditorSceneManager.SaveScene(
                 EditorSceneManager.GetActiveScene(),
                 scenePath);
             AssetDatabase.Refresh();
             Debug.Log($"Built Hull Breach sample at {scenePath}");
+        }
+
+        private static string ResolveSampleFolder()
+        {
+            if (AssetDatabase.IsValidFolder(ImportedSampleFolder)
+                || File.Exists(
+                    Path.Combine(
+                        ImportedSampleFolder,
+                        "HullBreachBootstrap.cs")))
+            {
+                return ImportedSampleFolder;
+            }
+
+            if (File.Exists(
+                    Path.Combine(
+                        PackageSampleFolder,
+                        "HullBreachBootstrap.cs")))
+            {
+                return PackageSampleFolder;
+            }
+
+            return ImportedSampleFolder;
         }
 
         private static GameObject CreateCube(
@@ -193,6 +234,7 @@ namespace Kyle.Flooding.Editor
         }
 
         private static Material CreateLitMaterial(
+            string sampleFolder,
             string name,
             Color color,
             bool transparent)
@@ -218,7 +260,7 @@ namespace Kyle.Flooding.Editor
             if (material.HasProperty("_BaseColor"))
                 material.SetColor("_BaseColor", color);
 
-            var path = Path.Combine(SampleFolder, name + ".mat").Replace('\\', '/');
+            var path = Path.Combine(sampleFolder, name + ".mat").Replace('\\', '/');
             AssetDatabase.CreateAsset(material, path);
             return AssetDatabase.LoadAssetAtPath<Material>(path);
         }

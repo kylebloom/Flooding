@@ -8,7 +8,7 @@ infinite external fluid boundary and one finite rectangular `FloodVolume`.
 Import **Hull Breach** from **Window > Package Management > Package Manager >
 Flooding > Samples**. Unity copies it to:
 
-`Assets/Samples/Flooding/0.10.0/Hull Breach`
+`Assets/Samples/Flooding/0.13.0/Hull Breach`
 
 Open `HullBreach.unity` from that imported folder and enter Play Mode. The scene
 hierarchy, component wiring, camera, light, water meshes, and presentation
@@ -37,6 +37,8 @@ Hull Breach Demo
     FloodConnection
     FloodConnectionVisual
     Opening Visual
+  Bilge Pump Sink
+    FloodSink (starts inactive; press B)
 Main Camera
 Directional Light
 ```
@@ -76,10 +78,16 @@ With the default empty compartment and ocean waterline above the breach:
 6. Rotating the compartment on X or Z keeps the compartment water surface
    gravity-aligned while walls and opening rotate with the hull.
 
-`FloodSource` is intentionally absent. Configured sources inject volume without
-pressure equilibrium; this sample uses an `ExternalFluidBoundary` plus
-`FloodConnection` so flow depends on breach depth and heads.
+Configured `FloodSource` injection is intentionally absent for the breach itself;
+this sample uses an `ExternalFluidBoundary` plus `FloodConnection` so inflow
+depends on breach depth and heads. An optional `FloodSink` bilge pump removes
+water from the compartment into nowhere (manager-mediated). Press **B** to
+toggle the pump. The HUD shows configured vs actual sink rate so supply
+scaling is visible when the compartment is nearly dry or competing with outflow.
 
 The Game-view readout reports ocean waterline elevation along gravity, compartment
-volume and equivalent level-fill height, applied flow, and the connection's
-signed pressure-head difference (side A minus side B).
+volume and equivalent level-fill height, applied breach flow, pressure-head
+difference, and bilge pump status when assigned.
+
+Rebuild with **Flooding > Internal > Build Hull Breach Sample** after package
+updates if the scene is missing the bilge sink.

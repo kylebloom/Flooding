@@ -108,6 +108,8 @@ finite volume deltas, then publishes state.
 - `FloodConnection` — pressure-driven opening between two boundaries, with
   `IsOpen` hard gate and `OpenFraction` effective-aperture control.
 - `FloodSource` — configured injection (not pressure equilibrium).
+- `FloodSink` — configured removal from a finite volume (manager-mediated;
+  shares supply with connection outflows).
 - Surface renderers — optional water visuals from `FloodState`.
 - `FloodConnectionVisual` / audio components — optional flow/fill presentation.
 - `FloodCameraTracker` — optional viewpoint / underwater state for presentation.

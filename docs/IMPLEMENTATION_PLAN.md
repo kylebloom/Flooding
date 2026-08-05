@@ -44,11 +44,11 @@ This document remains authoritative for feature-phase delivery.
 
 ## Current status
 
-- Current milestone: **Phase 15 / 0.12.0 runtime opening controls complete**
+- Current milestone: **Phase 16 / 0.13.0 FloodSink pumps/drains complete**
 - Overall package status: **Gameplay-consumable simulation prototype**
 - Current supported geometry: **Rotated prism or Editor-baked data**
 - Current presentation: **Clipped prism volume, baked free-surface patches, connection visuals, optional flow/fill audio, camera/underwater, and local ingress**
-- Current flow model: **Configured inflow, finite connections with open-fraction aperture control, and external boundaries**
+- Current flow model: **Configured inflow/outflow sinks, finite connections with open-fraction aperture control, and external boundaries**
 - Current query surface: **Live read-only point queries over authoritative state**
 
 Implementation status and verification status are tracked separately. Phases 7
@@ -489,6 +489,37 @@ Acceptance criteria:
 - [x] Changing `OpenFraction` does not mutate authored width/height.
 - [x] Non-finite runtime values are rejected deterministically.
 - [x] Presentation continues to consume applied flow, not `OpenFraction` directly.
+
+## Phase 16 — Pumps / drains / sinks (0.13.0)
+
+Goal: introduce manager-mediated finite-volume sinks as the canonical primitive
+for gameplay-driven water removal.
+
+- [x] Add `FloodSink` (`Target`, `FlowRate`, `IsActive`, `RequestedFlowRate`,
+  `CurrentFlowRate`) as the inverse of `FloodSource`.
+- [x] Register sinks with `FloodSimulationManager`; request removal; share
+  finite supply scaling with connection outflows.
+- [x] Preserve same-tick snapshot rules (sinks do not free capacity; sources do
+  not supply sinks).
+- [x] Add `FloodTickMetrics.ConfiguredSinkVolume` (applied) and update
+  conservation identity.
+- [x] Add `FloodSource.CurrentFlowRate` / `RequestedFlowRate` for API symmetry.
+- [x] Play Mode tests for dry/limited supply, proportional sharing, connection
+  competition, source+sink same-tick rules, and metrics.
+- [x] Hull Breach sample bilge pump (`B` toggle) + docs; package `0.13.0`.
+- [x] Unity regression: Edit Mode 115/115 and Play Mode 86/86 passed
+  (Unity 6000.5.6f1) after FloodSink.
+
+Acceptance criteria:
+
+- [x] Active sink removes configured amount when supply allows.
+- [x] Inactive / zero-rate / dry target produce zero applied flow.
+- [x] Volume never goes negative.
+- [x] Multiple sinks and connection outflows share supply proportionally.
+- [x] Source additions do not provide same-tick sink supply; sink removals do not
+  free same-tick source capacity.
+- [x] Conservation uses applied sink volume.
+- [x] No egress anchors, destinations, power, or intake physics in the package.
 
 ## Documentation roadmap
 

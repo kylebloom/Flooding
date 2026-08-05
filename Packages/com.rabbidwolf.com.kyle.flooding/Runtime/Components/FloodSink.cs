@@ -4,42 +4,41 @@ using UnityEngine;
 namespace Kyle.Flooding
 {
     /// <summary>
-    /// Requests configured volume injection during fixed simulation ticks.
+    /// Requests configured volume removal during fixed simulation ticks.
     /// </summary>
     /// <remarks>
-    /// Use <see cref="FloodSource"/> for gameplay-controlled or scripted
-    /// injection such as a broken pipe, sprinkler, or debug faucet. It does
-    /// not model pressure equilibrium. For ocean, lake, or reservoir exchange
-    /// that depends on opening depth and can reverse, use
-    /// <see cref="ExternalFluidBoundary"/> with a <see cref="FloodConnection"/>.
+    /// Use <see cref="FloodSink"/> for gameplay-controlled pumps, bilge systems,
+    /// or drains that extract water from a finite compartment into nowhere
+    /// (water leaves the simulation). Requests are manager-mediated and share
+    /// finite supply with connection outflows. <see cref="FlowRate"/> is the
+    /// configured maximum requested removal rate, not a guaranteed applied rate;
+    /// read <see cref="CurrentFlowRate"/> for the last-tick applied rate.
+    /// Intake submergence, power, and damage belong in gameplay code that sets
+    /// <see cref="IsActive"/> / <see cref="FlowRate"/>.
     /// </remarks>
-    public sealed class FloodSource : MonoBehaviour
+    [DisallowMultipleComponent]
+    [AddComponentMenu("Flooding/Flood Sink")]
+    public sealed class FloodSink : MonoBehaviour
     {
         [SerializeField]
-        [Tooltip("Manager that evaluates this source. If unassigned, the target or nearest parent manager is used.")]
+        [Tooltip("Manager that evaluates this sink. If unassigned, the target or nearest parent manager is used.")]
         private FloodSimulationManager simulationManager;
 
         [SerializeField]
-        [Tooltip("Flood volume that receives water from this configured source. Prefer External Fluid Body + FloodConnection when inflow should depend on pressure head.")]
+        [Tooltip("Finite flood volume that this sink removes water from.")]
         private FloodVolume target;
 
         [SerializeField]
-        [Tooltip("Configured maximum requested injection rate in cubic meters per second. Actual injection may be lower after destination-capacity reconciliation. This is not pressure-driven.")]
+        [Tooltip("Configured maximum requested removal rate in cubic meters per second. Actual removal may be lower after supply reconciliation.")]
         [Min(0f)]
         private float flowRate = 1f;
 
         [SerializeField]
-        [Tooltip("Whether this source currently requests water during simulation ticks.")]
+        [Tooltip("Whether this sink currently requests removal during simulation ticks.")]
         private bool active = true;
 
-        [Header("Presentation")]
-
-        [SerializeField]
-        [Tooltip("Optional Transform where ingress visuals spawn. When unset, this source's Transform position and forward are used. Simulation ignores this field.")]
-        private Transform ingressAnchor;
-
         /// <summary>
-        /// Gets or sets the manager that evaluates this source.
+        /// Gets or sets the manager that evaluates this sink.
         /// </summary>
         public FloodSimulationManager SimulationManager
         {
@@ -48,7 +47,7 @@ namespace Kyle.Flooding
         }
 
         /// <summary>
-        /// Gets or sets the volume that receives this source's inflow.
+        /// Gets or sets the finite volume this sink removes water from.
         /// </summary>
         public FloodVolume Target
         {
@@ -65,13 +64,12 @@ namespace Kyle.Flooding
         }
 
         /// <summary>
-        /// Gets or sets the configured maximum requested injection rate in
-        /// cubic meters per second.
+        /// Gets or sets the configured maximum requested removal rate in cubic
+        /// meters per second.
         /// </summary>
         /// <remarks>
-        /// This is not a guaranteed applied rate. Destination capacity limits
-        /// may reduce the accepted amount. Read <see cref="CurrentFlowRate"/>
-        /// for the last-tick applied rate.
+        /// This is not a guaranteed applied rate. Competing connection outflows
+        /// and limited compartment volume may reduce the accepted amount.
         /// </remarks>
         public float FlowRate
         {
@@ -84,7 +82,7 @@ namespace Kyle.Flooding
         }
 
         /// <summary>
-        /// Gets or sets whether this source requests inflow.
+        /// Gets or sets whether this sink requests removal.
         /// </summary>
         public bool IsActive
         {
@@ -93,8 +91,8 @@ namespace Kyle.Flooding
         }
 
         /// <summary>
-        /// Gets the configured injection rate that would be requested this
-        /// frame when active, in cubic meters per second.
+        /// Gets the configured removal rate that would be requested this frame
+        /// when active, in cubic meters per second.
         /// </summary>
         public float RequestedFlowRate =>
             isActiveAndEnabled && active && target != null && flowRate > 0f
@@ -102,28 +100,10 @@ namespace Kyle.Flooding
                 : 0f;
 
         /// <summary>
-        /// Gets the capacity-constrained injection rate applied during the
-        /// latest tick, in cubic meters per second.
+        /// Gets the supply-constrained removal rate applied during the latest
+        /// tick, in cubic meters per second.
         /// </summary>
         public float CurrentFlowRate { get; private set; }
-
-        /// <summary>
-        /// Gets or sets an optional presentation-only ingress anchor Transform.
-        /// Simulation ignores this field.
-        /// </summary>
-        public Transform IngressAnchor
-        {
-            get => ingressAnchor;
-            set => ingressAnchor = value;
-        }
-
-        /// <summary>
-        /// Gets the preferred world-space ingress presentation position.
-        /// Uses <see cref="IngressAnchor"/> when assigned; otherwise this
-        /// component's Transform position.
-        /// </summary>
-        public Vector3 IngressWorldPosition =>
-            ingressAnchor != null ? ingressAnchor.position : transform.position;
 
         private void Awake()
         {
@@ -164,7 +144,7 @@ namespace Kyle.Flooding
             }
         }
 
-        internal bool TryGetRequestedInflow(
+        internal bool TryGetRequestedOutflow(
             FloodSimulationManager manager,
             double deltaTime,
             out FloodVolume targetVolume,
@@ -192,11 +172,11 @@ namespace Kyle.Flooding
                 && requestedVolume > 0d;
         }
 
-        internal void ApplyTickResult(double appliedInjectionRateCubicMetersPerSecond)
+        internal void ApplyTickResult(double appliedRemovalRateCubicMetersPerSecond)
         {
             CurrentFlowRate = (float)Math.Max(
                 0d,
-                appliedInjectionRateCubicMetersPerSecond);
+                appliedRemovalRateCubicMetersPerSecond);
         }
 
         internal void ResetTickState()

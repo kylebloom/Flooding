@@ -7,6 +7,28 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-08-05
+
+### Added
+
+- `FloodSink` manager-mediated configured removal from a finite `FloodVolume`
+  (water leaves the simulation). Shares finite supply with connection outflows;
+  exposes `FlowRate` (configured max/request), `RequestedFlowRate`, and
+  `CurrentFlowRate` (applied last tick).
+- `FloodTickMetrics.ConfiguredSinkVolume` (applied) and conservation identity
+  `after = before + extIn − extOut + sources − sinks`.
+- Symmetrical `FloodSource.RequestedFlowRate` / `CurrentFlowRate` diagnostics.
+- Hull Breach sample optional bilge pump (`B` toggles `IsActive`) with
+  configured vs actual HUD readout.
+- Play Mode sink invariant suite (dry/limited supply, proportional sharing,
+  connection competition, same-tick source/sink rules).
+
+### Notes
+
+- Intake submergence, power, and damage remain gameplay concerns that drive
+  `IsActive` / `FlowRate`. No egress anchors or A→B pump destinations in this
+  release.
+
 ## [0.12.0] - 2026-08-05
 
 ### Added

@@ -44,9 +44,12 @@ namespace Kyle.Flooding
         private readonly List<FloodVolume> volumes = new();
         private readonly List<ExternalFluidBoundary> externalBoundaries = new();
         private readonly List<FloodSource> sources = new();
+        private readonly List<FloodSink> sinks = new();
         private readonly List<FloodConnection> connections = new();
         private readonly List<FloodConnectionEvaluation> connectionEvaluations = new();
         private readonly List<double> sourceLimitedTransferVolumes = new();
+        private readonly List<ConfiguredFlowRequest> configuredInflowRequests = new();
+        private readonly List<ConfiguredFlowRequest> configuredOutflowRequests = new();
 
         private readonly Dictionary<FluidBoundaryId, FluidBoundarySnapshot> boundarySnapshots = new();
         private readonly Dictionary<FloodVolume, FloodState> volumeSnapshots = new();
@@ -238,6 +241,7 @@ namespace Kyle.Flooding
             RemoveMissingRegistrations();
             CaptureBoundarySnapshots();
             CalculateRequestedConfiguredInflows(deltaTime);
+            CalculateRequestedConfiguredOutflows(deltaTime);
             EvaluateConnections(deltaTime);
             ReconcileTransfers(deltaTime);
             CommitVolumeDeltas();
@@ -283,6 +287,18 @@ namespace Kyle.Flooding
                 sources.Remove(source);
         }
 
+        internal void Register(FloodSink sink)
+        {
+            if (sink != null && !sinks.Contains(sink))
+                sinks.Add(sink);
+        }
+
+        internal void Unregister(FloodSink sink)
+        {
+            if (sink != null)
+                sinks.Remove(sink);
+        }
+
         internal void Register(FloodConnection connection)
         {
             if (connection != null && !connections.Contains(connection))
@@ -313,6 +329,11 @@ namespace Kyle.Flooding
             foreach (var source in childSources)
                 source.UseManagerIfUnset(this);
 
+            var childSinks = GetComponentsInChildren<FloodSink>(true);
+
+            foreach (var sink in childSinks)
+                sink.UseManagerIfUnset(this);
+
             var childConnections = GetComponentsInChildren<FloodConnection>(true);
 
             foreach (var connection in childConnections)
@@ -324,6 +345,7 @@ namespace Kyle.Flooding
             volumes.RemoveAll(volume => volume == null);
             externalBoundaries.RemoveAll(boundary => boundary == null);
             sources.RemoveAll(source => source == null);
+            sinks.RemoveAll(sink => sink == null);
             connections.RemoveAll(connection => connection == null);
         }
 
@@ -359,6 +381,10 @@ namespace Kyle.Flooding
         private void CalculateRequestedConfiguredInflows(double deltaTime)
         {
             requestedConfiguredInflows.Clear();
+            configuredInflowRequests.Clear();
+
+            foreach (var source in sources)
+                source.ResetTickState();
 
             foreach (var source in sources)
             {
@@ -373,10 +399,37 @@ namespace Kyle.Flooding
                     continue;
                 }
 
+                configuredInflowRequests.Add(
+                    new ConfiguredFlowRequest(source, null, target, requestedVolume));
                 AddAmount(
                     requestedConfiguredInflows,
                     target,
                     requestedVolume);
+            }
+        }
+
+        private void CalculateRequestedConfiguredOutflows(double deltaTime)
+        {
+            configuredOutflowRequests.Clear();
+
+            foreach (var sink in sinks)
+                sink.ResetTickState();
+
+            foreach (var sink in sinks)
+            {
+                if (
+                    !sink.TryGetRequestedOutflow(
+                        this,
+                        deltaTime,
+                        out var target,
+                        out var requestedVolume)
+                    || !volumeSnapshots.ContainsKey(target))
+                {
+                    continue;
+                }
+
+                configuredOutflowRequests.Add(
+                    new ConfiguredFlowRequest(null, sink, target, requestedVolume));
             }
         }
 
@@ -411,7 +464,8 @@ namespace Kyle.Flooding
             CalculateRequestedOutflows();
             CalculateSourceLimitedTransfers();
             CalculateDestinationScales();
-            ApplyConfiguredInflows();
+            ApplyConfiguredInflows(deltaTime);
+            ApplyConfiguredOutflows(deltaTime);
             ApplyConnectionTransfers(deltaTime);
         }
 
@@ -426,6 +480,14 @@ namespace Kyle.Flooding
                     requestedOutflows,
                     evaluation.FiniteSource,
                     evaluation.RequestedVolume);
+            }
+
+            foreach (var request in configuredOutflowRequests)
+            {
+                AddAmount(
+                    requestedOutflows,
+                    request.Target,
+                    request.RequestedVolume);
             }
         }
 
@@ -508,18 +570,40 @@ namespace Kyle.Flooding
             }
         }
 
-        private void ApplyConfiguredInflows()
+        private void ApplyConfiguredInflows(double deltaTime)
         {
-            foreach (var configuredInflow in requestedConfiguredInflows)
+            foreach (var request in configuredInflowRequests)
             {
                 var acceptedVolume =
-                    configuredInflow.Value
-                    * GetDestinationScale(configuredInflow.Key);
+                    request.RequestedVolume
+                    * GetDestinationScale(request.Target);
 
-                AddAmount(
-                    volumeDeltas,
-                    configuredInflow.Key,
-                    acceptedVolume);
+                AddAmount(volumeDeltas, request.Target, acceptedVolume);
+                request.Source?.ApplyTickResult(acceptedVolume / deltaTime);
+            }
+        }
+
+        private void ApplyConfiguredOutflows(double deltaTime)
+        {
+            foreach (var request in configuredOutflowRequests)
+            {
+                var acceptedVolume = 0d;
+
+                if (
+                    volumeSnapshots.TryGetValue(request.Target, out var snapshot)
+                    && requestedOutflows.TryGetValue(
+                        request.Target,
+                        out var totalRequestedOutflow)
+                    && totalRequestedOutflow > 0d)
+                {
+                    var sourceScale = Math.Min(
+                        1d,
+                        snapshot.Volume / totalRequestedOutflow);
+                    acceptedVolume = request.RequestedVolume * sourceScale;
+                }
+
+                AddAmount(volumeDeltas, request.Target, -acceptedVolume);
+                request.Sink?.ApplyTickResult(acceptedVolume / deltaTime);
             }
         }
 
@@ -590,6 +674,7 @@ namespace Kyle.Flooding
             var finiteVolumeBefore = 0d;
             var finiteVolumeAfter = 0d;
             var configuredSourceVolume = 0d;
+            var configuredSinkVolume = 0d;
             var internalTransferVolume = 0d;
             var externalInflowVolume = 0d;
             var externalOutflowVolume = 0d;
@@ -600,11 +685,31 @@ namespace Kyle.Flooding
                 finiteVolumeAfter += pair.Key.CurrentState.Volume;
             }
 
-            foreach (var configuredInflow in requestedConfiguredInflows)
+            foreach (var request in configuredInflowRequests)
             {
                 configuredSourceVolume +=
-                    configuredInflow.Value
-                    * GetDestinationScale(configuredInflow.Key);
+                    request.RequestedVolume
+                    * GetDestinationScale(request.Target);
+            }
+
+            foreach (var request in configuredOutflowRequests)
+            {
+                if (
+                    !volumeSnapshots.TryGetValue(
+                        request.Target,
+                        out var snapshot)
+                    || !requestedOutflows.TryGetValue(
+                        request.Target,
+                        out var totalRequestedOutflow)
+                    || totalRequestedOutflow <= 0d)
+                {
+                    continue;
+                }
+
+                var sourceScale = Math.Min(
+                    1d,
+                    snapshot.Volume / totalRequestedOutflow);
+                configuredSinkVolume += request.RequestedVolume * sourceScale;
             }
 
             for (var index = 0; index < connectionEvaluations.Count; index++)
@@ -636,6 +741,7 @@ namespace Kyle.Flooding
                 externalInflowVolume,
                 externalOutflowVolume,
                 configuredSourceVolume,
+                configuredSinkVolume,
                 finiteVolumeBefore,
                 finiteVolumeAfter);
         }
@@ -710,6 +816,29 @@ namespace Kyle.Flooding
                 && !float.IsInfinity(value.x)
                 && !float.IsInfinity(value.y)
                 && !float.IsInfinity(value.z);
+        }
+
+        private readonly struct ConfiguredFlowRequest
+        {
+            public ConfiguredFlowRequest(
+                FloodSource source,
+                FloodSink sink,
+                FloodVolume target,
+                double requestedVolume)
+            {
+                Source = source;
+                Sink = sink;
+                Target = target;
+                RequestedVolume = requestedVolume;
+            }
+
+            public FloodSource Source { get; }
+
+            public FloodSink Sink { get; }
+
+            public FloodVolume Target { get; }
+
+            public double RequestedVolume { get; }
         }
     }
 }

@@ -98,11 +98,11 @@ floating-point state differences.
 ```text
 Capture registered FloodState snapshots
         ↓
-Evaluate FloodSource and FloodConnection requests
+Evaluate FloodSource, FloodSink, and FloodConnection requests
         ↓
-Scale connection outflow by snapshot source availability
+Scale finite outflows (connections + sinks) by snapshot source availability
         ↓
-Scale all inflow by snapshot destination capacity
+Scale all inflow (connections + sources) by snapshot destination capacity
         ↓
 Build and commit one signed delta per volume
         ↓
@@ -111,9 +111,9 @@ Publish volume states
 Publish manager tick completion
 ```
 
-`FloodSimulationManager` owns this phase order. `FloodSource` does not mutate
-its target from `Update`, and `FloodVolume` does not poll for changes from
-`LateUpdate`.
+`FloodSimulationManager` owns this phase order. `FloodSource` and `FloodSink`
+do not mutate their targets from `Update`, and `FloodVolume` does not poll for
+changes from `LateUpdate`.
 
 The manager also owns the gravity policy shared by its volumes and connections:
 global `Physics.gravity` or one custom world-space vector. Near-zero fallback
@@ -127,11 +127,14 @@ produce deterministic phase and reconciliation ordering. Cross-platform
 bitwise floating-point identity and deterministic Unity Rigidbody behavior are
 not architectural guarantees.
 
-Connection requests are scaled proportionally first by finite source volume and
-then by destination capacity. Destination capacity uses the tick-start
-snapshot; outgoing transfers do not free same-tick incoming capacity. This
-avoids cyclic dependency solving while preserving conservation and preventing
-overdraw or overfill.
+All finite-volume consumers drawing from the same `FloodVolume` in a tick —
+connection outflows and configured sinks — participate in one shared supply
+scaling set. Inflows from connections and configured sources then share
+destination-capacity scaling. Destination capacity and source availability use
+the tick-start snapshot; outgoing transfers and sinks do not free same-tick
+incoming capacity, and source additions do not provide same-tick supply to
+sinks. This avoids cyclic dependency solving while preserving conservation and
+preventing overdraw or overfill.
 
 The manager uses `Update` only as a lightweight elapsed-time scheduler. All
 simulation work runs in discrete ticks. A configurable per-frame catch-up limit

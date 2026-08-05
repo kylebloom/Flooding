@@ -918,7 +918,43 @@ serialized Inspector label; the public API property is named `IsActive`.
 
 `FloodSource` no longer mutates its target from its own `Update()`. It submits a
 request during each manager tick, allowing all requests to be calculated before
-any destination is changed.
+any destination is changed. **Flow Rate** is the configured maximum requested
+injection rate; read `CurrentFlowRate` for the capacity-constrained rate
+applied last tick.
+
+## Create a sink GameObject
+
+1. In the Hierarchy, create an empty GameObject beneath `Flood System`.
+2. Name the GameObject for the removal device, such as `Bilge Pump`.
+3. Select that GameObject and choose
+   **Inspector > Add Component > Flood Sink**. This attaches the `FloodSink`
+   script component.
+4. On the `FloodSink` component, confirm **Simulation Manager** references the
+   same manager as the target volume.
+5. Drag the target compartment GameObject's `FloodVolume` into **Target**.
+6. Set **Flow Rate** in cubic meters per second (configured maximum requested
+   removal rate — not guaranteed applied rate).
+7. Enable **Active**.
+8. Enter Play Mode and confirm the target's volume decreases when supply
+   exists. Read `CurrentFlowRate` for the supply-constrained applied rate.
+
+`FloodSink` removes water from a finite compartment into nowhere (it leaves the
+simulation). It shares finite supply with connection outflows and does not free
+same-tick capacity for inflows. Intake submergence, electrical power, and
+damage belong in gameplay code that toggles `IsActive` / `FlowRate`. For
+pressure-driven dump to an ocean, use `FloodConnection` to an
+**External Fluid Body** instead. Do not use `FloodSink` to transfer water to
+another compartment.
+
+Gameplay example:
+
+```csharp
+sink.IsActive =
+    pump.HasPower
+    && !pump.IsBroken
+    && volume.QueryPoint(intake.position).IsSubmerged;
+sink.FlowRate = pump.RatedCubicMetersPerSecond;
+```
 
 ## Create a connection GameObject
 
@@ -986,7 +1022,8 @@ finite destination capacity. Multiple openings sharing one finite compartment
 are scaled proportionally. Infinite exterior endpoints skip supply or capacity
 scaling for the infinite side only. After each tick, read
 `FloodSimulationManager.LastTickMetrics` for internal transfer, external
-inflow/outflow, configured source volume, and conservation residual.
+inflow/outflow, configured source/sink volume (applied), and conservation
+residual.
 
 ### Read or control a connection from code
 
