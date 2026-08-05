@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="73" result="Passed" total="73" passed="73" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:12Z" duration="3.6760946">
+  <test-suite type="TestSuite" id="1101" name="Flooding" fullname="Flooding" runstate="Runnable" testcasecount="75" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:12Z" duration="3.676095" total="73" passed="73" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1087" name="Kyle.Flooding.Tests.PlayMode.dll" fullname="C:/Users/kyleb/Flooding/Library/ScriptAssemblies/Kyle.Flooding.Tests.PlayMode.dll" runstate="Runnable" testcasecount="73" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:12Z" duration="3.646982" total="73" passed="73" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="14448" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1088" name="Kyle" fullname="Kyle" runstate="Runnable" testcasecount="73" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:12Z" duration="3.640254" total="73" passed="73" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1089" name="Flooding" fullname="Kyle.Flooding" runstate="Runnable" testcasecount="73" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:12Z" duration="3.633348" total="73" passed="73" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1090" name="Tests" fullname="Kyle.Flooding.Tests" runstate="Runnable" testcasecount="73" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:12Z" duration="3.629780" total="73" passed="73" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1001" name="ExternalFluidBoundaryTests" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.679425" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1005" name="ClosedConnection_TransfersNothing" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests.ClosedConnection_TransfersNothing" methodname="ClosedConnection_TransfersNothing" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" seed="1077433394" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.164407" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1007" name="DensityMismatch_TransfersNothing" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests.DensityMismatch_TransfersNothing" methodname="DensityMismatch_TransfersNothing" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" seed="999165427" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.042438" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1009" name="DestinationCapacity_LimitsExternalInflow" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests.DestinationCapacity_LimitsExternalInflow" methodname="DestinationCapacity_LimitsExternalInflow" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" seed="1256418868" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.032519" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1006" name="DisabledExternalBoundary_TransfersNothing" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests.DisabledExternalBoundary_TransfersNothing" methodname="DisabledExternalBoundary_TransfersNothing" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" seed="98789664" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.005446" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1004" name="EqualizedHeads_ApproachZeroFlow" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests.EqualizedHeads_ApproachZeroFlow" methodname="EqualizedHeads_ApproachZeroFlow" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" seed="686758153" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.327597" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1002" name="ExteriorHigherHead_ProducesInflowIntoFiniteVolume" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests.ExteriorHigherHead_ProducesInflowIntoFiniteVolume" methodname="ExteriorHigherHead_ProducesInflowIntoFiniteVolume" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" seed="831022353" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.005462" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1003" name="InteriorHigherHead_ProducesOutflowToExterior" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests.InteriorHigherHead_ProducesOutflowToExterior" methodname="InteriorHigherHead_ProducesOutflowToExterior" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" seed="1481524176" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.006822" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1010" name="MultipleBreaches_ScaleDestinationCapacityTogether" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests.MultipleBreaches_ScaleDestinationCapacityTogether" methodname="MultipleBreaches_ScaleDestinationCapacityTogether" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" seed="1188923933" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.005321" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1013" name="OpenFraction_PreservesExteriorDepthSensitivity" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests.OpenFraction_PreservesExteriorDepthSensitivity" methodname="OpenFraction_PreservesExteriorDepthSensitivity" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" seed="1584768977" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.010802" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1008" name="OpeningAboveBothSurfaces_TransfersNothing" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests.OpeningAboveBothSurfaces_TransfersNothing" methodname="OpeningAboveBothSurfaces_TransfersNothing" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" seed="1272685831" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.004938" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1012" name="RaisingOceanSurface_IncreasesInflow" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests.RaisingOceanSurface_IncreasesInflow" methodname="RaisingOceanSurface_IncreasesInflow" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" seed="506627476" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.006698" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1011" name="SnapshotUsesTickStartExternalPlane" fullname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests.SnapshotUsesTickStartExternalPlane" methodname="SnapshotUsesTickStartExternalPlane" classname="Kyle.Flooding.Tests.ExternalFluidBoundaryTests" runstate="Runnable" seed="1164348685" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:09Z" duration="0.007356" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1014" name="FloodCameraTrackerTests" fullname="Kyle.Flooding.Tests.FloodCameraTrackerTests" classname="Kyle.Flooding.Tests.FloodCameraTrackerTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:10Z" duration="0.629519" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1022" name="AutoMode_ResolvesManagerSpawnedAfterTracker" fullname="Kyle.Flooding.Tests.FloodCameraTrackerTests.AutoMode_ResolvesManagerSpawnedAfterTracker" methodname="AutoMode_ResolvesManagerSpawnedAfterTracker" classname="Kyle.Flooding.Tests.FloodCameraTrackerTests" runstate="Runnable" seed="1358680098" result="Passed" start-time="2026-08-05 09:04:09Z" end-time="2026-08-05 09:04:10Z" duration="0.565739" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1017" name="AutoMode_SelectsContainingRegisteredVolume" fullname="Kyle.Flooding.Tests.FloodCameraTrackerTests.AutoMode_SelectsContainingRegisteredVolume" methodname="AutoMode_SelectsContainingRegisteredVolume" classname="Kyle.Flooding.Tests.FloodCameraTrackerTests" runstate="Runnable" seed="479713004" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.006685" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1020" name="Events_FireForVolumeAndWaterTransitions" fullname="Kyle.Flooding.Tests.FloodCameraTrackerTests.Events_FireForVolumeAndWaterTransitions" methodname="Events_FireForVolumeAndWaterTransitions" classname="Kyle.Flooding.Tests.FloodCameraTrackerTests" runstate="Runnable" seed="1276477848" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.009644" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1016" name="ExplicitMode_TracksAssignedVolume" fullname="Kyle.Flooding.Tests.FloodCameraTrackerTests.ExplicitMode_TracksAssignedVolume" methodname="ExplicitMode_TracksAssignedVolume" classname="Kyle.Flooding.Tests.FloodCameraTrackerTests" runstate="Runnable" seed="1338078594" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.004350" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1021" name="Hysteresis_PreventsSurfaceFlicker" fullname="Kyle.Flooding.Tests.FloodCameraTrackerTests.Hysteresis_PreventsSurfaceFlicker" methodname="Hysteresis_PreventsSurfaceFlicker" classname="Kyle.Flooding.Tests.FloodCameraTrackerTests" runstate="Runnable" seed="1881486366" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.006300" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1019" name="Overlap_PrefersSubmergedThenRegistrationOrder" fullname="Kyle.Flooding.Tests.FloodCameraTrackerTests.Overlap_PrefersSubmergedThenRegistrationOrder" methodname="Overlap_PrefersSubmergedThenRegistrationOrder" classname="Kyle.Flooding.Tests.FloodCameraTrackerTests" runstate="Runnable" seed="2089500101" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.006010" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1015" name="RegisteredVolumes_IsReadOnlyLiveView" fullname="Kyle.Flooding.Tests.FloodCameraTrackerTests.RegisteredVolumes_IsReadOnlyLiveView" methodname="RegisteredVolumes_IsReadOnlyLiveView" classname="Kyle.Flooding.Tests.FloodCameraTrackerTests" runstate="Runnable" seed="1867019535" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.011013" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1024" name="RotatedVolume_UsesSurfacePlaneSignedDistance" fullname="Kyle.Flooding.Tests.FloodCameraTrackerTests.RotatedVolume_UsesSurfacePlaneSignedDistance" methodname="RotatedVolume_UsesSurfacePlaneSignedDistance" classname="Kyle.Flooding.Tests.FloodCameraTrackerTests" runstate="Runnable" seed="9175489" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.008463" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1018" name="StickySelection_KeepsActiveVolumeWhileContainedAndDry" fullname="Kyle.Flooding.Tests.FloodCameraTrackerTests.StickySelection_KeepsActiveVolumeWhileContainedAndDry" methodname="StickySelection_KeepsActiveVolumeWhileContainedAndDry" classname="Kyle.Flooding.Tests.FloodCameraTrackerTests" runstate="Runnable" seed="1746814110" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.003900" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1023" name="ThresholdSetters_EnforceEnterNotAboveExit" fullname="Kyle.Flooding.Tests.FloodCameraTrackerTests.ThresholdSetters_EnforceEnterNotAboveExit" methodname="ThresholdSetters_EnforceEnterNotAboveExit" classname="Kyle.Flooding.Tests.FloodCameraTrackerTests" runstate="Runnable" seed="557460444" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.002568" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1025" name="FloodConnectionTests" fullname="Kyle.Flooding.Tests.FloodConnectionTests" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.153322" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1029" name="ClosedConnection_TransfersNothing" fullname="Kyle.Flooding.Tests.FloodConnectionTests.ClosedConnection_TransfersNothing" methodname="ClosedConnection_TransfersNothing" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" seed="54159359" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.005668" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1037" name="DestinationCapacity_LimitsAppliedFlow" fullname="Kyle.Flooding.Tests.FloodConnectionTests.DestinationCapacity_LimitsAppliedFlow" methodname="DestinationCapacity_LimitsAppliedFlow" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" seed="944255562" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.007257" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1026" name="EqualHeads_ProduceNoTransfer" fullname="Kyle.Flooding.Tests.FloodConnectionTests.EqualHeads_ProduceNoTransfer" methodname="EqualHeads_ProduceNoTransfer" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" seed="253186428" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.017114" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1027" name="GreaterHeadOnA_TransfersVolumeAndConservesTotal" fullname="Kyle.Flooding.Tests.FloodConnectionTests.GreaterHeadOnA_TransfersVolumeAndConservesTotal" methodname="GreaterHeadOnA_TransfersVolumeAndConservesTotal" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" seed="329745174" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.008336" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1028" name="GreaterHeadOnB_ReversesFlow" fullname="Kyle.Flooding.Tests.FloodConnectionTests.GreaterHeadOnB_ReversesFlow" methodname="GreaterHeadOnB_ReversesFlow" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" seed="2056006103" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.009672" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1036" name="MultipleConnections_CannotOverdrawSource" fullname="Kyle.Flooding.Tests.FloodConnectionTests.MultipleConnections_CannotOverdrawSource" methodname="MultipleConnections_CannotOverdrawSource" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" seed="1034207409" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.013738" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1034" name="OpenFraction_DoesNotMutateAuthoredOpeningDimensions" fullname="Kyle.Flooding.Tests.FloodConnectionTests.OpenFraction_DoesNotMutateAuthoredOpeningDimensions" methodname="OpenFraction_DoesNotMutateAuthoredOpeningDimensions" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" seed="589307532" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.011759" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1035" name="OpenFraction_RejectsNonFiniteRuntimeValues" fullname="Kyle.Flooding.Tests.FloodConnectionTests.OpenFraction_RejectsNonFiniteRuntimeValues" methodname="OpenFraction_RejectsNonFiniteRuntimeValues" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" seed="1472266342" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.009319" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1033" name="OpenFractionHalf_AppliesToReverseFlow" fullname="Kyle.Flooding.Tests.FloodConnectionTests.OpenFractionHalf_AppliesToReverseFlow" methodname="OpenFractionHalf_AppliesToReverseFlow" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" seed="198635679" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.023083" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1032" name="OpenFractionHalf_HalvesRequestedFlowUnderIdenticalHeads" fullname="Kyle.Flooding.Tests.FloodConnectionTests.OpenFractionHalf_HalvesRequestedFlowUnderIdenticalHeads" methodname="OpenFractionHalf_HalvesRequestedFlowUnderIdenticalHeads" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" seed="1287015699" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.013291" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1030" name="OpenFractionOne_PreservesExistingRequestedFlow" fullname="Kyle.Flooding.Tests.FloodConnectionTests.OpenFractionOne_PreservesExistingRequestedFlow" methodname="OpenFractionOne_PreservesExistingRequestedFlow" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" seed="2102181896" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.021673" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1031" name="OpenFractionZero_TransfersNothingWhileIsOpenRemainsTrue" fullname="Kyle.Flooding.Tests.FloodConnectionTests.OpenFractionZero_TransfersNothingWhileIsOpenRemainsTrue" methodname="OpenFractionZero_TransfersNothingWhileIsOpenRemainsTrue" classname="Kyle.Flooding.Tests.FloodConnectionTests" runstate="Runnable" seed="297088516" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.006030" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1038" name="FloodDiagnosticsTests" fullname="Kyle.Flooding.Tests.FloodDiagnosticsTests" classname="Kyle.Flooding.Tests.FloodDiagnosticsTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.070713" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1039" name="CaptureSnapshot_DoesNotMutateObservedState" fullname="Kyle.Flooding.Tests.FloodDiagnosticsTests.CaptureSnapshot_DoesNotMutateObservedState" methodname="CaptureSnapshot_DoesNotMutateObservedState" classname="Kyle.Flooding.Tests.FloodDiagnosticsTests" runstate="Runnable" seed="1492206446" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.068246" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1040" name="FloodLocalIngressPresenterTests" fullname="Kyle.Flooding.Tests.FloodLocalIngressPresenterTests" classname="Kyle.Flooding.Tests.FloodLocalIngressPresenterTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.092234" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1041" name="Presenter_DoesNotMutateAuthoritativeVolume" fullname="Kyle.Flooding.Tests.FloodLocalIngressPresenterTests.Presenter_DoesNotMutateAuthoritativeVolume" methodname="Presenter_DoesNotMutateAuthoritativeVolume" classname="Kyle.Flooding.Tests.FloodLocalIngressPresenterTests" runstate="Runnable" seed="32429268" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.070015" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1042" name="Presenter_ReversedConnectionUpdatesDestinationIngressOnly" fullname="Kyle.Flooding.Tests.FloodLocalIngressPresenterTests.Presenter_ReversedConnectionUpdatesDestinationIngressOnly" methodname="Presenter_ReversedConnectionUpdatesDestinationIngressOnly" classname="Kyle.Flooding.Tests.FloodLocalIngressPresenterTests" runstate="Runnable" seed="15389580" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.018833" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1043" name="FloodMassAdapterTests" fullname="Kyle.Flooding.Tests.FloodMassAdapterTests" classname="Kyle.Flooding.Tests.FloodMassAdapterTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.007681" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1044" name="Adapter_AppliesCompositeAndRestoresDryBody" fullname="Kyle.Flooding.Tests.FloodMassAdapterTests.Adapter_AppliesCompositeAndRestoresDryBody" methodname="Adapter_AppliesCompositeAndRestoresDryBody" classname="Kyle.Flooding.Tests.FloodMassAdapterTests" runstate="Runnable" seed="1284560468" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.005611" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1045" name="FloodPresentationEffectTests" fullname="Kyle.Flooding.Tests.FloodPresentationEffectTests" classname="Kyle.Flooding.Tests.FloodPresentationEffectTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.063349" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1050" name="ConnectionAudio_MissingClipFailsSoft" fullname="Kyle.Flooding.Tests.FloodPresentationEffectTests.ConnectionAudio_MissingClipFailsSoft" methodname="ConnectionAudio_MissingClipFailsSoft" classname="Kyle.Flooding.Tests.FloodPresentationEffectTests" runstate="Runnable" seed="517616116" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.018510" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1047" name="ConnectionVisual_HidesWhenFlowStops" fullname="Kyle.Flooding.Tests.FloodPresentationEffectTests.ConnectionVisual_HidesWhenFlowStops" methodname="ConnectionVisual_HidesWhenFlowStops" classname="Kyle.Flooding.Tests.FloodPresentationEffectTests" runstate="Runnable" seed="254317577" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.012159" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1046" name="ConnectionVisual_ScalesWithAppliedFlowAndDoesNotMutateSimulation" fullname="Kyle.Flooding.Tests.FloodPresentationEffectTests.ConnectionVisual_ScalesWithAppliedFlowAndDoesNotMutateSimulation" methodname="ConnectionVisual_ScalesWithAppliedFlowAndDoesNotMutateSimulation" classname="Kyle.Flooding.Tests.FloodPresentationEffectTests" runstate="Runnable" seed="1456911028" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.012746" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1049" name="SourceAudio_IsSilentWhenInactive" fullname="Kyle.Flooding.Tests.FloodPresentationEffectTests.SourceAudio_IsSilentWhenInactive" methodname="SourceAudio_IsSilentWhenInactive" classname="Kyle.Flooding.Tests.FloodPresentationEffectTests" runstate="Runnable" seed="238241119" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.009355" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1048" name="VolumeAudio_TracksFillWithoutMutatingVolume" fullname="Kyle.Flooding.Tests.FloodPresentationEffectTests.VolumeAudio_TracksFillWithoutMutatingVolume" methodname="VolumeAudio_TracksFillWithoutMutatingVolume" classname="Kyle.Flooding.Tests.FloodPresentationEffectTests" runstate="Runnable" seed="20913620" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.006267" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1051" name="FloodQueryTests" fullname="Kyle.Flooding.Tests.FloodQueryTests" classname="Kyle.Flooding.Tests.FloodQueryTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.047087" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1053" name="QueryPoint_OutsideVolumeBelowPlane_IsNotSubmerged" fullname="Kyle.Flooding.Tests.FloodQueryTests.QueryPoint_OutsideVolumeBelowPlane_IsNotSubmerged" methodname="QueryPoint_OutsideVolumeBelowPlane_IsNotSubmerged" classname="Kyle.Flooding.Tests.FloodQueryTests" runstate="Runnable" seed="409484520" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.003661" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1052" name="QueryPoint_ReportsSubmersionInsideRectangularVolume" fullname="Kyle.Flooding.Tests.FloodQueryTests.QueryPoint_ReportsSubmersionInsideRectangularVolume" methodname="QueryPoint_ReportsSubmersionInsideRectangularVolume" classname="Kyle.Flooding.Tests.FloodQueryTests" runstate="Runnable" seed="968604425" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.006526" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1055" name="QueryPoint_RespectsWorldTransform" fullname="Kyle.Flooding.Tests.FloodQueryTests.QueryPoint_RespectsWorldTransform" methodname="QueryPoint_RespectsWorldTransform" classname="Kyle.Flooding.Tests.FloodQueryTests" runstate="Runnable" seed="1384820152" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.004833" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1057" name="QueryPoint_RotatedVolume_UsesAuthoritativeSurfacePlane" fullname="Kyle.Flooding.Tests.FloodQueryTests.QueryPoint_RotatedVolume_UsesAuthoritativeSurfacePlane" methodname="QueryPoint_RotatedVolume_UsesAuthoritativeSurfacePlane" classname="Kyle.Flooding.Tests.FloodQueryTests" runstate="Runnable" seed="2129654603" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.006915" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1058" name="QueryPoint_RotatedVolumeWithTiltedGravity_ReportsSignedDistance" fullname="Kyle.Flooding.Tests.FloodQueryTests.QueryPoint_RotatedVolumeWithTiltedGravity_ReportsSignedDistance" methodname="QueryPoint_RotatedVolumeWithTiltedGravity_ReportsSignedDistance" classname="Kyle.Flooding.Tests.FloodQueryTests" runstate="Runnable" seed="942733228" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.008510" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1054" name="QueryPoint_SurfaceSignedDistance_OnSurfaceIsZero" fullname="Kyle.Flooding.Tests.FloodQueryTests.QueryPoint_SurfaceSignedDistance_OnSurfaceIsZero" methodname="QueryPoint_SurfaceSignedDistance_OnSurfaceIsZero" classname="Kyle.Flooding.Tests.FloodQueryTests" runstate="Runnable" seed="749606315" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.006191" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1056" name="QueryPoint_UsesTiltedSurfacePlaneDepth" fullname="Kyle.Flooding.Tests.FloodQueryTests.QueryPoint_UsesTiltedSurfacePlaneDepth" methodname="QueryPoint_UsesTiltedSurfacePlaneDepth" classname="Kyle.Flooding.Tests.FloodQueryTests" runstate="Runnable" seed="1652330750" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:10Z" duration="0.005991" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1059" name="FloodSimulationInvariantTests" fullname="Kyle.Flooding.Tests.FloodSimulationInvariantTests" classname="Kyle.Flooding.Tests.FloodSimulationInvariantTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:12Z" duration="1.189547" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1060" name="RepeatedTicks_PreserveFiniteInternalNetworkInvariants" fullname="Kyle.Flooding.Tests.FloodSimulationInvariantTests.RepeatedTicks_PreserveFiniteInternalNetworkInvariants" methodname="RepeatedTicks_PreserveFiniteInternalNetworkInvariants" classname="Kyle.Flooding.Tests.FloodSimulationInvariantTests" runstate="Runnable" seed="1283962762" result="Passed" start-time="2026-08-05 09:04:10Z" end-time="2026-08-05 09:04:12Z" duration="1.186718" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1061" name="FloodSimulationManagerTests" fullname="Kyle.Flooding.Tests.FloodSimulationManagerTests" classname="Kyle.Flooding.Tests.FloodSimulationManagerTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.162217" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1064" name="Advance_UsesFixedRateAndCatchUpLimit" fullname="Kyle.Flooding.Tests.FloodSimulationManagerTests.Advance_UsesFixedRateAndCatchUpLimit" methodname="Advance_UsesFixedRateAndCatchUpLimit" classname="Kyle.Flooding.Tests.FloodSimulationManagerTests" runstate="Runnable" seed="1913320557" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.033983" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1066" name="Configuration_RejectsInvalidNumericInput" fullname="Kyle.Flooding.Tests.FloodSimulationManagerTests.Configuration_RejectsInvalidNumericInput" methodname="Configuration_RejectsInvalidNumericInput" classname="Kyle.Flooding.Tests.FloodSimulationManagerTests" runstate="Runnable" seed="668774731" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.017141" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1065" name="DisabledSource_DoesNotRequestInflow" fullname="Kyle.Flooding.Tests.FloodSimulationManagerTests.DisabledSource_DoesNotRequestInflow" methodname="DisabledSource_DoesNotRequestInflow" classname="Kyle.Flooding.Tests.FloodSimulationManagerTests" runstate="Runnable" seed="1037376282" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.029130" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1062" name="SimulateTick_AggregatesSourcesAndPublishesOnce" fullname="Kyle.Flooding.Tests.FloodSimulationManagerTests.SimulateTick_AggregatesSourcesAndPublishesOnce" methodname="SimulateTick_AggregatesSourcesAndPublishesOnce" classname="Kyle.Flooding.Tests.FloodSimulationManagerTests" runstate="Runnable" seed="1351437482" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.038385" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1063" name="SimulateTick_ReconcilesDestinationCapacity" fullname="Kyle.Flooding.Tests.FloodSimulationManagerTests.SimulateTick_ReconcilesDestinationCapacity" methodname="SimulateTick_ReconcilesDestinationCapacity" classname="Kyle.Flooding.Tests.FloodSimulationManagerTests" runstate="Runnable" seed="1168777172" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.037672" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1067" name="FloodSurfaceRendererTests" fullname="Kyle.Flooding.Tests.FloodSurfaceRendererTests" classname="Kyle.Flooding.Tests.FloodSurfaceRendererTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.394390" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1068" name="CubeRenderer_AppliesPublishedState" fullname="Kyle.Flooding.Tests.FloodSurfaceRendererTests.CubeRenderer_AppliesPublishedState" methodname="CubeRenderer_AppliesPublishedState" classname="Kyle.Flooding.Tests.FloodSurfaceRendererTests" runstate="Runnable" seed="506497028" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.030393" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1072" name="PolygonRenderer_ClipsMeshToGravityAlignedPlane" fullname="Kyle.Flooding.Tests.FloodSurfaceRendererTests.PolygonRenderer_ClipsMeshToGravityAlignedPlane" methodname="PolygonRenderer_ClipsMeshToGravityAlignedPlane" classname="Kyle.Flooding.Tests.FloodSurfaceRendererTests" runstate="Runnable" seed="963405892" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.048990" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1071" name="PolygonRenderer_GeneratesConcaveWaterMesh" fullname="Kyle.Flooding.Tests.FloodSurfaceRendererTests.PolygonRenderer_GeneratesConcaveWaterMesh" methodname="PolygonRenderer_GeneratesConcaveWaterMesh" classname="Kyle.Flooding.Tests.FloodSurfaceRendererTests" runstate="Runnable" seed="1050195834" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.023450" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1069" name="Renderer_DoesNotMutateSimulation" fullname="Kyle.Flooding.Tests.FloodSurfaceRendererTests.Renderer_DoesNotMutateSimulation" methodname="Renderer_DoesNotMutateSimulation" classname="Kyle.Flooding.Tests.FloodSurfaceRendererTests" runstate="Runnable" seed="784542817" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.211296" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1070" name="Renderer_InterpolatesAndCanSnapToCurrentState" fullname="Kyle.Flooding.Tests.FloodSurfaceRendererTests.Renderer_InterpolatesAndCanSnapToCurrentState" methodname="Renderer_InterpolatesAndCanSnapToCurrentState" classname="Kyle.Flooding.Tests.FloodSurfaceRendererTests" runstate="Runnable" seed="463499158" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.054623" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1073" name="FloodTelemetryAndAudioTests" fullname="Kyle.Flooding.Tests.FloodTelemetryAndAudioTests" classname="Kyle.Flooding.Tests.FloodTelemetryAndAudioTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.014260" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1075" name="CameraTelemetry_ReportsTrackerState" fullname="Kyle.Flooding.Tests.FloodTelemetryAndAudioTests.CameraTelemetry_ReportsTrackerState" methodname="CameraTelemetry_ReportsTrackerState" classname="Kyle.Flooding.Tests.FloodTelemetryAndAudioTests" runstate="Runnable" seed="1663485737" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.003994" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1076" name="UnderwaterAudio_SmoothsTowardUnderwaterTargets" fullname="Kyle.Flooding.Tests.FloodTelemetryAndAudioTests.UnderwaterAudio_SmoothsTowardUnderwaterTargets" methodname="UnderwaterAudio_SmoothsTowardUnderwaterTargets" classname="Kyle.Flooding.Tests.FloodTelemetryAndAudioTests" runstate="Runnable" seed="2074091845" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.004833" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1074" name="VolumeTelemetry_ReportsFillVolumeAndCapacity" fullname="Kyle.Flooding.Tests.FloodTelemetryAndAudioTests.VolumeTelemetry_ReportsFillVolumeAndCapacity" methodname="VolumeTelemetry_ReportsFillVolumeAndCapacity" classname="Kyle.Flooding.Tests.FloodTelemetryAndAudioTests" runstate="Runnable" seed="102242131" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.003473" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1077" name="FloodVolumeTests" fullname="Kyle.Flooding.Tests.FloodVolumeTests" classname="Kyle.Flooding.Tests.FloodVolumeTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.111882" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1083" name="BakedGeometry_DrivesCapacityAndArbitraryPlaneState" fullname="Kyle.Flooding.Tests.FloodVolumeTests.BakedGeometry_DrivesCapacityAndArbitraryPlaneState" methodname="BakedGeometry_DrivesCapacityAndArbitraryPlaneState" classname="Kyle.Flooding.Tests.FloodVolumeTests" runstate="Runnable" seed="1415762193" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.016752" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1081" name="ConfiguredDensity_ScalesWaterMass" fullname="Kyle.Flooding.Tests.FloodVolumeTests.ConfiguredDensity_ScalesWaterMass" methodname="ConfiguredDensity_ScalesWaterMass" classname="Kyle.Flooding.Tests.FloodVolumeTests" runstate="Runnable" seed="725374594" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.004322" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1080" name="CurrentState_ContainsDerivedRectangularValues" fullname="Kyle.Flooding.Tests.FloodVolumeTests.CurrentState_ContainsDerivedRectangularValues" methodname="CurrentState_ContainsDerivedRectangularValues" classname="Kyle.Flooding.Tests.FloodVolumeTests" runstate="Runnable" seed="1523023131" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.005741" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1085" name="CustomGravity_ControlsWorldSurfaceNormal" fullname="Kyle.Flooding.Tests.FloodVolumeTests.CustomGravity_ControlsWorldSurfaceNormal" methodname="CustomGravity_ControlsWorldSurfaceNormal" classname="Kyle.Flooding.Tests.FloodVolumeTests" runstate="Runnable" seed="177171485" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.003810" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1082" name="PolygonGeometry_DrivesCapacityHeightAndCentroid" fullname="Kyle.Flooding.Tests.FloodVolumeTests.PolygonGeometry_DrivesCapacityHeightAndCentroid" methodname="PolygonGeometry_DrivesCapacityHeightAndCentroid" classname="Kyle.Flooding.Tests.FloodVolumeTests" runstate="Runnable" seed="912115789" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.003558" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1084" name="RotatedVolume_SurfaceRemainsPerpendicularToGravity" fullname="Kyle.Flooding.Tests.FloodVolumeTests.RotatedVolume_SurfaceRemainsPerpendicularToGravity" methodname="RotatedVolume_SurfaceRemainsPerpendicularToGravity" classname="Kyle.Flooding.Tests.FloodVolumeTests" runstate="Runnable" seed="497901004" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.007326" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1079" name="TransformChange_PublishesStateWithoutVolumeEvent" fullname="Kyle.Flooding.Tests.FloodVolumeTests.TransformChange_PublishesStateWithoutVolumeEvent" methodname="TransformChange_PublishesStateWithoutVolumeEvent" classname="Kyle.Flooding.Tests.FloodVolumeTests" runstate="Runnable" seed="627097896" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.015600" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1078" name="VolumeMutations_ArePublishedOncePerFrame" fullname="Kyle.Flooding.Tests.FloodVolumeTests.VolumeMutations_ArePublishedOncePerFrame" methodname="VolumeMutations_ArePublishedOncePerFrame" classname="Kyle.Flooding.Tests.FloodVolumeTests" runstate="Runnable" seed="1482247784" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.016023" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1086" name="ZeroGravity_RetainsLastValidLocalOrientation" fullname="Kyle.Flooding.Tests.FloodVolumeTests.ZeroGravity_RetainsLastValidLocalOrientation" methodname="ZeroGravity_RetainsLastValidLocalOrientation" classname="Kyle.Flooding.Tests.FloodVolumeTests" runstate="Runnable" seed="118736360" result="Passed" start-time="2026-08-05 09:04:12Z" end-time="2026-08-05 09:04:12Z" duration="0.031049" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: C:/Users/kyleb/AppData/LocalLow/DefaultCompany/Flooding\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

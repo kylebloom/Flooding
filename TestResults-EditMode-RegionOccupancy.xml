@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="25" result="Failed(Child)" total="25" passed="22" failed="3" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:08Z" duration="0.56938">
+  <test-suite type="TestSuite" id="1000" name="Flooding" fullname="Flooding" runstate="Runnable" testcasecount="130" result="Failed" site="Child" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:08Z" duration="0.569380" total="25" passed="22" failed="3" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1154" name="Kyle.Flooding.Tests.Editor.dll" fullname="C:/Users/kyleb/Flooding/Library/ScriptAssemblies/Kyle.Flooding.Tests.Editor.dll" runstate="Runnable" testcasecount="130" result="Failed" site="Child" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:08Z" duration="0.556630" total="25" passed="22" failed="3" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="29820" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1155" name="Kyle" fullname="Kyle" runstate="Runnable" testcasecount="130" result="Failed" site="Child" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:08Z" duration="0.554703" total="25" passed="22" failed="3" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1156" name="Flooding" fullname="Kyle.Flooding" runstate="Runnable" testcasecount="130" result="Failed" site="Child" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:08Z" duration="0.552132" total="25" passed="22" failed="3" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1157" name="Tests" fullname="Kyle.Flooding.Tests" runstate="Runnable" testcasecount="130" result="Failed" site="Child" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:08Z" duration="0.549633" total="25" passed="22" failed="3" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1001" name="BakedFloodGeometryTests" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:08Z" duration="0.388216" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1011" name="Authoring_DetectsStaleFingerprint" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.Authoring_DetectsStaleFingerprint" methodname="Authoring_DetectsStaleFingerprint" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="1156514260" result="Passed" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:07Z" duration="0.052095" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1005" name="BakedData_ClonesInputAndReportsApproximationIndicator" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.BakedData_ClonesInputAndReportsApproximationIndicator" methodname="BakedData_ClonesInputAndReportsApproximationIndicator" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="1322731362" result="Passed" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:07Z" duration="0.012087" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1004" name="BakedData_EvaluateArbitraryPlaneDeterministically" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.BakedData_EvaluateArbitraryPlaneDeterministically" methodname="BakedData_EvaluateArbitraryPlaneDeterministically" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="1494290187" result="Passed" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:07Z" duration="0.014175" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1007" name="BakedData_WithoutPresentationBoundary_FallsBackToVoxelContours" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.BakedData_WithoutPresentationBoundary_FallsBackToVoxelContours" methodname="BakedData_WithoutPresentationBoundary_FallsBackToVoxelContours" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="1700072562" result="Passed" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:07Z" duration="0.004668" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1006" name="BakedData_WithPresentationBoundary_UsesBoundarySurfaceNotVoxelPatches" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.BakedData_WithPresentationBoundary_UsesBoundarySurfaceNotVoxelPatches" methodname="BakedData_WithPresentationBoundary_UsesBoundarySurfaceNotVoxelPatches" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="923172188" result="Passed" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:07Z" duration="0.008832" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1003" name="BakedRuntimeImplementation_IsNotPublic" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.BakedRuntimeImplementation_IsNotPublic" methodname="BakedRuntimeImplementation_IsNotPublic" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="386620023" result="Passed" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:07Z" duration="0.000327" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1010" name="ClosedMesh_WithDuplicatedSeamVertices_IsAccepted" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.ClosedMesh_WithDuplicatedSeamVertices_IsAccepted" methodname="ClosedMesh_WithDuplicatedSeamVertices_IsAccepted" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="937221555" result="Passed" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:07Z" duration="0.009375" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1002" name="GeometryMode_AppendsBakeWithoutChangingExistingValues" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.GeometryMode_AppendsBakeWithoutChangingExistingValues" methodname="GeometryMode_AppendsBakeWithoutChangingExistingValues" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="1621395587" result="Passed" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:07Z" duration="0.000735" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1009" name="OpenSourceMesh_IsRejectedBeforeBake" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.OpenSourceMesh_IsRejectedBeforeBake" methodname="OpenSourceMesh_IsRejectedBeforeBake" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="964576759" result="Passed" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:07Z" duration="0.003293" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1008" name="SurfaceSolver_HasDeterministicWorkGuardFor512Cells" fullname="Kyle.Flooding.Tests.BakedFloodGeometryTests.SurfaceSolver_HasDeterministicWorkGuardFor512Cells" methodname="SurfaceSolver_HasDeterministicWorkGuardFor512Cells" classname="Kyle.Flooding.Tests.BakedFloodGeometryTests" runstate="Runnable" seed="1981939424" result="Passed" start-time="2026-08-05 15:53:07Z" end-time="2026-08-05 15:53:08Z" duration="0.252147" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1137" name="RegionOccupancyBakeTests" fullname="Kyle.Flooding.Tests.RegionOccupancyBakeTests" classname="Kyle.Flooding.Tests.RegionOccupancyBakeTests" runstate="Runnable" testcasecount="9" result="Failed" site="Child" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.141370" total="9" passed="6" failed="3" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1143" name="CompositeFloodGeometry_PrefersUsableBakeOverTwoBox" fullname="Kyle.Flooding.Tests.RegionOccupancyBakeTests.CompositeFloodGeometry_PrefersUsableBakeOverTwoBox" methodname="CompositeFloodGeometry_PrefersUsableBakeOverTwoBox" classname="Kyle.Flooding.Tests.RegionOccupancyBakeTests" runstate="Runnable" seed="2106531173" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.052758" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1141" name="DisconnectedMembers_FailBake" fullname="Kyle.Flooding.Tests.RegionOccupancyBakeTests.DisconnectedMembers_FailBake" methodname="DisconnectedMembers_FailBake" classname="Kyle.Flooding.Tests.RegionOccupancyBakeTests" runstate="Runnable" seed="1155083541" result="Failed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.021581" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[Unhandled log message: '[Error] FloodRegion 'DisconnectedRegion' geometry failed: FloodVolumes 'Member' and 'Member' are disconnected in region space. Members must overlap or share a face within tolerance.'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[Kyle.Flooding.FloodRegion:TryInitializeRegion () (at ./Packages/com.rabbidwolf.com.kyle.flooding/Runtime/Components/FloodRegion.cs:589)
+Kyle.Flooding.FloodRegion:Rebuild () (at ./Packages/com.rabbidwolf.com.kyle.flooding/Runtime/Components/FloodRegion.cs:355)
+Kyle.Flooding.FloodRegion:SetMembers (System.Collections.Generic.IReadOnlyList`1<Kyle.Flooding.FloodVolume>) (at ./Packages/com.rabbidwolf.com.kyle.flooding/Runtime/Components/FloodRegion.cs:341)
+Kyle.Flooding.Tests.RegionOccupancyBakeTests:DisconnectedMembers_FailBake () (at ./Packages/com.rabbidwolf.com.kyle.flooding/Tests/Editor/RegionOccupancyBakeTests.cs:84)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[FloodRegion 'DisconnectedRegion' geometry failed: FloodVolumes 'Member' and 'Member' are disconnected in region space. Members must overlap or share a face within tolerance.
+]]></output>
+              </test-case>
+              <test-case id="1139" name="FaceTouchingMembers_SumCapacityApproximately" fullname="Kyle.Flooding.Tests.RegionOccupancyBakeTests.FaceTouchingMembers_SumCapacityApproximately" methodname="FaceTouchingMembers_SumCapacityApproximately" classname="Kyle.Flooding.Tests.RegionOccupancyBakeTests" runstate="Runnable" seed="465098955" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.015488" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1146" name="FloodRegionData_DeduplicatesOccupiedIndices" fullname="Kyle.Flooding.Tests.RegionOccupancyBakeTests.FloodRegionData_DeduplicatesOccupiedIndices" methodname="FloodRegionData_DeduplicatesOccupiedIndices" classname="Kyle.Flooding.Tests.RegionOccupancyBakeTests" runstate="Runnable" seed="1936770393" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.001085" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1142" name="MixedModeBake_RectangularPlusBakedMember_Unions" fullname="Kyle.Flooding.Tests.RegionOccupancyBakeTests.MixedModeBake_RectangularPlusBakedMember_Unions" methodname="MixedModeBake_RectangularPlusBakedMember_Unions" classname="Kyle.Flooding.Tests.RegionOccupancyBakeTests" runstate="Runnable" seed="273322642" result="Failed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.011522" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Baked members are disconnected in region space. Members must overlap or share a face within the region grid (face-adjacent occupied cells).
+  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at Kyle.Flooding.Tests.RegionOccupancyBakeTests.MixedModeBake_RectangularPlusBakedMember_Unions () [0x000b8] in .\Packages\com.rabbidwolf.com.kyle.flooding\Tests\Editor\RegionOccupancyBakeTests.cs:131
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[FloodRegion 'MixedRegion' geometry failed: No region union strategy supports these 2 members without a usable FloodRegionData bake. Use Bake Region in the FloodRegion Inspector. Exactly two Rectangular Prism members that are axis-aligned with the region can still use TwoBoxAnalyticUnionStrategy without baking.
+]]></output>
+              </test-case>
+              <test-case id="1140" name="PartialFill_DoesNotDoubleCountOverlap" fullname="Kyle.Flooding.Tests.RegionOccupancyBakeTests.PartialFill_DoesNotDoubleCountOverlap" methodname="PartialFill_DoesNotDoubleCountOverlap" classname="Kyle.Flooding.Tests.RegionOccupancyBakeTests" runstate="Runnable" seed="604477354" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.013567" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1145" name="StaleFingerprint_DetectedWhenResolutionChanges" fullname="Kyle.Flooding.Tests.RegionOccupancyBakeTests.StaleFingerprint_DetectedWhenResolutionChanges" methodname="StaleFingerprint_DetectedWhenResolutionChanges" classname="Kyle.Flooding.Tests.RegionOccupancyBakeTests" runstate="Runnable" seed="1885352249" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.006906" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1138" name="ThreeOverlappingMembers_CountOverlapCellsOnce" fullname="Kyle.Flooding.Tests.RegionOccupancyBakeTests.ThreeOverlappingMembers_CountOverlapCellsOnce" methodname="ThreeOverlappingMembers_CountOverlapCellsOnce" classname="Kyle.Flooding.Tests.RegionOccupancyBakeTests" runstate="Runnable" seed="1000608132" result="Failed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.012383" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[Unhandled log message: '[Error] FloodRegion 'BakeRegion' geometry failed: No region union strategy supports these 3 members without a usable FloodRegionData bake. Use Bake Region in the FloodRegion Inspector. Exactly two Rectangular Prism members that are axis-aligned with the region can still use TwoBoxAnalyticUnionStrategy without baking.'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[Kyle.Flooding.FloodRegion:TryInitializeRegion () (at ./Packages/com.rabbidwolf.com.kyle.flooding/Runtime/Components/FloodRegion.cs:589)
+Kyle.Flooding.FloodRegion:Rebuild () (at ./Packages/com.rabbidwolf.com.kyle.flooding/Runtime/Components/FloodRegion.cs:355)
+Kyle.Flooding.FloodRegion:SetMembers (System.Collections.Generic.IReadOnlyList`1<Kyle.Flooding.FloodVolume>) (at ./Packages/com.rabbidwolf.com.kyle.flooding/Runtime/Components/FloodRegion.cs:341)
+Kyle.Flooding.Tests.RegionOccupancyBakeTests/RegionBakeFixture:.ctor (UnityEngine.Vector3,UnityEngine.Vector3,System.Nullable`1<UnityEngine.Vector3>,single,single,single,single) (at ./Packages/com.rabbidwolf.com.kyle.flooding/Tests/Editor/RegionOccupancyBakeTests.cs:335)
+Kyle.Flooding.Tests.RegionOccupancyBakeTests:ThreeOverlappingMembers_CountOverlapCellsOnce () (at ./Packages/com.rabbidwolf.com.kyle.flooding/Tests/Editor/RegionOccupancyBakeTests.cs:13)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[FloodRegion 'BakeRegion' geometry failed: No region union strategy supports these 3 members without a usable FloodRegionData bake. Use Bake Region in the FloodRegion Inspector. Exactly two Rectangular Prism members that are axis-aligned with the region can still use TwoBoxAnalyticUnionStrategy without baking.
+]]></output>
+              </test-case>
+              <test-case id="1144" name="TwoBoxAnalyticPath_StillWorksWithoutBake" fullname="Kyle.Flooding.Tests.RegionOccupancyBakeTests.TwoBoxAnalyticPath_StillWorksWithoutBake" methodname="TwoBoxAnalyticPath_StillWorksWithoutBake" classname="Kyle.Flooding.Tests.RegionOccupancyBakeTests" runstate="Runnable" seed="1234261887" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.001329" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1147" name="TwoBoxAnalyticUnionTests" fullname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests" classname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.012137" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1153" name="ContainsLocalPoint_UsesUnion" fullname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests.ContainsLocalPoint_UsesUnion" methodname="ContainsLocalPoint_UsesUnion" classname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests" runstate="Runnable" seed="735063550" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.001799" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1152" name="DisconnectedBoxes_FailValidation" fullname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests.DisconnectedBoxes_FailValidation" methodname="DisconnectedBoxes_FailValidation" classname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests" runstate="Runnable" seed="177858040" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.000805" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1149" name="NonOverlappingTouchingBoxes_SumCapacity" fullname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests.NonOverlappingTouchingBoxes_SumCapacity" methodname="NonOverlappingTouchingBoxes_SumCapacity" classname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests" runstate="Runnable" seed="1400970379" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.000568" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1148" name="OverlappingBoxes_CountCapacityOnce" fullname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests.OverlappingBoxes_CountCapacityOnce" methodname="OverlappingBoxes_CountCapacityOnce" classname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests" runstate="Runnable" seed="822264038" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.000559" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1150" name="PartialFill_DoesNotDoubleCountOverlap" fullname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests.PartialFill_DoesNotDoubleCountOverlap" methodname="PartialFill_DoesNotDoubleCountOverlap" classname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests" runstate="Runnable" seed="147690766" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.002247" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1151" name="SurfaceSolver_FindsOnePlaneForUnionVolume" fullname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests.SurfaceSolver_FindsOnePlaneForUnionVolume" methodname="SurfaceSolver_FindsOnePlaneForUnionVolume" classname="Kyle.Flooding.Tests.TwoBoxAnalyticUnionTests" runstate="Runnable" seed="917326051" result="Passed" start-time="2026-08-05 15:53:08Z" end-time="2026-08-05 15:53:08Z" duration="0.003642" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: C:/Users/kyleb/AppData/LocalLow/DefaultCompany/Flooding\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

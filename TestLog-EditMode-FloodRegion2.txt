@@ -1,0 +1,46 @@
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.5/staging' branch; Version is '6000.5.6f1 (0e0577a1a2ac) revision 918903'; Using compiler version '194234433'; Build Type 'Release'
+OS: 'Windows 11  (10.0.26200) Core' Language: 'en' Physical Memory: 16146 MB
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-kyleb" at "2026-08-05T11:47:46.2107228Z"
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-08-05T11:47:46Z
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 27436, path: "C:/Program Files/Unity/Hub/Editor/6000.5.6f1/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.1+9fbee8e
+  Session Id:              fa475fa08bf949829b6b40b27abcea48
+  Correlation Id:          1089d6dd16947ce82104f4a357592b79
+  External correlation Id: 310389765333698049
+  Machine Id:              tSM2ICXoYqQDnQCvObY2KsjeUzY=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-kyleb" (connect: 0.00s, validation: 0.00s, handshake: 0.06s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-kyleb-notifications" at "2026-08-05T11:47:46.2694579Z"
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 2474913519566-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.00
+[Licensing::Module] Licensing Background thread has ended after 0.06s
+
+COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\6000.5.6f1\Editor\Unity.exe
+-batchmode
+-nographics
+-projectPath
+C:\Users\kyleb\Flooding
+-runTests
+-testPlatform
+EditMode
+-testFilter
+TwoBoxAnalyticUnionTests
+-testResults
+C:\Users\kyleb\Flooding\TestResults-EditMode-FloodRegion.xml
+-logFile
+C:\Users\kyleb\Flooding\TestLog-EditMode-FloodRegion2.txt
+Successfully changed project path to: C:\Users\kyleb\Flooding
+C:/Users/kyleb/Flooding
+Exiting without the bug reporter. Application will terminate with return code 1
