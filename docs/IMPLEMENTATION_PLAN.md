@@ -44,10 +44,10 @@ This document remains authoritative for feature-phase delivery.
 
 ## Current status
 
-- Current milestone: **Phase 12 gameplay query API implemented; Unity regression verification pending**
+- Current milestone: **Phase 14 local ingress presentation implemented; Unity regression verification pending**
 - Overall package status: **Gameplay-consumable simulation prototype**
 - Current supported geometry: **Rotated prism or Editor-baked data**
-- Current presentation: **Clipped prism volume, baked free-surface patches, connection visuals, and optional flow/fill audio**
+- Current presentation: **Clipped prism volume, baked free-surface patches, connection visuals, optional flow/fill audio, camera/underwater, and local ingress**
 - Current flow model: **Configured inflow, finite connections, and external boundaries**
 - Current query surface: **Live read-only point queries over authoritative state**
 
@@ -424,6 +424,38 @@ Acceptance criteria:
 - Auto-discover manager resolution retries while null and after scene loads.
 - Package version `0.10.0` for the first-person / camera presentation feature
   set.
+
+## Phase 14 — Local ingress presentation
+
+Goal: present early localized water entry without CFD or a second authoritative
+volume.
+
+- [x] Add factual profile-independent `FloodIngressSample` and
+  `FloodIngressSampler`.
+- [x] Add optional presentation-only `IngressAnchor`, `OpeningCenterWorld`, and
+  `IngressWorldPosition` on `FloodConnection` / `FloodSource`.
+- [x] Add `FloodIngressPresentationProfile` and pure
+  `FloodIngressPresentationState` with Growing / Settling / Converging phases,
+  one patch per provider, and bounded reuse without cross-provider merge.
+- [x] Add `FloodLocalIngressPresenter` (shared unit disc + MPB, floor plane,
+  diagnostics) and lightweight `FloodIngressStreamPresenter`.
+- [x] Do not add `VisualFillWeight` to `FloodSurfaceRenderer`; fade local
+  opacity during convergence and document residual overlap.
+- [x] Add Edit Mode lifecycle tests and Play Mode non-mutation tests.
+- [x] Add Local Ingress sample, package docs, and version `0.11.0`.
+- [x] Final regression: Edit Mode 104/104 and Play Mode 66/66 passed
+  (Unity 6000.5.6f1), including 14 ingress Edit Mode and 2 presenter Play Mode
+  tests.
+
+Acceptance criteria:
+
+- Presentation never mutates `FloodVolume` or solver transfers.
+- Sampling does not require a presentation profile.
+- Reversed connection flow selects the correct destination and flips
+  `DirectionWorld` into that volume.
+- One provider updates one patch across frames; stop transitions through
+  settle/converge without popping.
+- Core runtime remains free of URP dependencies for local ingress.
 
 ## Documentation roadmap
 

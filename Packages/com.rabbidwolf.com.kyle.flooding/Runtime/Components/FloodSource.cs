@@ -32,6 +32,12 @@ namespace Kyle.Flooding
         [Tooltip("Whether this source currently requests water during simulation ticks.")]
         private bool active = true;
 
+        [Header("Presentation")]
+
+        [SerializeField]
+        [Tooltip("Optional Transform where ingress visuals spawn. When unset, this source's Transform position and forward are used. Simulation ignores this field.")]
+        private Transform ingressAnchor;
+
         /// <summary>
         /// Gets or sets the manager that evaluates this source.
         /// </summary>
@@ -79,6 +85,24 @@ namespace Kyle.Flooding
             get => active;
             set => active = value;
         }
+
+        /// <summary>
+        /// Gets or sets an optional presentation-only ingress anchor Transform.
+        /// Simulation ignores this field.
+        /// </summary>
+        public Transform IngressAnchor
+        {
+            get => ingressAnchor;
+            set => ingressAnchor = value;
+        }
+
+        /// <summary>
+        /// Gets the preferred world-space ingress presentation position.
+        /// Uses <see cref="IngressAnchor"/> when assigned; otherwise this
+        /// component's Transform position.
+        /// </summary>
+        public Vector3 IngressWorldPosition =>
+            ingressAnchor != null ? ingressAnchor.position : transform.position;
 
         private void Awake()
         {

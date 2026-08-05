@@ -266,6 +266,14 @@ surface-renderer contract:
   underwater state.
 - `FloodVolumeTelemetry` / `FloodCameraTelemetry` expose framework-neutral
   values for UI; they do not depend on TextMeshPro.
+- Local ingress presentation (`FloodIngressSample`, `FloodIngressSampler`,
+  `FloodIngressPresentationState`, `FloodLocalIngressPresenter`, optional
+  `FloodIngressStreamPresenter`) reads applied connection/source flow and
+  presentation anchors only. It never writes volume, and does not replace
+  `FloodSurfaceRenderer`. Patches are a visual proxy with Growing / Settling /
+  Converging phases; gameplay queries remain solver-based.
+- Optional `IngressAnchor` on `FloodConnection` / `FloodSource` is
+  presentation-only. Connection fallback position is `OpeningCenterWorld`.
 
 `FloodSimulationManager.RegisteredVolumes` exposes a live read-only view of
 registered volumes for presentation discovery. Membership remains

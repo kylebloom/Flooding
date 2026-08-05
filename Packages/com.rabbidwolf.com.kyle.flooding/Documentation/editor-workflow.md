@@ -59,7 +59,7 @@ Best when you want a complete authored hierarchy to inspect and edit.
 1. Open **Window > Package Management > Package Manager**.
 2. Select **Flooding** in the package list.
 3. Open the **Samples** tab and import one sample.
-4. Open the imported scene under `Assets/Samples/Flooding/0.10.0/...`.
+4. Open the imported scene under `Assets/Samples/Flooding/<version>/...`.
 5. Enter Play Mode, then stop and edit Inspector fields before playing again.
 
 | Sample | What it teaches |
@@ -69,6 +69,7 @@ Best when you want a complete authored hierarchy to inspect and edit.
 | Connected Compartments | Conserved doorway flow between two finite rooms |
 | Hull Breach | Ocean waterline exchanging water with one compartment |
 | First Person Flooding | Rising flood from first person with waterline / URP FX; see [Scenario 9](#scenario-9--first-person-camera-through-a-rising-flood) |
+| Local Ingress | Localized breach stream/spread vs instant bulk surface; see [Scenario 10](#scenario-10--local-ingress-presentation-vs-instant-bulk-surface) |
 
 Re-importing a sample can overwrite your copy under `Assets/Samples`. Duplicate
 customized copies first.
@@ -381,6 +382,35 @@ submerged views tint. Press **T** in the sample to tilt the room — the
 waterline follows `SurfacePlane`, not world Y. Tune look settings with the
 [underwater look cheat sheet](#tune-underwater-look-symptom--where-to-click).
 
+### Scenario 10 — Local ingress presentation vs instant bulk surface
+
+**Goal:** Show water entering at a breach as a local stream/pool before the
+room-wide free surface dominates — without changing solver volume semantics.
+
+**Fastest path:** import the **Local Ingress** sample (Package Manager Samples,
+or **Flooding > Internal > Build Local Ingress Sample**), enter Play Mode, and
+press **I** to toggle local ingress ON/OFF.
+
+**From components:**
+
+1. Build a compartment with bulk `FloodCubeSurfaceRenderer`
+   ([Scenario 1](#scenario-1--single-room-filling-from-a-leak) or
+   [Scenario 3](#scenario-3--hull-breach-against-an-ocean-waterline)).
+2. **Assets > Create > Flooding > Flood Ingress Presentation Profile**.
+3. On the `FloodConnection` / `FloodSource`, optionally assign **Ingress Anchor**
+   under **Presentation**.
+4. Add **Flood Local Ingress Presenter** on a child of the compartment:
+   assign **Volume**, **Profile**, **Floor Plane** (position + up = floor
+   normal), **Patch Material**, and explicit **Connections** / **Sources**.
+5. Optionally add **Flood Ingress Stream Presenter** at the breach and list it
+   under **Stream Presenters**.
+
+**Expected:** Early inflow shows a stream and expanding shallow disc near the
+ingress; after settling/convergence the local opacity fades while the
+authoritative bulk surface remains. Disabling the presenter must not change
+`FloodVolume.CurrentVolume`. Full details:
+[Local ingress presentation](local-ingress.md).
+
 ## Quick references
 
 ### Prefab chooser
@@ -421,6 +451,7 @@ Built-in, HDRP, or a custom pipeline.
 | Flow VFX / SFX | [Scenario 7](#scenario-7--flow-visuals-and-audio) |
 | Debug overlays | [Scenario 8](#scenario-8--scene-view-diagnostics-while-tuning) |
 | First-person waterline / underwater FX | [Scenario 9](#scenario-9--first-person-camera-through-a-rising-flood) |
+| Local ingress stream / spread | [Scenario 10](#scenario-10--local-ingress-presentation-vs-instant-bulk-surface) |
 
 ### Sample import
 
@@ -480,6 +511,13 @@ regenerate the authored hierarchy.
   a first-person camera uses `FloodCameraTracker`, optional URP underwater
   effects, audio, and telemetry. Enable Depth Texture and the Flood Underwater
   Renderer Feature for waterline crossing. Press **T** to tilt the room.
+- **Local Ingress**: Unity copies it to
+  `Assets/Samples/Flooding/0.11.0/Local Ingress`. Open `LocalIngress.unity`
+  there (or rebuild with **Flooding > Internal > Build Local Ingress Sample**).
+  Compare instant bulk free-surface visuals with local stream/spread that
+  converges to the authoritative surface. Press **I** to toggle local ingress.
+  See [Scenario 10](#scenario-10--local-ingress-presentation-vs-instant-bulk-surface)
+  and [local-ingress.md](local-ingress.md).
 
 The package's `Samples~` folders are authoritative. Package Manager import
 creates a writable copy under `Assets/Samples` but does not synchronize that

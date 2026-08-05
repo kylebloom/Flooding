@@ -60,6 +60,12 @@ namespace Kyle.Flooding
         [Tooltip("Whether water may currently flow through this opening.")]
         private bool isOpen = true;
 
+        [Header("Presentation")]
+
+        [SerializeField]
+        [Tooltip("Optional Transform where ingress visuals spawn for water entering a destination volume. When unset, Opening Center World is used. Simulation ignores this field.")]
+        private Transform ingressAnchor;
+
         /// <summary>
         /// Gets or sets the manager that evaluates this connection.
         /// </summary>
@@ -201,6 +207,31 @@ namespace Kyle.Flooding
                 : CurrentFlowRate < 0d
                     ? -transform.forward
                     : Vector3.zero;
+
+        /// <summary>
+        /// Gets or sets an optional presentation-only ingress anchor Transform.
+        /// Simulation ignores this field.
+        /// </summary>
+        public Transform IngressAnchor
+        {
+            get => ingressAnchor;
+            set => ingressAnchor = value;
+        }
+
+        /// <summary>
+        /// Gets the world-space center of the rectangular opening
+        /// (bottom center + half opening height along local Y).
+        /// </summary>
+        public Vector3 OpeningCenterWorld =>
+            transform.TransformPoint(new Vector3(0f, openingHeight * 0.5f, 0f));
+
+        /// <summary>
+        /// Gets the preferred world-space ingress presentation position.
+        /// Uses <see cref="IngressAnchor"/> when assigned; otherwise
+        /// <see cref="OpeningCenterWorld"/>.
+        /// </summary>
+        public Vector3 IngressWorldPosition =>
+            ingressAnchor != null ? ingressAnchor.position : OpeningCenterWorld;
 
         private void Awake()
         {

@@ -1,7 +1,7 @@
 # Flooding
 
 Flooding is a reusable, gameplay-focused flooding simulation package for Unity
-6.5. The current `0.10.0` prototype models gravity-aligned water volume inside
+6.5. The current `0.11.0` prototype models gravity-aligned water volume inside
 rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
 
 ## Current features
@@ -37,6 +37,9 @@ rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
 - Optional underwater AudioMixer muffling and framework-neutral flood telemetry
   adapters (no TextMeshPro dependency).
 - Optional `FloodConnectionVisual` and connection/source/volume audio consumers.
+- Optional local ingress presentation (`FloodLocalIngressPresenter`) that shows
+  stream/shallow-spread visuals converging to the bulk free surface without a
+  second authoritative water volume.
 - Optional read-only Scene-view diagnostics for mass centers, gravity, solved
   surfaces, and connection flow.
 - Basic transparent water material and example room prefabs.
@@ -240,6 +243,11 @@ transient simulation or presentation state.
   audio muffling, and telemetry. Enable the URP Depth Texture and Flood
   Underwater Renderer Feature for the fullscreen waterline pass. Press **T** to
   tilt the room; waterline follows the authoritative surface plane.
+- **Local Ingress** imports to `Assets/Samples/Flooding/0.11.0/Local Ingress`.
+  Open `LocalIngress.unity` (rebuild via **Flooding > Internal > Build Local
+  Ingress Sample** if needed). Toggle local ingress with **I** to compare
+  stream/shallow-spread presentation against instant bulk equilibrium visuals.
+  Details: `Documentation/local-ingress.md`.
 
 The package folders under `Samples~` are the authoritative sample sources.
 Package Manager copies them into `Assets/Samples` rather than synchronizing

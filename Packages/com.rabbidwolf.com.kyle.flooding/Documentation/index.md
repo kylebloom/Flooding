@@ -54,6 +54,8 @@ Camera / underwater presentation (optional):
 - [Underwater audio](editor-workflow.md#underwater-audio-audiomixer)
 - [Telemetry adapters](editor-workflow.md#flood-telemetry-for-ui)
 - [Scenario 9 — first-person rising flood](editor-workflow.md#scenario-9--first-person-camera-through-a-rising-flood)
+- [Local ingress presentation](local-ingress.md)
+- [Scenario 10 — local ingress vs bulk surface](editor-workflow.md#scenario-10--local-ingress-presentation-vs-instant-bulk-surface)
 
 ### Fastest smoke test
 
@@ -78,6 +80,7 @@ a transparent material compatible with your render pipeline.
 | Add flow VFX or SFX | [Scenario 7](editor-workflow.md#scenario-7--flow-visuals-and-audio) |
 | Debug surfaces and flow in Scene view | [Scenario 8](editor-workflow.md#scenario-8--scene-view-diagnostics-while-tuning) |
 | First-person waterline / underwater FX | [Scenario 9](editor-workflow.md#scenario-9--first-person-camera-through-a-rising-flood) |
+| Localized breach/leak ingress visuals | [Scenario 10](editor-workflow.md#scenario-10--local-ingress-presentation-vs-instant-bulk-surface) / [Local ingress](local-ingress.md) |
 | Soften wavy underwater look | [Tune underwater look](editor-workflow.md#tune-underwater-look-symptom--where-to-click) |
 
 ## Units and ownership

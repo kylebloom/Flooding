@@ -474,6 +474,16 @@ volume or event publication.
 world flow direction, then drives authored Transform, ParticleSystem, and/or
 MeshRenderer targets. It never mutates connection or volume state.
 
+Local ingress presentation is an optional visual proxy for early compartment
+entry. `FloodIngressSampler` builds factual `FloodIngressSample` values
+(provider id, destination volume, world position, direction into the
+destination, effective flow rate) without requiring a presentation profile.
+`FloodLocalIngressPresenter` expands bounded provider-owned patches that settle
+and converge toward the bulk free surface. Local patches do not affect
+`QueryPoint` / gameplay depth and do not store authoritative cubic meters.
+Optional `IngressAnchor` fields on `FloodConnection` / `FloodSource` are ignored
+by simulation.
+
 `FloodConnectionAudio`, `FloodSourceAudio`, and `FloodVolumeAudio` are optional
 3D audio consumers. They drive an `AudioSource` from applied connection flow,
 configured source rate, or compartment fill percentage. Missing clips fail soft
@@ -509,6 +519,8 @@ Migration must not reinterpret a height value directly as cubic meters.
 - Optional interpolated scaled-cube or generated polygon-mesh presentation.
 - Optional focused baked-data free-surface presentation.
 - Optional connection flow visuals and connection/source/volume audio consumers.
+- Optional local ingress stream/spread presentation converging to the bulk
+  free surface (visual proxy only).
 
 ## Current non-goals
 
@@ -518,7 +530,10 @@ Migration must not reinterpret a height value directly as cubic meters.
   adapter only applies reported mass and center of mass.
 - Multiple mixed fluids in one compartment.
 - Save/load and network synchronization guarantees.
-- Transient slosh, surge, delayed settling, or oscillating free surfaces.
+- Transient slosh, surge, delayed settling, or oscillating free surfaces as
+  authoritative simulation behavior. Local ingress presentation may approximate
+  early localized spread visually without becoming a second fluid solver.
+- CFD, SPH/FLIP, collision-based spray/foam, or pressure-shaped local surfaces.
 - Bundled audio clips, particle assets, foam, or spray content. Presentation
   components expose authored slots for project-supplied assets.
 

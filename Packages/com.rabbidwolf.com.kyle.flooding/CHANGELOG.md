@@ -7,6 +7,27 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-08-05
+
+### Added
+
+- Local ingress presentation: factual `FloodIngressSample`, profile-independent
+  `FloodIngressSampler`, `FloodIngressPresentationProfile`, deterministic
+  `FloodIngressPresentationState` with Growing / Settling / Converging phases,
+  `FloodLocalIngressPresenter`, and lightweight `FloodIngressStreamPresenter`.
+- Optional presentation-only `IngressAnchor` on `FloodConnection` and
+  `FloodSource`, plus `OpeningCenterWorld` / `IngressWorldPosition` helpers.
+  Simulation ignores anchors.
+- **Local Ingress** sample with ON/OFF comparison, breach/doorway/leak presets,
+  and HUD diagnostics (`Flooding > Internal > Build Local Ingress Sample`).
+- Edit Mode lifecycle tests and Play Mode presenter non-mutation tests.
+
+### Notes
+
+- Local ingress is a visual proxy only. Authoritative cubic meters remain on
+  `FloodVolume`. Gameplay queries are unchanged. v1 fades local opacity during
+  convergence without adding `VisualFillWeight` to `FloodSurfaceRenderer`.
+
 ## [0.10.0] - 2026-08-04
 
 ### Changed
