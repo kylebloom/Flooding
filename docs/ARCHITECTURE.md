@@ -140,14 +140,16 @@ discards and counts excess whole ticks to prevent a spiral of death.
 ## Connection boundary
 
 `FloodFlowCalculator` is the pure deterministic hydraulic rule. It receives two
-opening-bottom pressure heads, opening dimensions, discharge coefficient, and
-gravity magnitude, derives submerged area and centroid heads, and returns signed
-unconstrained flow diagnostics.
+opening-bottom pressure heads, authored opening dimensions, discharge
+coefficient, gravity magnitude, and an open-fraction aperture multiplier;
+derives submerged area, scales it by open fraction, evaluates centroid heads,
+and returns signed unconstrained flow diagnostics.
 
 `FloodConnection` is the scene adapter. It:
 
 - resolves two `IFluidBoundary` endpoints through `FluidBoundaryReference`,
 - reads pressure heads from manager-captured boundary snapshots,
+- exposes runtime `IsOpen` (hard gate) and `OpenFraction` (effective aperture),
 - identifies source and destination from flow sign,
 - reports a requested transfer to the manager,
 - receives the manager-constrained applied rate after reconciliation,

@@ -105,7 +105,8 @@ finite volume deltas, then publishes state.
   and read-only point queries (`ContainsPoint`, `IsPointSubmerged`,
   `QueryPoint`).
 - `ExternalFluidBoundary` — infinite exterior (**External Fluid Body**).
-- `FloodConnection` — pressure-driven opening between two boundaries.
+- `FloodConnection` — pressure-driven opening between two boundaries, with
+  `IsOpen` hard gate and `OpenFraction` effective-aperture control.
 - `FloodSource` — configured injection (not pressure equilibrium).
 - Surface renderers — optional water visuals from `FloodState`.
 - `FloodConnectionVisual` / audio components — optional flow/fill presentation.

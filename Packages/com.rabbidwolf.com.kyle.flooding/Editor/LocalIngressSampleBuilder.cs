@@ -13,7 +13,7 @@ namespace Kyle.Flooding.Editor
     internal static class LocalIngressSampleBuilder
     {
         private const string SampleFolder =
-            "Assets/Samples/Flooding/0.11.0/Local Ingress";
+            "Assets/Samples/Flooding/0.12.0/Local Ingress";
 
         private const string PackageSampleFolder =
             "Packages/com.rabbidwolf.com.kyle.flooding/Samples~/Local Ingress";

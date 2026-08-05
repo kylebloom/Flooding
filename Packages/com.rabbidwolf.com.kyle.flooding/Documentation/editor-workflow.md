@@ -972,10 +972,14 @@ lakes, and reservoirs.
 The simplified flow model is:
 
 ```text
+A_submerged = opening width × min(source head, opening height)
+A = A_submerged × OpenFraction
 Q = Cd × A × √(2 × g × |headA - headB|)
 ```
 
-where heads are centroid depths derived from opening-bottom submersion.
+where heads are centroid depths derived from opening-bottom submersion of the
+authored geometry, and `OpenFraction` scales how much of that submerged
+aperture participates in flow.
 
 The manager limits requested flow by available finite source volume and
 finite destination capacity. Multiple openings sharing one finite compartment
@@ -1001,16 +1005,33 @@ public sealed class WatertightDoor : MonoBehaviour
         floodConnection.IsOpen = open;
     }
 
+    /// <summary>
+    /// 0 = hydraulically closed aperture, 1 = fully available aperture.
+    /// Does not mutate authored Opening Width / Height.
+    /// </summary>
+    public void SetAperture(float openFraction)
+    {
+        floodConnection.OpenFraction = openFraction;
+    }
+
     public double CurrentFlowRate => floodConnection.CurrentFlowRate;
 
     public Vector3 FlowDirection => floodConnection.FlowDirectionWorld;
+
+    public float EffectiveOpeningArea => floodConnection.EffectiveOpeningArea;
 }
 ```
 
+`IsOpen` is a hard on/off gate. `OpenFraction` (0–1) multiplies the submerged
+aperture after heads are computed from authored geometry — use it for partially
+open doors, hatches, valves, debris, or damage without resizing the opening.
+Do not overload `DischargeCoefficient` as openness.
+
 `RequestedFlowRate` reports unconstrained hydraulic demand.
 `CurrentFlowRate` reports the flow actually applied after source and destination
-limits. `SubmergedOpeningArea` is in square meters, and
-`PressureHeadDifference` is in meters.
+limits. `SubmergedOpeningArea` is the effective submerged area in square meters
+(after open fraction), and `PressureHeadDifference` is in meters.
+`FullOpeningArea` / `EffectiveOpeningArea` expose authored aperture helpers.
 
 ### Optional connection visual and audio
 

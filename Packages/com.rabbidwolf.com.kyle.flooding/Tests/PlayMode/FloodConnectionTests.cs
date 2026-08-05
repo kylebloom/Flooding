@@ -82,6 +82,143 @@ namespace Kyle.Flooding.Tests
         }
 
         [UnityTest]
+        public IEnumerator OpenFractionOne_PreservesExistingRequestedFlow()
+        {
+            var baseline = CreateSetup();
+            baseline.VolumeA.AddWater(10f);
+            baseline.Manager.SimulateTick(1d);
+            var baselineRequested = baseline.Connection.RequestedFlowRate;
+
+            var withFraction = CreateSetup();
+            withFraction.VolumeA.AddWater(10f);
+            withFraction.Connection.OpenFraction = 1f;
+            withFraction.Manager.SimulateTick(1d);
+
+            Assert.That(
+                withFraction.Connection.RequestedFlowRate,
+                Is.EqualTo(baselineRequested).Within(Tolerance));
+
+            Object.Destroy(baseline.Root);
+            Object.Destroy(withFraction.Root);
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator OpenFractionZero_TransfersNothingWhileIsOpenRemainsTrue()
+        {
+            var setup = CreateSetup();
+            setup.VolumeA.AddWater(10f);
+            setup.Connection.IsOpen = true;
+            setup.Connection.OpenFraction = 0f;
+
+            setup.Manager.SimulateTick(1d);
+
+            Assert.That(setup.Connection.IsOpen, Is.True);
+            Assert.That(setup.Connection.RequestedFlowRate, Is.Zero);
+            Assert.That(setup.Connection.CurrentFlowRate, Is.Zero);
+            Assert.That(setup.Connection.SubmergedOpeningArea, Is.Zero);
+            Assert.That(setup.VolumeA.CurrentVolume, Is.EqualTo(10f).Within(Tolerance));
+            Assert.That(setup.VolumeB.CurrentVolume, Is.Zero.Within(Tolerance));
+
+            Object.Destroy(setup.Root);
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator OpenFractionHalf_HalvesRequestedFlowUnderIdenticalHeads()
+        {
+            var full = CreateSetup();
+            full.VolumeA.AddWater(10f);
+            full.Connection.OpenFraction = 1f;
+            full.Manager.SimulateTick(1d);
+
+            var half = CreateSetup();
+            half.VolumeA.AddWater(10f);
+            half.Connection.OpenFraction = 0.5f;
+            half.Manager.SimulateTick(1d);
+
+            Assert.That(full.Connection.RequestedFlowRate, Is.GreaterThan(0d));
+            Assert.That(
+                half.Connection.RequestedFlowRate,
+                Is.EqualTo(full.Connection.RequestedFlowRate * 0.5d)
+                    .Within(Tolerance));
+            Assert.That(
+                half.Connection.SubmergedOpeningArea,
+                Is.EqualTo(full.Connection.SubmergedOpeningArea * 0.5d)
+                    .Within(Tolerance));
+
+            Object.Destroy(full.Root);
+            Object.Destroy(half.Root);
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator OpenFractionHalf_AppliesToReverseFlow()
+        {
+            var full = CreateSetup();
+            full.VolumeB.AddWater(10f);
+            full.Connection.OpenFraction = 1f;
+            full.Manager.SimulateTick(1d);
+
+            var half = CreateSetup();
+            half.VolumeB.AddWater(10f);
+            half.Connection.OpenFraction = 0.5f;
+            half.Manager.SimulateTick(1d);
+
+            Assert.That(full.Connection.RequestedFlowRate, Is.LessThan(0d));
+            Assert.That(
+                half.Connection.RequestedFlowRate,
+                Is.EqualTo(full.Connection.RequestedFlowRate * 0.5d)
+                    .Within(Tolerance));
+
+            Object.Destroy(full.Root);
+            Object.Destroy(half.Root);
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator OpenFraction_DoesNotMutateAuthoredOpeningDimensions()
+        {
+            var setup = CreateSetup(openingWidth: 1.25f);
+            setup.Connection.OpeningHeight = 1.75f;
+            var authoredWidth = setup.Connection.OpeningWidth;
+            var authoredHeight = setup.Connection.OpeningHeight;
+
+            setup.Connection.OpenFraction = 0.25f;
+            setup.VolumeA.AddWater(8f);
+            setup.Manager.SimulateTick(1d);
+
+            Assert.That(setup.Connection.OpeningWidth, Is.EqualTo(authoredWidth));
+            Assert.That(setup.Connection.OpeningHeight, Is.EqualTo(authoredHeight));
+            Assert.That(
+                setup.Connection.FullOpeningArea,
+                Is.EqualTo(authoredWidth * authoredHeight).Within(Tolerance));
+            Assert.That(
+                setup.Connection.EffectiveOpeningArea,
+                Is.EqualTo(authoredWidth * authoredHeight * 0.25f)
+                    .Within(Tolerance));
+
+            Object.Destroy(setup.Root);
+            yield return null;
+        }
+
+        [Test]
+        public void OpenFraction_RejectsNonFiniteRuntimeValues()
+        {
+            var setup = CreateSetup();
+
+            Assert.Throws<System.ArgumentOutOfRangeException>(
+                () => setup.Connection.OpenFraction = float.NaN);
+            Assert.Throws<System.ArgumentOutOfRangeException>(
+                () => setup.Connection.OpenFraction = float.PositiveInfinity);
+            Assert.Throws<System.ArgumentOutOfRangeException>(
+                () => setup.Connection.OpenFraction = float.NegativeInfinity);
+            Assert.That(setup.Connection.OpenFraction, Is.EqualTo(1f));
+
+            Object.DestroyImmediate(setup.Root);
+        }
+
+        [UnityTest]
         public IEnumerator MultipleConnections_CannotOverdrawSource()
         {
             var root = new GameObject("Connection source reconciliation test");

@@ -60,6 +60,15 @@ namespace Kyle.Flooding
         [Tooltip("Whether water may currently flow through this opening.")]
         private bool isOpen = true;
 
+        [SerializeField]
+        [Tooltip(
+            "Effective-aperture multiplier from zero to one. Zero is "
+            + "hydraulically closed; one uses the full submerged aperture. "
+            + "Does not change authored Opening Width / Height. Is Open remains "
+            + "a hard gate that forces zero flow when false.")]
+        [Range(0f, 1f)]
+        private float openFraction = 1f;
+
         [Header("Presentation")]
 
         [SerializeField]
@@ -170,6 +179,42 @@ namespace Kyle.Flooding
         }
 
         /// <summary>
+        /// Gets or sets the effective-aperture multiplier from zero to one.
+        /// </summary>
+        /// <remarks>
+        /// Authored <see cref="OpeningWidth"/> and <see cref="OpeningHeight"/>
+        /// remain the fully-open geometry used for opening position and
+        /// submerged-height / head calculations. After the submerged aperture
+        /// is computed, it is multiplied by this fraction before orifice flow.
+        /// <see cref="IsOpen"/> remains a hard gate: when false, flow is zero
+        /// regardless of this value.
+        /// </remarks>
+        public float OpenFraction
+        {
+            get => openFraction;
+            set
+            {
+                EnsureFinite(value, nameof(value));
+                openFraction = Mathf.Clamp01(value);
+            }
+        }
+
+        /// <summary>
+        /// Gets the authored fully-open rectangular opening area in square
+        /// meters (<see cref="OpeningWidth"/> × <see cref="OpeningHeight"/>).
+        /// </summary>
+        public float FullOpeningArea => openingWidth * openingHeight;
+
+        /// <summary>
+        /// Gets the authored opening area available for flow after applying
+        /// <see cref="IsOpen"/> and <see cref="OpenFraction"/>, in square
+        /// meters. This is not the live submerged slice from the latest tick;
+        /// read <see cref="SubmergedOpeningArea"/> for that diagnostic.
+        /// </summary>
+        public float EffectiveOpeningArea =>
+            isOpen ? FullOpeningArea * openFraction : 0f;
+
+        /// <summary>
         /// Gets the unconstrained signed flow requested during the latest tick,
         /// in cubic meters per second.
         /// </summary>
@@ -182,8 +227,8 @@ namespace Kyle.Flooding
         public double CurrentFlowRate { get; private set; }
 
         /// <summary>
-        /// Gets the source-side submerged opening area from the latest tick, in
-        /// square meters.
+        /// Gets the source-side effective submerged opening area from the
+        /// latest tick, in square meters (submerged aperture × open fraction).
         /// </summary>
         public double SubmergedOpeningArea { get; private set; }
 
@@ -270,6 +315,10 @@ namespace Kyle.Flooding
                 || float.IsInfinity(dischargeCoefficient)
                     ? 0.62f
                     : Mathf.Clamp01(dischargeCoefficient);
+            openFraction =
+                float.IsNaN(openFraction) || float.IsInfinity(openFraction)
+                    ? 1f
+                    : Mathf.Clamp01(openFraction);
 
             MigrateLegacyEndpoints();
 
@@ -327,7 +376,8 @@ namespace Kyle.Flooding
                 openingWidth,
                 openingHeight,
                 dischargeCoefficient,
-                gravityMagnitude);
+                gravityMagnitude,
+                openFraction);
 
             var requestedVolume =
                 Math.Abs(flow.SignedFlowRate) * deltaTime;

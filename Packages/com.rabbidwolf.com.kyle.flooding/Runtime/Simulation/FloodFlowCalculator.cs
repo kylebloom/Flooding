@@ -24,7 +24,8 @@ namespace Kyle.Flooding
         public double SignedFlowRate { get; }
 
         /// <summary>
-        /// Gets the source-side submerged opening area in square meters.
+        /// Gets the source-side effective submerged opening area in square
+        /// meters after applying the open-fraction aperture multiplier.
         /// </summary>
         public double SubmergedOpeningArea { get; }
 
@@ -51,10 +52,11 @@ namespace Kyle.Flooding
         /// Calculates signed pressure-driven flow from opening-bottom heads.
         /// </summary>
         /// <remarks>
-        /// Submerged opening area uses the greater opening-bottom depth.
-        /// Pressure head for orifice flow is evaluated at the centroid of that
-        /// submerged portion (half the submerged height above the opening
-        /// bottom). Differences within
+        /// Submerged opening area uses the greater opening-bottom depth, then
+        /// multiplies by <paramref name="openFraction"/> so only the available
+        /// aperture participates in flow. Pressure head for orifice flow is
+        /// evaluated at the centroid of the authored submerged portion (half
+        /// the submerged height above the opening bottom). Differences within
         /// <see cref="FloodFluidTolerances.PressureHead"/> produce no flow.
         /// </remarks>
         /// <param name="pressureHeadA">
@@ -71,6 +73,10 @@ namespace Kyle.Flooding
         /// <param name="gravityMagnitude">
         /// Gravity magnitude in meters per second squared.
         /// </param>
+        /// <param name="openFraction">
+        /// Effective-aperture multiplier from zero to one. Zero is
+        /// hydraulically closed; one uses the full submerged aperture.
+        /// </param>
         /// <returns>The signed flow rate and diagnostic values.</returns>
         public static FloodFlowResult Calculate(
             double pressureHeadA,
@@ -78,7 +84,8 @@ namespace Kyle.Flooding
             double openingWidth,
             double openingHeight,
             double dischargeCoefficient,
-            double gravityMagnitude)
+            double gravityMagnitude,
+            double openFraction = 1d)
         {
             EnsureFinite(pressureHeadA, nameof(pressureHeadA));
             EnsureFinite(pressureHeadB, nameof(pressureHeadB));
@@ -86,6 +93,7 @@ namespace Kyle.Flooding
             EnsureFiniteNonNegative(openingHeight, nameof(openingHeight));
             EnsureFiniteNonNegative(gravityMagnitude, nameof(gravityMagnitude));
             EnsureFinite(dischargeCoefficient, nameof(dischargeCoefficient));
+            EnsureFinite(openFraction, nameof(openFraction));
 
             if (dischargeCoefficient < 0d || dischargeCoefficient > 1d)
             {
@@ -93,13 +101,17 @@ namespace Kyle.Flooding
                     nameof(dischargeCoefficient));
             }
 
+            if (openFraction < 0d || openFraction > 1d)
+                throw new ArgumentOutOfRangeException(nameof(openFraction));
+
             var clampedHeadA = Math.Max(0d, pressureHeadA);
             var clampedHeadB = Math.Max(0d, pressureHeadB);
             var sourceHead = Math.Max(clampedHeadA, clampedHeadB);
             var submergedHeight = Math.Min(sourceHead, openingHeight);
             var submergedArea = openingWidth * submergedHeight;
+            var effectiveSubmergedArea = submergedArea * openFraction;
 
-            if (double.IsInfinity(submergedArea))
+            if (double.IsInfinity(effectiveSubmergedArea))
                 throw new ArgumentOutOfRangeException(nameof(openingWidth));
 
             var centroidOffset = submergedHeight * 0.5d;
@@ -112,19 +124,19 @@ namespace Kyle.Flooding
 
             if (
                 headDifference == 0d
-                || submergedArea <= 0d
+                || effectiveSubmergedArea <= 0d
                 || dischargeCoefficient <= 0d
                 || gravityMagnitude <= 0d)
             {
                 return new FloodFlowResult(
                     0d,
-                    submergedArea,
+                    effectiveSubmergedArea,
                     headDifference);
             }
 
             var flowMagnitude =
                 dischargeCoefficient
-                * submergedArea
+                * effectiveSubmergedArea
                 * Math.Sqrt(
                     2d
                     * gravityMagnitude
@@ -137,7 +149,7 @@ namespace Kyle.Flooding
                 headDifference > 0d
                     ? flowMagnitude
                     : -flowMagnitude,
-                submergedArea,
+                effectiveSubmergedArea,
                 headDifference);
         }
 

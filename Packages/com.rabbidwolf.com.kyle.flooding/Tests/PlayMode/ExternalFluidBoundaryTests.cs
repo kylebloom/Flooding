@@ -284,6 +284,61 @@ namespace Kyle.Flooding.Tests
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator OpenFraction_PreservesExteriorDepthSensitivity()
+        {
+            var fullLow = CreateBreachSetup(
+                oceanSurfaceY: 0.6f,
+                compartmentInitialVolume: 0f,
+                openingY: 0.1f,
+                openingWidth: 2f);
+            var fullHigh = CreateBreachSetup(
+                oceanSurfaceY: 1.8f,
+                compartmentInitialVolume: 0f,
+                openingY: 0.1f,
+                openingWidth: 2f);
+            var halfLow = CreateBreachSetup(
+                oceanSurfaceY: 0.6f,
+                compartmentInitialVolume: 0f,
+                openingY: 0.1f,
+                openingWidth: 2f);
+            var halfHigh = CreateBreachSetup(
+                oceanSurfaceY: 1.8f,
+                compartmentInitialVolume: 0f,
+                openingY: 0.1f,
+                openingWidth: 2f);
+
+            halfLow.Connection.OpenFraction = 0.5f;
+            halfHigh.Connection.OpenFraction = 0.5f;
+
+            fullLow.Manager.SimulateTick(0.25d);
+            fullHigh.Manager.SimulateTick(0.25d);
+            halfLow.Manager.SimulateTick(0.25d);
+            halfHigh.Manager.SimulateTick(0.25d);
+
+            Assert.That(
+                halfHigh.Connection.RequestedFlowRate,
+                Is.GreaterThan(halfLow.Connection.RequestedFlowRate));
+            Assert.That(
+                halfHigh.Connection.PressureHeadDifference,
+                Is.EqualTo(fullHigh.Connection.PressureHeadDifference)
+                    .Within(Tolerance));
+            Assert.That(
+                halfLow.Connection.PressureHeadDifference,
+                Is.EqualTo(fullLow.Connection.PressureHeadDifference)
+                    .Within(Tolerance));
+            Assert.That(
+                halfHigh.Connection.RequestedFlowRate,
+                Is.EqualTo(fullHigh.Connection.RequestedFlowRate * 0.5d)
+                    .Within(Tolerance));
+
+            Object.Destroy(fullLow.Root);
+            Object.Destroy(fullHigh.Root);
+            Object.Destroy(halfLow.Root);
+            Object.Destroy(halfHigh.Root);
+            yield return null;
+        }
+
         private static BreachSetup CreateBreachSetup(
             float oceanSurfaceY,
             float compartmentInitialVolume,

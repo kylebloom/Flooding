@@ -1,7 +1,7 @@
 # Flooding
 
 Flooding is a reusable, gameplay-focused flooding simulation package for Unity
-6.5. The current `0.11.0` prototype models gravity-aligned water volume inside
+6.5. The current `0.12.0` prototype models gravity-aligned water volume inside
 rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
 
 ## Current features
@@ -25,6 +25,8 @@ rotated rectangular, extruded-polygon, or Editor-baked complex compartments.
 - Fixed-rate simulation with post-commit state publication.
 - Configurable direct inflow through `FloodSource`.
 - Bidirectional pressure-driven flow through `FloodConnection`.
+- Runtime opening control via `FloodConnection.IsOpen` and `OpenFraction`
+  (effective-aperture multiplier for doors, hatches, valves, and damage).
 - Simultaneous finite-volume transfer reconciliation.
 - Replaceable, interpolated presentation driven by immutable state.
 - Scaled-cube and generated polygon-mesh water renderers.
@@ -243,7 +245,7 @@ transient simulation or presentation state.
   audio muffling, and telemetry. Enable the URP Depth Texture and Flood
   Underwater Renderer Feature for the fullscreen waterline pass. Press **T** to
   tilt the room; waterline follows the authoritative surface plane.
-- **Local Ingress** imports to `Assets/Samples/Flooding/0.11.0/Local Ingress`.
+- **Local Ingress** imports to `Assets/Samples/Flooding/0.12.0/Local Ingress`.
   Open `LocalIngress.unity` (rebuild via **Flooding > Internal > Build Local
   Ingress Sample** if needed). URP showcase with turbulent jet, soft droplet /
   mist / foam impact layers, and irregular shallow spread with edge foam.

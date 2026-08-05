@@ -157,18 +157,25 @@ center. Local X defines width, local Y defines height, and local forward
 indicates positive A-to-B flow direction.
 
 For each side, pressure head is the non-negative water depth above the opening
-bottom. Signed unconstrained flow is:
+bottom. Authored `OpeningWidth` / `OpeningHeight` define the fully-open geometry
+used for opening position and submerged-height / head calculations.
+`OpenFraction` ∈ [0, 1] is an effective-aperture multiplier applied after the
+submerged aperture is computed. `IsOpen == false` is a hard gate that forces
+zero flow regardless of fraction. `DischargeCoefficient` remains the orifice
+factor and is not used as openness.
+
+Signed unconstrained flow is:
 
 ```text
+A_submerged = opening width × min(source head, opening height)
+A = A_submerged × OpenFraction
 Q = Cd × A × √(2 × g × |headA - headB|)
 ```
 
 The sign is positive when side A has greater head and negative when side B has
-greater head. The source-side submerged opening area is:
-
-```text
-A = opening width × min(source head, opening height)
-```
+greater head. `SubmergedOpeningArea` diagnostics report the effective area `A`
+(after open fraction). `FullOpeningArea` is the authored rectangle;
+`EffectiveOpeningArea` is that rectangle scaled by `IsOpen` and `OpenFraction`.
 
 Pressure depth follows the solved gravity-aligned planes. Submerged opening
 area still treats configured opening height as aligned with pressure depth, so

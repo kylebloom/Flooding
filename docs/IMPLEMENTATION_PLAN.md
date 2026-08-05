@@ -44,11 +44,11 @@ This document remains authoritative for feature-phase delivery.
 
 ## Current status
 
-- Current milestone: **Phase 14 local ingress presentation implemented; Unity regression verification pending**
+- Current milestone: **Phase 15 / 0.12.0 runtime opening controls complete**
 - Overall package status: **Gameplay-consumable simulation prototype**
 - Current supported geometry: **Rotated prism or Editor-baked data**
 - Current presentation: **Clipped prism volume, baked free-surface patches, connection visuals, optional flow/fill audio, camera/underwater, and local ingress**
-- Current flow model: **Configured inflow, finite connections, and external boundaries**
+- Current flow model: **Configured inflow, finite connections with open-fraction aperture control, and external boundaries**
 - Current query surface: **Live read-only point queries over authoritative state**
 
 Implementation status and verification status are tracked separately. Phases 7
@@ -461,6 +461,34 @@ Acceptance criteria:
 - Core runtime remains free of URP dependencies for local ingress.
 - URP showcase aims for single-digit / low-teens draw calls per active major
   ingress with bounded particle counts; no CFD.
+
+## Phase 15 — Runtime opening / flow controls (0.12.0)
+
+Goal: let gameplay restrict connection aperture without mutating authored
+opening geometry or overloading discharge coefficient.
+
+- [x] Add `FloodConnection.OpenFraction` as a 0–1 effective-aperture multiplier.
+- [x] Apply fraction after submerged aperture in `FloodFlowCalculator`
+  (`authored geometry → submerged aperture → × OpenFraction → orifice flow`).
+- [x] Keep `IsOpen` as a hard gate; keep `OpeningWidth` / `OpeningHeight` as
+  fully-open authored geometry; do not overload `DischargeCoefficient`.
+- [x] Expose `FullOpeningArea` / `EffectiveOpeningArea` helpers.
+- [x] Add Edit Mode and Play Mode tests for 0 / 0.5 / 1, reverse flow, exterior
+  depth sensitivity, authored-dimension immutability, and non-finite rejection.
+- [x] Document SPEC / ARCHITECTURE / editor workflow door pattern; optional
+  Local Ingress aperture keys; package version `0.12.0`.
+- [x] Unity regression: Edit Mode 115/115 and Play Mode 73/73 passed
+  (Unity 6000.5.6f1) after OpenFraction.
+
+Acceptance criteria:
+
+- [x] `OpenFraction = 1` preserves prior hydraulic behavior.
+- [x] `OpenFraction = 0` with `IsOpen = true` yields zero flow.
+- [x] `OpenFraction = 0.5` halves requested flow under identical heads.
+- [x] Reverse flow and exterior depth sensitivity remain correct.
+- [x] Changing `OpenFraction` does not mutate authored width/height.
+- [x] Non-finite runtime values are rejected deterministically.
+- [x] Presentation continues to consume applied flow, not `OpenFraction` directly.
 
 ## Documentation roadmap
 

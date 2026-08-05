@@ -7,6 +7,30 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-08-05
+
+### Added
+
+- Runtime opening control on `FloodConnection`: `OpenFraction` (0–1
+  effective-aperture multiplier), plus `FullOpeningArea` /
+  `EffectiveOpeningArea` helpers. Authored `OpeningWidth` / `OpeningHeight`
+  remain fully-open geometry for position and submerged-head calculations;
+  `IsOpen` remains the hard gate; `DischargeCoefficient` is unchanged.
+- Local Ingress sample keys `4` / `5` / `6` set primary-breach aperture to
+  25% / 50% / 100%. Ingress presentation continues to follow effective solver
+  flow only.
+- Edit Mode and Play Mode coverage for fraction 0 / 0.5 / 1, reverse flow,
+  exterior depth sensitivity, authored-dimension immutability, and non-finite
+  rejection.
+
+### Notes
+
+- Hydraulic sequence: authored geometry → submerged aperture → × `OpenFraction`
+  → orifice flow. Suitable for doors, hatches, valves, debris, and damaged
+  openings without implying a sliding-door width model.
+
+## [0.11.0] - 2026-08-05
+
 ### Changed
 
 - Local ingress visuals: replaced the stretched cube stream with a procedural
@@ -14,8 +38,6 @@ and this project follows [Semantic Versioning](https://semver.org/).
   particles, directional elongated multi-lobe floor spread, and URP ingress
   jet/patch shaders with scrolling/noise/foam cues. Logical provider-owned patch
   architecture is unchanged.
-
-## [0.11.0] - 2026-08-05
 
 ### Added
 

@@ -13,7 +13,7 @@ transfers, and gameplay queries remain owned by `FloodVolume`.
 Import **Local Ingress** from **Window > Package Management > Package Manager >
 Flooding > Samples**. Unity copies it to:
 
-`Assets/Samples/Flooding/0.11.0/Local Ingress`
+`Assets/Samples/Flooding/0.12.0/Local Ingress`
 
 Open `LocalIngress.unity` from that imported folder.
 
@@ -61,9 +61,15 @@ equilibrium visuals for the same solver state.
 | **1** | Tiny leak preset |
 | **2** | Medium breach preset |
 | **3** | Major breach preset (+ secondary doorway) |
-| **O** | Toggle primary breach open/closed |
+| **O** | Toggle primary breach open/closed (`IsOpen`) |
+| **4** | Primary breach aperture 25% (`OpenFraction`) |
+| **5** | Primary breach aperture 50% |
+| **6** | Primary breach aperture 100% |
 | **P** | Toggle secondary doorway open/closed |
 | **R** | Reset compartment water volume |
+
+Aperture keys change solver flow only; local ingress presentation continues to
+follow the applied flow rate, not `OpenFraction` directly.
 
 ## Visual stack
 

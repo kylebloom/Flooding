@@ -55,7 +55,7 @@ namespace Kyle.Flooding.Samples
         [SerializeField]
         [Tooltip("Medium comparison flow scale tip shown in the HUD.")]
         private string controlsHint =
-            "I local on/off | 1 tiny | 2 medium | 3 breach | O open | R reset | P secondary";
+            "I local on/off | 1 tiny | 2 medium | 3 breach | O open | 4/5/6 aperture 25/50/100% | R reset | P secondary";
 
         private void Update()
         {
@@ -74,6 +74,15 @@ namespace Kyle.Flooding.Samples
             if (WasPressedKeyR() && compartment != null)
                 compartment.RemoveWater(compartment.CurrentVolume);
 
+            if (WasPressedKey4())
+                SetPrimaryOpenFraction(0.25f);
+
+            if (WasPressedKey5())
+                SetPrimaryOpenFraction(0.5f);
+
+            if (WasPressedKey6())
+                SetPrimaryOpenFraction(1f);
+
             if (WasPressedKey1())
                 ApplyTinyLeakPreset();
 
@@ -91,7 +100,7 @@ namespace Kyle.Flooding.Samples
 
             const float width = 560f;
             var boxX = Mathf.Max(16f, (Screen.width - width) * 0.5f);
-            GUI.Box(new Rect(boxX, 12f, width, 210f), "Local Ingress");
+            GUI.Box(new Rect(boxX, 12f, width, 230f), "Local Ingress");
 
             var y = 40f;
             GUI.Label(
@@ -132,6 +141,7 @@ namespace Kyle.Flooding.Samples
                 GUI.Label(
                     new Rect(boxX + 14f, y, width - 28f, 20f),
                     $"Primary Breach Open: {primaryBreach.IsOpen}  "
+                    + $"Aperture: {primaryBreach.OpenFraction * 100f:F0}%  "
                     + $"Applied: {primaryBreach.CurrentFlowRate:F3} m³/s");
                 y += 20f;
             }
@@ -139,6 +149,14 @@ namespace Kyle.Flooding.Samples
             GUI.Label(
                 new Rect(boxX + 14f, y, width - 28f, 20f),
                 controlsHint);
+        }
+
+        private void SetPrimaryOpenFraction(float fraction)
+        {
+            if (primaryBreach == null)
+                return;
+
+            primaryBreach.OpenFraction = fraction;
         }
 
         private void ApplyTinyLeakPreset()
@@ -202,6 +220,12 @@ namespace Kyle.Flooding.Samples
 
         private static bool WasPressedKey3() => WasPressedKey(KeyCode.Alpha3);
 
+        private static bool WasPressedKey4() => WasPressedKey(KeyCode.Alpha4);
+
+        private static bool WasPressedKey5() => WasPressedKey(KeyCode.Alpha5);
+
+        private static bool WasPressedKey6() => WasPressedKey(KeyCode.Alpha6);
+
         private static bool WasPressedKey(KeyCode key)
         {
 #if ENABLE_INPUT_SYSTEM
@@ -218,6 +242,9 @@ namespace Kyle.Flooding.Samples
                 KeyCode.Alpha1 => keyboard.digit1Key.wasPressedThisFrame,
                 KeyCode.Alpha2 => keyboard.digit2Key.wasPressedThisFrame,
                 KeyCode.Alpha3 => keyboard.digit3Key.wasPressedThisFrame,
+                KeyCode.Alpha4 => keyboard.digit4Key.wasPressedThisFrame,
+                KeyCode.Alpha5 => keyboard.digit5Key.wasPressedThisFrame,
+                KeyCode.Alpha6 => keyboard.digit6Key.wasPressedThisFrame,
                 _ => Input.GetKeyDown(key),
             };
 #else
