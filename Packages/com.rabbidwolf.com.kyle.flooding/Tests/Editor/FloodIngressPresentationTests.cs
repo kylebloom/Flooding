@@ -386,6 +386,86 @@ namespace Kyle.Flooding.Tests
         }
 
         [Test]
+        public void PresentationState_DirectionalStretchElongatesMajorAxisWhileGrowing()
+        {
+            var profile = CreateProfile();
+            profile.DirectionalStretch = 1f;
+            var state = new FloodIngressPresentationState(1);
+            var provider = CreateProviderId();
+
+            state.Tick(
+                0.2f,
+                new[]
+                {
+                    new FloodIngressSample(
+                        provider,
+                        null,
+                        Vector3.zero,
+                        Vector3.forward,
+                        1f),
+                },
+                profile,
+                Vector3.up);
+
+            Assert.That(state.TryGetPatch(provider, out var patch), Is.True);
+            Assert.That(patch.DirectionalStretch, Is.GreaterThan(0f));
+            Assert.That(patch.MajorRadius, Is.GreaterThan(patch.MinorRadius));
+            Assert.That(
+                Vector3.Dot(patch.SpreadDirectionWorld.normalized, Vector3.forward),
+                Is.EqualTo(1f).Within(0.001f));
+
+            UnityEngine.Object.DestroyImmediate(profile);
+            UnityEngine.Object.DestroyImmediate(Resources.EntityIdToObject(provider));
+        }
+
+        [Test]
+        public void PresentationState_DirectionalStretchRelaxesAfterStop()
+        {
+            var profile = CreateProfile();
+            profile.DirectionalStretch = 1f;
+            profile.DirectionalRelaxation = 2f;
+            profile.SettlingDurationSeconds = 1f;
+            var state = new FloodIngressPresentationState(1);
+            var provider = CreateProviderId();
+
+            state.Tick(
+                0.1f,
+                new[] { MakeSample(provider, 1f) },
+                profile,
+                Vector3.up);
+            Assert.That(state.TryGetPatch(provider, out var growing), Is.True);
+            var stretchWhileGrowing = growing.DirectionalStretch;
+
+            state.Tick(0.5f, ReadOnlySpan<FloodIngressSample>.Empty, profile, Vector3.up);
+            Assert.That(state.TryGetPatch(provider, out var settling), Is.True);
+            Assert.That(settling.Phase, Is.EqualTo(FloodIngressPatchPhase.Settling));
+            Assert.That(settling.DirectionalStretch, Is.LessThan(stretchWhileGrowing));
+
+            UnityEngine.Object.DestroyImmediate(profile);
+            UnityEngine.Object.DestroyImmediate(Resources.EntityIdToObject(provider));
+        }
+
+        [Test]
+        public void JetMesh_DeformsWithGravityAndReportsFloorImpact()
+        {
+            var jet = new FloodIngressJetMesh(6, 5);
+            jet.Deform(
+                originWorld: new Vector3(0f, 2f, 0f),
+                directionWorld: Vector3.forward,
+                gravityWorld: new Vector3(0f, -9.81f, 0f),
+                initialSpeed: 4f,
+                lifetimeSeconds: 1f,
+                sourceWidth: 0.2f,
+                taper: 0.3f,
+                floorPointWorld: Vector3.zero,
+                floorNormalWorld: Vector3.up);
+
+            Assert.That(jet.HasImpact, Is.True);
+            Assert.That(jet.ImpactPointWorld.y, Is.EqualTo(0f).Within(0.05f));
+            Assert.That(jet.Mesh.vertexCount, Is.GreaterThan(0));
+        }
+
+        [Test]
         public void Profile_EvaluateNormalizedStrength_UsesThresholds()
         {
             var profile = CreateProfile();

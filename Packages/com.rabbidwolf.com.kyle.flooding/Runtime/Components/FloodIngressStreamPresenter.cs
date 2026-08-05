@@ -3,53 +3,73 @@ using UnityEngine;
 namespace Kyle.Flooding
 {
     /// <summary>
-    /// Lightweight presentation-only stream visual driven by an ingress sample.
+    /// Presentation-only ballistic water jet and optional impact splash driven by
+    /// an ingress sample. Does not use Rigidbody particles for the primary jet.
     /// </summary>
-    /// <remarks>
-    /// Scales with flow rate and fades when inflow stops. Does not simulate
-    /// collision-based spray or foam.
-    /// </remarks>
     [DisallowMultipleComponent]
     [AddComponentMenu("Flooding/Flood Ingress Stream Presenter")]
     public sealed class FloodIngressStreamPresenter : MonoBehaviour
     {
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int ColorId = Shader.PropertyToID("_Color");
+        private static readonly int FlowSpeedId = Shader.PropertyToID("_FlowSpeed");
+        private static readonly int TurbulenceId = Shader.PropertyToID("_Turbulence");
+        private static readonly int OpacityId = Shader.PropertyToID("_Opacity");
+        private static readonly int StrengthId = Shader.PropertyToID("_Strength");
 
         [Header("Visual")]
 
         [SerializeField]
-        [Tooltip("Optional stream mesh renderer. When unset, a child quad is created at runtime.")]
+        [Tooltip("Optional mesh renderer for the procedural jet. When unset, a child MeshFilter/MeshRenderer is created at runtime.")]
         private MeshRenderer streamRenderer;
 
         [SerializeField]
-        [Tooltip("Optional particle system whose emission rate scales with flow. Keep simple; no collision spray.")]
+        [Tooltip("Optional particle system placed at the jet impact region. Emission scales with flow; no collision fluid simulation.")]
         private ParticleSystem splashParticles;
 
         [SerializeField]
-        [Tooltip("Material used when a runtime stream mesh is created.")]
+        [Tooltip("Material for the procedural jet. Prefer Kyle/Flooding/Ingress Jet under URP; Lit/transparent materials remain a valid fallback.")]
         private Material streamMaterial;
 
         [SerializeField]
-        [Tooltip("Stream color. Alpha is multiplied by flow-driven opacity.")]
-        private Color streamColor = new(0.25f, 0.55f, 0.85f, 0.65f);
+        [Tooltip("Jet color used when the material exposes _BaseColor/_Color. Alpha is multiplied by display strength.")]
+        private Color streamColor = new(0.35f, 0.7f, 0.95f, 0.75f);
+
+        [Header("Simulation Context")]
+
+        [SerializeField]
+        [Tooltip("Optional manager used for ActiveGravity. When unset, Physics.gravity is used.")]
+        private FloodSimulationManager simulationManager;
+
+        [SerializeField]
+        [Tooltip("Presentation floor plane for impact projection. Position is a point on the floor; up is the floor normal.")]
+        private Transform floorPlane;
 
         [Header("Response")]
 
         [SerializeField]
-        [Tooltip("Seconds used to fade the stream out after inflow stops.")]
+        [Tooltip("Seconds used to fade the jet out after inflow stops.")]
         [Min(0f)]
-        private float fadeOutSeconds = 0.35f;
+        private float fadeOutSeconds = 0.25f;
 
+        private FloodIngressJetMesh jetMesh;
+        private MeshFilter meshFilter;
         private Transform streamTransform;
         private MaterialPropertyBlock propertyBlock;
-        private float baseParticleRate;
-        private bool hasBaseParticleRate;
+        private ParticleSystem.MainModule splashMain;
+        private ParticleSystem.EmissionModule splashEmission;
+        private ParticleSystem.ShapeModule splashShape;
+        private float baseParticleRate = 24f;
+        private float baseStartSpeed = 1.5f;
+        private float baseStartSize = 0.08f;
+        private bool hasCachedParticles;
         private float displayStrength;
         private bool ownsRuntimeMesh;
+        private Vector3 lastImpactPoint;
+        private bool hasImpact;
 
         /// <summary>
-        /// Gets or sets the optional authored stream renderer.
+        /// Gets or sets the optional authored jet renderer.
         /// </summary>
         public MeshRenderer StreamRenderer
         {
@@ -66,18 +86,41 @@ namespace Kyle.Flooding
             set
             {
                 splashParticles = value;
-                hasBaseParticleRate = false;
-                CacheParticleRate();
+                hasCachedParticles = false;
+                CacheParticleDefaults();
             }
         }
 
         /// <summary>
-        /// Gets or sets the material used for a runtime-created stream mesh.
+        /// Gets or sets the jet material.
         /// </summary>
         public Material StreamMaterial
         {
             get => streamMaterial;
-            set => streamMaterial = value;
+            set
+            {
+                streamMaterial = value;
+                if (streamRenderer != null && streamMaterial != null)
+                    streamRenderer.sharedMaterial = streamMaterial;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the floor plane used for impact projection.
+        /// </summary>
+        public Transform FloorPlane
+        {
+            get => floorPlane;
+            set => floorPlane = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the simulation manager used for gravity.
+        /// </summary>
+        public FloodSimulationManager SimulationManager
+        {
+            get => simulationManager;
+            set => simulationManager = value;
         }
 
         /// <summary>
@@ -85,17 +128,27 @@ namespace Kyle.Flooding
         /// </summary>
         public float DisplayStrength => displayStrength;
 
+        /// <summary>
+        /// Gets the latest predicted impact point.
+        /// </summary>
+        public Vector3 ImpactPointWorld => lastImpactPoint;
+
+        /// <summary>
+        /// Gets whether the latest deform found a floor impact.
+        /// </summary>
+        public bool HasImpact => hasImpact;
+
         private void Awake()
         {
             propertyBlock = new MaterialPropertyBlock();
-            EnsureStreamVisual();
-            CacheParticleRate();
-            ApplyVisual(0f, transform.position, transform.forward, 1f, 0.1f, 0f);
+            EnsureJetVisual();
+            CacheParticleDefaults();
+            ApplyHidden();
         }
 
         private void OnDisable()
         {
-            ApplyVisual(0f, transform.position, transform.forward, 1f, 0.1f, 0f);
+            ApplyHidden();
         }
 
         private void OnDestroy()
@@ -105,7 +158,7 @@ namespace Kyle.Flooding
         }
 
         /// <summary>
-        /// Applies a stream visual from the latest ingress sample and profile.
+        /// Applies a ballistic jet visual from the latest ingress sample.
         /// </summary>
         public void Apply(
             in FloodIngressSample sample,
@@ -124,22 +177,77 @@ namespace Kyle.Flooding
                 target,
                 deltaTime <= 0f ? 1f : deltaTime / Mathf.Max(0.01f, fadeOutSeconds));
 
-            var length = profile.StreamLengthMeters * Mathf.Max(displayStrength, 0.01f);
-            var width = profile.StreamWidthMeters * Mathf.Max(displayStrength, 0.05f);
-            var splash = profile.EvaluateSplashStrength(sample.FlowRateCubicMetersPerSecond)
-                * displayStrength;
+            if (displayStrength <= 0.001f)
+            {
+                ApplyHidden();
+                return;
+            }
 
-            ApplyVisual(
-                displayStrength,
+            EnsureJetVisual();
+            CacheParticleDefaults();
+
+            var gravity = ResolveGravity() * profile.JetGravityInfluence;
+            var speed = profile.JetInitialSpeed * Mathf.Max(displayStrength, 0.05f);
+            var lifetime = profile.JetLifetimeSeconds * Mathf.Lerp(0.55f, 1f, displayStrength);
+            var width = profile.JetWidthMeters * Mathf.Max(displayStrength, 0.08f);
+            var floorPoint = floorPlane != null ? floorPlane.position : transform.position;
+            var floorNormal = floorPlane != null && floorPlane.up.sqrMagnitude > 0.0001f
+                ? floorPlane.up.normalized
+                : Vector3.up;
+
+            jetMesh.Deform(
                 sample.WorldPosition,
                 sample.DirectionWorld,
-                length,
+                gravity,
+                speed,
+                lifetime,
                 width,
-                splash);
+                profile.JetTaper,
+                floorPoint,
+                floorNormal);
+
+            hasImpact = jetMesh.HasImpact;
+            lastImpactPoint = jetMesh.ImpactPointWorld;
+
+            if (streamTransform != null)
+            {
+                streamTransform.SetPositionAndRotation(
+                    sample.WorldPosition,
+                    Quaternion.identity);
+                streamTransform.localScale = Vector3.one;
+            }
+
+            if (streamRenderer != null)
+            {
+                streamRenderer.enabled = true;
+                if (streamMaterial != null)
+                    streamRenderer.sharedMaterial = streamMaterial;
+
+                propertyBlock ??= new MaterialPropertyBlock();
+                var color = streamColor;
+                color.a *= Mathf.Clamp01(displayStrength);
+                streamRenderer.GetPropertyBlock(propertyBlock);
+                propertyBlock.SetColor(BaseColorId, color);
+                propertyBlock.SetColor(ColorId, color);
+                propertyBlock.SetFloat(OpacityId, color.a);
+                propertyBlock.SetFloat(StrengthId, displayStrength);
+                propertyBlock.SetFloat(
+                    FlowSpeedId,
+                    profile.JetUvFlowSpeed * displayStrength);
+                propertyBlock.SetFloat(
+                    TurbulenceId,
+                    profile.JetTurbulence * displayStrength);
+                streamRenderer.SetPropertyBlock(propertyBlock);
+            }
+
+            var splashStrength =
+                profile.EvaluateSplashStrength(sample.FlowRateCubicMetersPerSecond)
+                * displayStrength;
+            ApplySplash(profile, splashStrength);
         }
 
         /// <summary>
-        /// Fades the stream toward hidden.
+        /// Fades the jet toward hidden.
         /// </summary>
         public void Hide(float deltaTime)
         {
@@ -148,99 +256,119 @@ namespace Kyle.Flooding
                 0f,
                 deltaTime <= 0f ? 1f : deltaTime / Mathf.Max(0.01f, fadeOutSeconds));
 
-            ApplyVisual(
-                displayStrength,
-                transform.position,
-                transform.forward,
-                1f,
-                0.1f,
-                0f);
+            if (displayStrength <= 0.001f)
+                ApplyHidden();
         }
 
-        private void EnsureStreamVisual()
+        private void ApplyHidden()
         {
+            if (streamRenderer != null)
+                streamRenderer.enabled = false;
+
+            if (splashParticles != null && splashParticles.isPlaying)
+                splashParticles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+
+            hasImpact = false;
+        }
+
+        private void EnsureJetVisual()
+        {
+            jetMesh ??= new FloodIngressJetMesh();
+
             if (streamRenderer != null)
             {
                 streamTransform = streamRenderer.transform;
+                meshFilter = streamRenderer.GetComponent<MeshFilter>();
+                if (meshFilter == null)
+                    meshFilter = streamRenderer.gameObject.AddComponent<MeshFilter>();
+                meshFilter.sharedMesh = jetMesh.Mesh;
+                if (streamMaterial != null)
+                    streamRenderer.sharedMaterial = streamMaterial;
                 return;
             }
 
-            var streamObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            streamObject.name = "Ingress Stream";
-            streamObject.transform.SetParent(transform, false);
-            Object.Destroy(streamObject.GetComponent<Collider>());
-            streamRenderer = streamObject.GetComponent<MeshRenderer>();
+            var jetObject = new GameObject("Ingress Jet");
+            jetObject.transform.SetParent(transform, false);
+            meshFilter = jetObject.AddComponent<MeshFilter>();
+            meshFilter.sharedMesh = jetMesh.Mesh;
+            streamRenderer = jetObject.AddComponent<MeshRenderer>();
+            streamRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            streamRenderer.receiveShadows = false;
             if (streamMaterial != null)
                 streamRenderer.sharedMaterial = streamMaterial;
-            streamTransform = streamObject.transform;
+            streamTransform = jetObject.transform;
             ownsRuntimeMesh = true;
         }
 
-        private void CacheParticleRate()
+        private void CacheParticleDefaults()
         {
-            if (splashParticles == null || hasBaseParticleRate)
+            if (splashParticles == null || hasCachedParticles)
                 return;
 
-            var emission = splashParticles.emission;
-            baseParticleRate = emission.rateOverTime.constant;
-            hasBaseParticleRate = true;
+            splashMain = splashParticles.main;
+            splashEmission = splashParticles.emission;
+            splashShape = splashParticles.shape;
+            baseParticleRate = splashEmission.rateOverTime.constant;
+            if (baseParticleRate <= 0f)
+                baseParticleRate = 24f;
+            baseStartSpeed = splashMain.startSpeed.constant;
+            if (baseStartSpeed <= 0f)
+                baseStartSpeed = 1.5f;
+            baseStartSize = splashMain.startSize.constant;
+            if (baseStartSize <= 0f)
+                baseStartSize = 0.08f;
+            hasCachedParticles = true;
         }
 
-        private void ApplyVisual(
-            float strength,
-            Vector3 worldPosition,
-            Vector3 directionWorld,
-            float length,
-            float width,
+        private void ApplySplash(
+            FloodIngressPresentationProfile profile,
             float splashStrength)
         {
-            EnsureStreamVisual();
-            propertyBlock ??= new MaterialPropertyBlock();
+            if (splashParticles == null)
+                return;
 
-            var active = strength > 0.001f;
-            if (streamRenderer != null)
-                streamRenderer.enabled = active;
+            CacheParticleDefaults();
+            var flowing = splashStrength > 0.02f && hasImpact;
+            splashEmission.enabled = flowing;
+            splashEmission.rateOverTime = flowing
+                ? baseParticleRate
+                    * profile.SplashEmissionMultiplier
+                    * splashStrength
+                : 0f;
 
-            if (streamTransform != null && active)
+            if (flowing)
             {
-                var direction = directionWorld.sqrMagnitude > 0.0001f
-                    ? directionWorld.normalized
-                    : transform.forward;
-                streamTransform.position = worldPosition + (direction * (length * 0.5f));
-                streamTransform.rotation = Quaternion.LookRotation(
-                    direction,
-                    Vector3.up);
-                streamTransform.localScale = new Vector3(
-                    Mathf.Max(0.01f, width),
-                    Mathf.Max(0.01f, width),
-                    Mathf.Max(0.01f, length));
-            }
+                splashParticles.transform.position = lastImpactPoint;
+                if (floorPlane != null)
+                {
+                    splashParticles.transform.rotation = Quaternion.LookRotation(
+                        floorPlane.up,
+                        Vector3.forward);
+                }
 
-            if (streamRenderer != null)
-            {
-                var color = streamColor;
-                color.a *= Mathf.Clamp01(strength);
-                streamRenderer.GetPropertyBlock(propertyBlock);
-                propertyBlock.SetColor(BaseColorId, color);
-                propertyBlock.SetColor(ColorId, color);
-                streamRenderer.SetPropertyBlock(propertyBlock);
-            }
+                splashMain.startSpeed = baseStartSpeed
+                    * profile.SplashDropletSpeed
+                    * Mathf.Lerp(0.35f, 1.25f, splashStrength);
+                splashMain.startSize = baseStartSize
+                    * profile.SplashDropletSize
+                    * Mathf.Lerp(0.5f, 1.35f, splashStrength);
+                splashShape.angle = Mathf.Lerp(12f, 35f, splashStrength);
 
-            if (splashParticles != null)
-            {
-                CacheParticleRate();
-                var emission = splashParticles.emission;
-                var flowing = splashStrength > 0.001f;
-                emission.enabled = flowing;
-                emission.rateOverTime = flowing
-                    ? Mathf.Max(baseParticleRate, 8f) * splashStrength
-                    : 0f;
-
-                if (flowing && !splashParticles.isPlaying)
+                if (!splashParticles.isPlaying)
                     splashParticles.Play(true);
-                else if (!flowing && splashParticles.isPlaying)
-                    splashParticles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
             }
+            else if (splashParticles.isPlaying)
+            {
+                splashParticles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            }
+        }
+
+        private Vector3 ResolveGravity()
+        {
+            if (simulationManager != null)
+                return simulationManager.ActiveGravity;
+
+            return Physics.gravity;
         }
 
         private static float MoveTowards(float current, float target, float maxDelta)
@@ -254,7 +382,7 @@ namespace Kyle.Flooding
         private void OnValidate()
         {
             fadeOutSeconds = float.IsNaN(fadeOutSeconds) || float.IsInfinity(fadeOutSeconds)
-                ? 0.35f
+                ? 0.25f
                 : Mathf.Max(0f, fadeOutSeconds);
         }
     }

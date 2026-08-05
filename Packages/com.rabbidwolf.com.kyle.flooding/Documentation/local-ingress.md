@@ -31,13 +31,28 @@ Do not treat local patches as a second water-volume simulation. Presentation may
 track a flow **impulse / visual weight** to drive radius; authoritative cubic
 meters remain exclusively on `FloodVolume`.
 
+## Visual stack (presentation only)
+
+| Element | Implementation |
+| --- | --- |
+| Jet | Procedural tapered tube deformed on a ballistic curve (`FloodIngressJetMesh`) |
+| Gravity | `FloodSimulationManager.ActiveGravity` (fallback `Physics.gravity`) |
+| Jet motion | URP `Kyle/Flooding/Ingress Jet` scroll/turbulence, or Lit/color fallback |
+| Splash | Pooled `ParticleSystem` at predicted floor impact |
+| Floor spread | One logical patch → up to 3 deterministic visual lobes, directional stretch |
+| Patch look | URP `Kyle/Flooding/Ingress Patch` irregular mask/ripples/foam, or Lit fallback |
+
+Expected cost per active ingress: ~1 jet draw + ≤3 patch draws + 1 particle system;
+cheap vertex updates on a reused ~50-vert jet mesh; no per-frame Instantiate or
+scene search.
+
 ## Setup in the Unity Editor
 
 ### 1. Create a profile
 
 1. **Assets > Create > Flooding > Flood Ingress Presentation Profile**
-2. Tune spread speed, max radius, settling / convergence durations, minimum flow,
-   max patches, and flow→stream/spread/splash curves.
+2. Tune lifecycle size, **Jet**, **Directional Spread**, **Splash**, and **Foam**
+   groups, plus flow→stream/spread/splash curves.
 
 ### 2. Configure presentation anchors
 
@@ -65,8 +80,10 @@ Simulation ignores `Ingress Anchor`.
      **up** is the floor normal
    - **Patch Material** — transparent water-compatible material
    - **Connections** / **Sources** — explicit providers (preferred)
-4. Optionally add **Flood Ingress Stream Presenter** children and assign them in
-   **Stream Presenters** (index-aligned: connections first, then sources).
+4. Optionally add **Flood Ingress Stream Presenter** children (jet + splash) and
+   assign them in **Stream Presenters** (index-aligned: connections first, then
+   sources). Prefer materials using `Kyle/Flooding/Ingress Jet` and
+   `Kyle/Flooding/Ingress Patch` under URP.
 
 Auto-discover (when enabled) runs only on enable / `RefreshProviders()`, never
 every frame.

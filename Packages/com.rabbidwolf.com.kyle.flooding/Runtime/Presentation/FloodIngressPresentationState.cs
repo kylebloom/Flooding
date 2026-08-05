@@ -310,14 +310,17 @@ namespace Kyle.Flooding
             FloodIngressPresentationProfile profile,
             Vector3 floorNormalWorld)
         {
+            var direction = sample.DirectionWorld.sqrMagnitude > 0.0001f
+                ? sample.DirectionWorld.normalized
+                : Vector3.forward;
+            var spreadDirection = ProjectOntoFloor(direction, floorNormalWorld);
             return new FloodIngressPatchState
             {
                 ProviderId = sample.ProviderId,
                 CenterWorld = sample.WorldPosition,
                 FloorNormalWorld = floorNormalWorld,
-                DirectionWorld = sample.DirectionWorld.sqrMagnitude > 0.0001f
-                    ? sample.DirectionWorld.normalized
-                    : Vector3.forward,
+                DirectionWorld = direction,
+                SpreadDirectionWorld = spreadDirection,
                 CurrentRadius = 0.05f,
                 TargetRadius = 0.05f,
                 VisualDepth = profile.InitialPoolDepth,
@@ -328,6 +331,9 @@ namespace Kyle.Flooding
                 FlowImpulse = 0f,
                 Strength = 0f,
                 FlowRateCubicMetersPerSecond = sample.FlowRateCubicMetersPerSecond,
+                DirectionalStretch = profile.DirectionalStretch,
+                MajorRadius = 0.05f,
+                MinorRadius = 0.05f,
             };
         }
 
@@ -346,10 +352,16 @@ namespace Kyle.Flooding
             patch.DirectionWorld = sample.DirectionWorld.sqrMagnitude > 0.0001f
                 ? sample.DirectionWorld.normalized
                 : patch.DirectionWorld;
+            patch.SpreadDirectionWorld = ProjectOntoFloor(
+                patch.DirectionWorld,
+                floorNormalWorld);
             patch.FlowRateCubicMetersPerSecond = sample.FlowRateCubicMetersPerSecond;
             patch.Strength = profile.EvaluateNormalizedStrength(
                 sample.FlowRateCubicMetersPerSecond);
             patch.VisualDepth = profile.InitialPoolDepth;
+            patch.DirectionalStretch = Mathf.Max(
+                patch.DirectionalStretch,
+                profile.DirectionalStretch * Mathf.Lerp(0.35f, 1f, patch.Strength));
 
             // Presentation-only impulse (not conserved cubic meters).
             patch.FlowImpulse += Mathf.Max(
@@ -362,6 +374,7 @@ namespace Kyle.Flooding
                 profile.MaximumLocalRadius,
                 0.15f + (patch.FlowImpulse * 0.85f * Mathf.Max(0.01f, spreadMultiplier)));
             patch.TargetRadius = Mathf.Max(patch.TargetRadius, desired);
+            UpdateAxisRadii(ref patch);
         }
 
         private static void BeginSettling(ref FloodIngressPatchState patch)
@@ -403,6 +416,10 @@ namespace Kyle.Flooding
                     break;
 
                 case FloodIngressPatchPhase.Settling:
+                    patch.DirectionalStretch = MoveTowards(
+                        patch.DirectionalStretch,
+                        0f,
+                        profile.DirectionalRelaxation * deltaTime);
                     if (patch.PhaseAgeSeconds >= profile.SettlingDurationSeconds)
                     {
                         patch.Phase = FloodIngressPatchPhase.Converging;
@@ -413,6 +430,10 @@ namespace Kyle.Flooding
 
                 case FloodIngressPatchPhase.Converging:
                     {
+                        patch.DirectionalStretch = MoveTowards(
+                            patch.DirectionalStretch,
+                            0f,
+                            profile.DirectionalRelaxation * deltaTime);
                         var duration = Mathf.Max(
                             0.01f,
                             profile.ConvergenceDurationSeconds);
@@ -424,6 +445,36 @@ namespace Kyle.Flooding
 
                     break;
             }
+
+            if (patch.IsActive)
+                UpdateAxisRadii(ref patch);
+        }
+
+        private static void UpdateAxisRadii(ref FloodIngressPatchState patch)
+        {
+            var stretch = Mathf.Max(0f, patch.DirectionalStretch);
+            var radius = Mathf.Max(0.01f, patch.CurrentRadius);
+            patch.MajorRadius = radius * (1f + stretch);
+            patch.MinorRadius = radius / Mathf.Sqrt(1f + stretch);
+        }
+
+        private static Vector3 ProjectOntoFloor(Vector3 direction, Vector3 floorNormal)
+        {
+            if (floorNormal.sqrMagnitude <= 0.0001f)
+                floorNormal = Vector3.up;
+            else
+                floorNormal = floorNormal.normalized;
+
+            var projected = direction - (Vector3.Dot(direction, floorNormal) * floorNormal);
+            if (projected.sqrMagnitude <= 0.0001f)
+            {
+                var fallback = Vector3.Cross(floorNormal, Vector3.right);
+                if (fallback.sqrMagnitude <= 0.0001f)
+                    fallback = Vector3.Cross(floorNormal, Vector3.forward);
+                return fallback.normalized;
+            }
+
+            return projected.normalized;
         }
 
         private static float ScorePatch(in FloodIngressPatchState patch)

@@ -54,14 +54,14 @@ namespace Kyle.Flooding.Editor
                 "Room Water",
                 new Color(0.12f, 0.45f, 0.8f, 0.5f),
                 transparent: true);
-            var localWaterMaterial = CreateLitMaterial(
+            var localWaterMaterial = CreateIngressMaterial(
                 "Local Ingress Water",
-                new Color(0.2f, 0.55f, 0.9f, 0.55f),
-                transparent: true);
-            var streamMaterial = CreateLitMaterial(
+                "Kyle/Flooding/Ingress Patch",
+                new Color(0.2f, 0.55f, 0.9f, 0.55f));
+            var streamMaterial = CreateIngressMaterial(
                 "Ingress Stream",
-                new Color(0.3f, 0.65f, 0.95f, 0.7f),
-                transparent: true);
+                "Kyle/Flooding/Ingress Jet",
+                new Color(0.35f, 0.72f, 0.98f, 0.78f));
             var openingMaterial = CreateLitMaterial(
                 "Breach Opening",
                 new Color(0.2f, 0.85f, 0.35f, 1f),
@@ -83,17 +83,32 @@ namespace Kyle.Flooding.Editor
                 profile = ScriptableObject
                     .CreateInstance<FloodIngressPresentationProfile>();
                 profile.name = "LocalIngressPresentationProfile";
-                profile.LocalSpreadSpeed = 0.9f;
-                profile.MaximumLocalRadius = 4.5f;
-                profile.SettlingDurationSeconds = 1f;
-                profile.ConvergenceDurationSeconds = 5f;
-                profile.MinimumFlowRate = 0.01f;
-                profile.MaximumSimultaneousPatches = 8;
-                profile.FloorOffsetMeters = 0.015f;
                 AssetDatabase.CreateAsset(profile, profilePath);
                 profile = AssetDatabase.LoadAssetAtPath<FloodIngressPresentationProfile>(
                     profilePath);
             }
+
+            profile.LocalSpreadSpeed = 0.9f;
+            profile.MaximumLocalRadius = 4.5f;
+            profile.SettlingDurationSeconds = 1f;
+            profile.ConvergenceDurationSeconds = 5f;
+            profile.MinimumFlowRate = 0.01f;
+            profile.MaximumSimultaneousPatches = 8;
+            profile.FloorOffsetMeters = 0.015f;
+            profile.JetInitialSpeed = 5.5f;
+            profile.JetLifetimeSeconds = 0.65f;
+            profile.JetWidthMeters = 0.16f;
+            profile.JetTaper = 0.3f;
+            profile.JetGravityInfluence = 1.1f;
+            profile.JetTurbulence = 0.45f;
+            profile.JetUvFlowSpeed = 3f;
+            profile.DirectionalStretch = 0.95f;
+            profile.DirectionalRelaxation = 0.5f;
+            profile.EdgeNoiseStrength = 0.4f;
+            profile.RippleStrength = 0.16f;
+            profile.SplashEmissionMultiplier = 1.25f;
+            profile.FoamStrength = 0.5f;
+            EditorUtility.SetDirty(profile);
 
             EditorSceneManager.NewScene(
                 NewSceneSetup.EmptyScene,
@@ -208,6 +223,9 @@ namespace Kyle.Flooding.Editor
             streamObject.transform.SetParent(breachObject.transform, false);
             var stream = streamObject.AddComponent<FloodIngressStreamPresenter>();
             stream.StreamMaterial = streamMaterial;
+            stream.FloorPlane = floor.transform;
+            stream.SimulationManager = manager;
+            stream.SplashParticles = CreateSplashParticles(streamObject.transform);
 
             var adjacentObject = new GameObject("Adjacent Flooded Room");
             adjacentObject.transform.SetParent(root.transform, false);
@@ -401,6 +419,53 @@ namespace Kyle.Flooding.Editor
             return cube;
         }
 
+        private static Material CreateIngressMaterial(
+            string name,
+            string preferredShaderName,
+            Color color)
+        {
+            var shader = Shader.Find(preferredShaderName)
+                ?? Shader.Find("Universal Render Pipeline/Lit")
+                ?? Shader.Find("HDRP/Lit")
+                ?? Shader.Find("Standard");
+            var material = new Material(shader)
+            {
+                name = name,
+                color = color,
+            };
+
+            if (material.HasProperty("_Surface"))
+            {
+                material.SetFloat("_Surface", 1f);
+                material.SetFloat("_Blend", 0f);
+                material.SetOverrideTag("RenderType", "Transparent");
+                material.renderQueue = (int)RenderQueue.Transparent;
+                material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            }
+
+            if (material.HasProperty("_BaseColor"))
+                material.SetColor("_BaseColor", color);
+            if (material.HasProperty("_Opacity"))
+                material.SetFloat("_Opacity", color.a);
+
+            var path = Path.Combine(SampleFolder, name + ".mat").Replace('\\', '/');
+            var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (existing != null)
+            {
+                existing.shader = shader;
+                existing.color = color;
+                if (existing.HasProperty("_BaseColor"))
+                    existing.SetColor("_BaseColor", color);
+                if (existing.HasProperty("_Opacity"))
+                    existing.SetFloat("_Opacity", color.a);
+                EditorUtility.SetDirty(existing);
+                return existing;
+            }
+
+            AssetDatabase.CreateAsset(material, path);
+            return AssetDatabase.LoadAssetAtPath<Material>(path);
+        }
+
         private static Material CreateLitMaterial(
             string name,
             Color color,
@@ -430,6 +495,63 @@ namespace Kyle.Flooding.Editor
             var path = Path.Combine(SampleFolder, name + ".mat").Replace('\\', '/');
             AssetDatabase.CreateAsset(material, path);
             return AssetDatabase.LoadAssetAtPath<Material>(path);
+        }
+
+        private static ParticleSystem CreateSplashParticles(Transform parent)
+        {
+            var splashObject = new GameObject("Impact Splash");
+            splashObject.transform.SetParent(parent, false);
+            var particles = splashObject.AddComponent<ParticleSystem>();
+            var main = particles.main;
+            main.loop = true;
+            main.playOnAwake = false;
+            main.startLifetime = 0.45f;
+            main.startSpeed = 1.8f;
+            main.startSize = 0.07f;
+            main.startColor = new Color(0.85f, 0.92f, 1f, 0.65f);
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.gravityModifier = 0.85f;
+            main.maxParticles = 128;
+
+            var emission = particles.emission;
+            emission.rateOverTime = 28f;
+
+            var shape = particles.shape;
+            shape.shapeType = ParticleSystemShapeType.Cone;
+            shape.angle = 22f;
+            shape.radius = 0.08f;
+
+            var colorOverLifetime = particles.colorOverLifetime;
+            colorOverLifetime.enabled = true;
+            var gradient = new Gradient();
+            gradient.SetKeys(
+                new[]
+                {
+                    new GradientColorKey(Color.white, 0f),
+                    new GradientColorKey(new Color(0.7f, 0.85f, 1f), 1f),
+                },
+                new[]
+                {
+                    new GradientAlphaKey(0.7f, 0f),
+                    new GradientAlphaKey(0f, 1f),
+                });
+            colorOverLifetime.color = gradient;
+
+            var renderer = splashObject.GetComponent<ParticleSystemRenderer>();
+            renderer.renderMode = ParticleSystemRenderMode.Billboard;
+            var particleShader = Shader.Find("Universal Render Pipeline/Particles/Unlit")
+                ?? Shader.Find("Particles/Standard Unlit")
+                ?? Shader.Find("Sprites/Default");
+            if (particleShader != null)
+            {
+                renderer.sharedMaterial = new Material(particleShader)
+                {
+                    color = new Color(0.85f, 0.92f, 1f, 0.7f),
+                };
+            }
+
+            particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            return particles;
         }
     }
 }

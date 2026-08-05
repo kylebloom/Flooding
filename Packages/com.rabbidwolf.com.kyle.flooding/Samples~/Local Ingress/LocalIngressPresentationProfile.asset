@@ -19,6 +19,7 @@ MonoBehaviour:
   convergenceDurationSeconds: 5
   minimumFlowRate: 0.01
   maximumSimultaneousPatches: 8
+  floorOffsetMeters: 0.015
   lowFlowThreshold: 0.1
   highFlowThreshold: 2
   flowToStreamScale:
@@ -93,6 +94,22 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  floorOffsetMeters: 0.015
-  streamLengthMeters: 1.25
-  streamWidthMeters: 0.12
+  jetInitialSpeed: 5.5
+  jetLifetimeSeconds: 0.65
+  jetWidthMeters: 0.16
+  jetTaper: 0.3
+  jetGravityInfluence: 1.1
+  jetTurbulence: 0.45
+  jetUvFlowSpeed: 3
+  directionalStretch: 0.95
+  directionalRelaxation: 0.5
+  edgeNoiseScale: 2.4
+  edgeNoiseStrength: 0.4
+  edgeSoftness: 0.18
+  rippleStrength: 0.16
+  rippleSpeed: 1.4
+  splashEmissionMultiplier: 1.25
+  splashDropletSpeed: 2.2
+  splashDropletSize: 1
+  foamStrength: 0.5
+  foamEdgeWidth: 0.12

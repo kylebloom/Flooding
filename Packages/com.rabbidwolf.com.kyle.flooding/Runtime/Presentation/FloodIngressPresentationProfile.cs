@@ -3,13 +3,9 @@ using UnityEngine;
 namespace Kyle.Flooding
 {
     /// <summary>
-    /// Shared presentation settings for local ingress spread and convergence.
+    /// Shared presentation settings for local ingress jet, spread, splash, and
+    /// convergence. Never mutates flood simulation.
     /// </summary>
-    /// <remarks>
-    /// Contains no runtime state and never mutates flood simulation. Sampling
-    /// of solver flow does not require this asset; only
-    /// <see cref="FloodIngressPresentationState"/> and visual consumers use it.
-    /// </remarks>
     [CreateAssetMenu(
         fileName = "FloodIngressPresentationProfile",
         menuName = "Flooding/Flood Ingress Presentation Profile")]
@@ -24,7 +20,7 @@ namespace Kyle.Flooding
         public const float DefaultMinimumFlowRate = 0.01f;
         public const float DefaultFloorOffsetMeters = 0.01f;
 
-        [Header("Spread")]
+        [Header("Lifecycle / Spread Size")]
 
         [SerializeField]
         [Tooltip("Base radial expansion speed of a local ingress patch in meters per second at full flow-driven spread strength.")]
@@ -40,8 +36,6 @@ namespace Kyle.Flooding
         [Tooltip("Initial shallow visual depth of a new local pool in meters. Presentation only.")]
         [Min(0f)]
         private float initialPoolDepth = DefaultInitialPoolDepth;
-
-        [Header("Lifecycle")]
 
         [SerializeField]
         [Tooltip("Seconds a stopped patch remains in Settling before Converging begins.")]
@@ -63,6 +57,11 @@ namespace Kyle.Flooding
         [Min(1)]
         private int maximumSimultaneousPatches = DefaultMaximumSimultaneousPatches;
 
+        [SerializeField]
+        [Tooltip("Meters to offset local patches along the floor normal to reduce Z-fighting with floor geometry.")]
+        [Min(0f)]
+        private float floorOffsetMeters = DefaultFloorOffsetMeters;
+
         [Header("Flow Response")]
 
         [SerializeField]
@@ -76,7 +75,7 @@ namespace Kyle.Flooding
         private float highFlowThreshold = 2f;
 
         [SerializeField]
-        [Tooltip("Maps normalized 0–1 flow strength to stream visual scale.")]
+        [Tooltip("Maps normalized 0–1 flow strength to jet / stream visual scale.")]
         private AnimationCurve flowToStreamScale = AnimationCurve.Linear(0f, 0.15f, 1f, 1f);
 
         [SerializeField]
@@ -87,161 +86,326 @@ namespace Kyle.Flooding
         [Tooltip("Maps normalized 0–1 flow strength to splash/particle intensity.")]
         private AnimationCurve flowToSplashStrength = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
-        [Header("Floor / Stream")]
+        [Header("Jet")]
 
         [SerializeField]
-        [Tooltip("Meters to offset local patches along the floor normal to reduce Z-fighting with floor geometry.")]
+        [Tooltip("Initial jet speed in meters per second at full flow-driven stream scale.")]
         [Min(0f)]
-        private float floorOffsetMeters = DefaultFloorOffsetMeters;
+        private float jetInitialSpeed = 4.5f;
 
         [SerializeField]
-        [Tooltip("Default stream visual length in meters at full stream scale.")]
-        [Min(0f)]
-        private float streamLengthMeters = 1.25f;
+        [Tooltip("Ballistic jet lifetime in seconds at full stream scale. Longer lifetime produces a longer arc.")]
+        [Min(0.05f)]
+        private float jetLifetimeSeconds = 0.55f;
 
         [SerializeField]
-        [Tooltip("Default stream visual width in meters at full stream scale.")]
-        [Min(0f)]
-        private float streamWidthMeters = 0.12f;
+        [Tooltip("Jet source width in meters at full stream scale.")]
+        [Min(0.005f)]
+        private float jetWidthMeters = 0.14f;
 
-        /// <summary>
-        /// Gets or sets base radial expansion speed in meters per second.
-        /// </summary>
+        [SerializeField]
+        [Tooltip("End radius as a fraction of source width (0 = needle tip, 1 = no taper).")]
+        [Range(0f, 1f)]
+        private float jetTaper = 0.35f;
+
+        [SerializeField]
+        [Tooltip("Multiplier on ActiveGravity / Physics.gravity applied to the presentation-only ballistic curve.")]
+        [Min(0f)]
+        private float jetGravityInfluence = 1f;
+
+        [SerializeField]
+        [Tooltip("Shader turbulence / distortion strength at full stream scale.")]
+        [Min(0f)]
+        private float jetTurbulence = 0.35f;
+
+        [SerializeField]
+        [Tooltip("UV scroll speed along the jet in cycles per second at full stream scale.")]
+        [Min(0f)]
+        private float jetUvFlowSpeed = 2.5f;
+
+        [Header("Directional Spread")]
+
+        [SerializeField]
+        [Tooltip("Extra major-axis elongation relative to minor axis while Growing (0 = round, 1 = strongly elongated).")]
+        [Range(0f, 2f)]
+        private float directionalStretch = 0.85f;
+
+        [SerializeField]
+        [Tooltip("How quickly directional stretch relaxes toward round during Settling/Converging (units per second).")]
+        [Min(0f)]
+        private float directionalRelaxation = 0.55f;
+
+        [SerializeField]
+        [Tooltip("Shader edge-noise spatial scale for irregular patch boundaries.")]
+        [Min(0.01f)]
+        private float edgeNoiseScale = 2.4f;
+
+        [SerializeField]
+        [Tooltip("Shader edge-noise amplitude. Higher values break the circular silhouette more.")]
+        [Min(0f)]
+        private float edgeNoiseStrength = 0.35f;
+
+        [SerializeField]
+        [Tooltip("Shader soft edge width in normalized radial space.")]
+        [Range(0.01f, 0.5f)]
+        private float edgeSoftness = 0.18f;
+
+        [SerializeField]
+        [Tooltip("Shader ripple amplitude for shallow local water motion.")]
+        [Min(0f)]
+        private float rippleStrength = 0.12f;
+
+        [SerializeField]
+        [Tooltip("Shader ripple animation speed in cycles per second.")]
+        [Min(0f)]
+        private float rippleSpeed = 1.4f;
+
+        [Header("Splash")]
+
+        [SerializeField]
+        [Tooltip("Multiplier on particle emission rate at full splash strength.")]
+        [Min(0f)]
+        private float splashEmissionMultiplier = 1f;
+
+        [SerializeField]
+        [Tooltip("Splash droplet speed scale at full splash strength.")]
+        [Min(0f)]
+        private float splashDropletSpeed = 2.2f;
+
+        [SerializeField]
+        [Tooltip("Splash droplet size scale at full splash strength.")]
+        [Min(0f)]
+        private float splashDropletSize = 1f;
+
+        [Header("Foam")]
+
+        [SerializeField]
+        [Tooltip("Shader foam intensity near irregular patch edges and impact cues.")]
+        [Range(0f, 1f)]
+        private float foamStrength = 0.45f;
+
+        [SerializeField]
+        [Tooltip("Normalized radial width of the foam rim on local patches.")]
+        [Range(0.01f, 0.4f)]
+        private float foamEdgeWidth = 0.12f;
+
         public float LocalSpreadSpeed
         {
             get => localSpreadSpeed;
             set => localSpreadSpeed = Mathf.Max(0f, value);
         }
 
-        /// <summary>
-        /// Gets or sets the maximum visual patch radius in meters.
-        /// </summary>
         public float MaximumLocalRadius
         {
             get => maximumLocalRadius;
             set => maximumLocalRadius = Mathf.Max(0.01f, value);
         }
 
-        /// <summary>
-        /// Gets or sets the initial shallow visual depth in meters.
-        /// </summary>
         public float InitialPoolDepth
         {
             get => initialPoolDepth;
             set => initialPoolDepth = Mathf.Max(0f, value);
         }
 
-        /// <summary>
-        /// Gets or sets settling duration in seconds after inflow stops.
-        /// </summary>
         public float SettlingDurationSeconds
         {
             get => settlingDurationSeconds;
             set => settlingDurationSeconds = Mathf.Max(0f, value);
         }
 
-        /// <summary>
-        /// Gets or sets converging / handoff duration in seconds.
-        /// </summary>
         public float ConvergenceDurationSeconds
         {
             get => convergenceDurationSeconds;
             set => convergenceDurationSeconds = Mathf.Max(0.01f, value);
         }
 
-        /// <summary>
-        /// Gets or sets the minimum inflow rate that creates or sustains Growing.
-        /// </summary>
         public float MinimumFlowRate
         {
             get => minimumFlowRate;
             set => minimumFlowRate = Mathf.Max(0f, value);
         }
 
-        /// <summary>
-        /// Gets or sets the maximum simultaneous provider-owned patches.
-        /// </summary>
         public int MaximumSimultaneousPatches
         {
             get => maximumSimultaneousPatches;
             set => maximumSimultaneousPatches = Mathf.Max(1, value);
         }
 
-        /// <summary>
-        /// Gets or sets the low-band absolute flow threshold.
-        /// </summary>
         public float LowFlowThreshold
         {
             get => lowFlowThreshold;
             set => lowFlowThreshold = Mathf.Max(0f, value);
         }
 
-        /// <summary>
-        /// Gets or sets the high-band absolute flow threshold.
-        /// </summary>
         public float HighFlowThreshold
         {
             get => highFlowThreshold;
             set => highFlowThreshold = Mathf.Max(lowFlowThreshold, value);
         }
 
-        /// <summary>
-        /// Gets or sets the normalized-strength → stream scale curve.
-        /// </summary>
         public AnimationCurve FlowToStreamScale
         {
             get => flowToStreamScale;
             set => flowToStreamScale = value ?? AnimationCurve.Linear(0f, 0.15f, 1f, 1f);
         }
 
-        /// <summary>
-        /// Gets or sets the normalized-strength → spread-speed multiplier curve.
-        /// </summary>
         public AnimationCurve FlowToSpreadSpeed
         {
             get => flowToSpreadSpeed;
             set => flowToSpreadSpeed = value ?? AnimationCurve.Linear(0f, 0.35f, 1f, 1f);
         }
 
-        /// <summary>
-        /// Gets or sets the normalized-strength → splash strength curve.
-        /// </summary>
         public AnimationCurve FlowToSplashStrength
         {
             get => flowToSplashStrength;
             set => flowToSplashStrength = value ?? AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
         }
 
-        /// <summary>
-        /// Gets or sets floor offset along the presentation normal in meters.
-        /// </summary>
         public float FloorOffsetMeters
         {
             get => floorOffsetMeters;
             set => floorOffsetMeters = Mathf.Max(0f, value);
         }
 
+        public float JetInitialSpeed
+        {
+            get => jetInitialSpeed;
+            set => jetInitialSpeed = Mathf.Max(0f, value);
+        }
+
+        public float JetLifetimeSeconds
+        {
+            get => jetLifetimeSeconds;
+            set => jetLifetimeSeconds = Mathf.Max(0.05f, value);
+        }
+
+        public float JetWidthMeters
+        {
+            get => jetWidthMeters;
+            set => jetWidthMeters = Mathf.Max(0.005f, value);
+        }
+
+        public float JetTaper
+        {
+            get => jetTaper;
+            set => jetTaper = Mathf.Clamp01(value);
+        }
+
+        public float JetGravityInfluence
+        {
+            get => jetGravityInfluence;
+            set => jetGravityInfluence = Mathf.Max(0f, value);
+        }
+
+        public float JetTurbulence
+        {
+            get => jetTurbulence;
+            set => jetTurbulence = Mathf.Max(0f, value);
+        }
+
+        public float JetUvFlowSpeed
+        {
+            get => jetUvFlowSpeed;
+            set => jetUvFlowSpeed = Mathf.Max(0f, value);
+        }
+
         /// <summary>
-        /// Gets or sets default stream length in meters.
+        /// Compatibility alias for approximate jet path length
+        /// (<see cref="JetInitialSpeed"/> × <see cref="JetLifetimeSeconds"/>).
         /// </summary>
         public float StreamLengthMeters
         {
-            get => streamLengthMeters;
-            set => streamLengthMeters = Mathf.Max(0f, value);
+            get => jetInitialSpeed * jetLifetimeSeconds;
+            set
+            {
+                var length = Mathf.Max(0f, value);
+                if (jetInitialSpeed <= 0.01f)
+                    jetInitialSpeed = 4.5f;
+                jetLifetimeSeconds = Mathf.Max(0.05f, length / jetInitialSpeed);
+            }
         }
 
         /// <summary>
-        /// Gets or sets default stream width in meters.
+        /// Compatibility alias for <see cref="JetWidthMeters"/>.
         /// </summary>
         public float StreamWidthMeters
         {
-            get => streamWidthMeters;
-            set => streamWidthMeters = Mathf.Max(0f, value);
+            get => jetWidthMeters;
+            set => jetWidthMeters = Mathf.Max(0.005f, value);
         }
 
-        /// <summary>
-        /// Maps an absolute flow rate onto a 0–1 normalized strength.
-        /// </summary>
+        public float DirectionalStretch
+        {
+            get => directionalStretch;
+            set => directionalStretch = Mathf.Clamp(value, 0f, 2f);
+        }
+
+        public float DirectionalRelaxation
+        {
+            get => directionalRelaxation;
+            set => directionalRelaxation = Mathf.Max(0f, value);
+        }
+
+        public float EdgeNoiseScale
+        {
+            get => edgeNoiseScale;
+            set => edgeNoiseScale = Mathf.Max(0.01f, value);
+        }
+
+        public float EdgeNoiseStrength
+        {
+            get => edgeNoiseStrength;
+            set => edgeNoiseStrength = Mathf.Max(0f, value);
+        }
+
+        public float EdgeSoftness
+        {
+            get => edgeSoftness;
+            set => edgeSoftness = Mathf.Clamp(value, 0.01f, 0.5f);
+        }
+
+        public float RippleStrength
+        {
+            get => rippleStrength;
+            set => rippleStrength = Mathf.Max(0f, value);
+        }
+
+        public float RippleSpeed
+        {
+            get => rippleSpeed;
+            set => rippleSpeed = Mathf.Max(0f, value);
+        }
+
+        public float SplashEmissionMultiplier
+        {
+            get => splashEmissionMultiplier;
+            set => splashEmissionMultiplier = Mathf.Max(0f, value);
+        }
+
+        public float SplashDropletSpeed
+        {
+            get => splashDropletSpeed;
+            set => splashDropletSpeed = Mathf.Max(0f, value);
+        }
+
+        public float SplashDropletSize
+        {
+            get => splashDropletSize;
+            set => splashDropletSize = Mathf.Max(0f, value);
+        }
+
+        public float FoamStrength
+        {
+            get => foamStrength;
+            set => foamStrength = Mathf.Clamp01(value);
+        }
+
+        public float FoamEdgeWidth
+        {
+            get => foamEdgeWidth;
+            set => foamEdgeWidth = Mathf.Clamp(value, 0.01f, 0.4f);
+        }
+
         public float EvaluateNormalizedStrength(float flowRateCubicMetersPerSecond)
         {
             return FloodPresentationUtility.FlowIntensity(
@@ -250,9 +414,6 @@ namespace Kyle.Flooding
                 highFlowThreshold);
         }
 
-        /// <summary>
-        /// Evaluates stream scale from absolute flow rate.
-        /// </summary>
         public float EvaluateStreamScale(float flowRateCubicMetersPerSecond)
         {
             return EvaluateCurve(
@@ -261,9 +422,6 @@ namespace Kyle.Flooding
                 1f);
         }
 
-        /// <summary>
-        /// Evaluates spread-speed multiplier from absolute flow rate.
-        /// </summary>
         public float EvaluateSpreadSpeedMultiplier(float flowRateCubicMetersPerSecond)
         {
             return EvaluateCurve(
@@ -272,9 +430,6 @@ namespace Kyle.Flooding
                 1f);
         }
 
-        /// <summary>
-        /// Evaluates splash strength from absolute flow rate.
-        /// </summary>
         public float EvaluateSplashStrength(float flowRateCubicMetersPerSecond)
         {
             return EvaluateCurve(
@@ -285,15 +440,11 @@ namespace Kyle.Flooding
 
         private void OnValidate()
         {
-            localSpreadSpeed = SanitizeNonNegative(
-                localSpreadSpeed,
-                DefaultLocalSpreadSpeed);
+            localSpreadSpeed = SanitizeNonNegative(localSpreadSpeed, DefaultLocalSpreadSpeed);
             maximumLocalRadius = Mathf.Max(
                 0.01f,
                 SanitizeNonNegative(maximumLocalRadius, DefaultMaximumLocalRadius));
-            initialPoolDepth = SanitizeNonNegative(
-                initialPoolDepth,
-                DefaultInitialPoolDepth);
+            initialPoolDepth = SanitizeNonNegative(initialPoolDepth, DefaultInitialPoolDepth);
             settlingDurationSeconds = SanitizeNonNegative(
                 settlingDurationSeconds,
                 DefaultSettlingDurationSeconds);
@@ -302,19 +453,35 @@ namespace Kyle.Flooding
                 SanitizeNonNegative(
                     convergenceDurationSeconds,
                     DefaultConvergenceDurationSeconds));
-            minimumFlowRate = SanitizeNonNegative(
-                minimumFlowRate,
-                DefaultMinimumFlowRate);
+            minimumFlowRate = SanitizeNonNegative(minimumFlowRate, DefaultMinimumFlowRate);
             maximumSimultaneousPatches = Mathf.Max(1, maximumSimultaneousPatches);
             lowFlowThreshold = SanitizeNonNegative(lowFlowThreshold, 0.1f);
             highFlowThreshold = Mathf.Max(
                 lowFlowThreshold,
                 SanitizeNonNegative(highFlowThreshold, 2f));
-            floorOffsetMeters = SanitizeNonNegative(
-                floorOffsetMeters,
-                DefaultFloorOffsetMeters);
-            streamLengthMeters = SanitizeNonNegative(streamLengthMeters, 1.25f);
-            streamWidthMeters = SanitizeNonNegative(streamWidthMeters, 0.12f);
+            floorOffsetMeters = SanitizeNonNegative(floorOffsetMeters, DefaultFloorOffsetMeters);
+
+            jetInitialSpeed = SanitizeNonNegative(jetInitialSpeed, 4.5f);
+            jetLifetimeSeconds = Mathf.Max(0.05f, SanitizeNonNegative(jetLifetimeSeconds, 0.55f));
+            jetWidthMeters = Mathf.Max(0.005f, SanitizeNonNegative(jetWidthMeters, 0.14f));
+            jetTaper = Mathf.Clamp01(jetTaper);
+            jetGravityInfluence = SanitizeNonNegative(jetGravityInfluence, 1f);
+            jetTurbulence = SanitizeNonNegative(jetTurbulence, 0.35f);
+            jetUvFlowSpeed = SanitizeNonNegative(jetUvFlowSpeed, 2.5f);
+
+            directionalStretch = Mathf.Clamp(directionalStretch, 0f, 2f);
+            directionalRelaxation = SanitizeNonNegative(directionalRelaxation, 0.55f);
+            edgeNoiseScale = Mathf.Max(0.01f, SanitizeNonNegative(edgeNoiseScale, 2.4f));
+            edgeNoiseStrength = SanitizeNonNegative(edgeNoiseStrength, 0.35f);
+            edgeSoftness = Mathf.Clamp(edgeSoftness, 0.01f, 0.5f);
+            rippleStrength = SanitizeNonNegative(rippleStrength, 0.12f);
+            rippleSpeed = SanitizeNonNegative(rippleSpeed, 1.4f);
+
+            splashEmissionMultiplier = SanitizeNonNegative(splashEmissionMultiplier, 1f);
+            splashDropletSpeed = SanitizeNonNegative(splashDropletSpeed, 2.2f);
+            splashDropletSize = SanitizeNonNegative(splashDropletSize, 1f);
+            foamStrength = Mathf.Clamp01(foamStrength);
+            foamEdgeWidth = Mathf.Clamp(foamEdgeWidth, 0.01f, 0.4f);
 
             flowToStreamScale ??= AnimationCurve.Linear(0f, 0.15f, 1f, 1f);
             flowToSpreadSpeed ??= AnimationCurve.Linear(0f, 0.35f, 1f, 1f);

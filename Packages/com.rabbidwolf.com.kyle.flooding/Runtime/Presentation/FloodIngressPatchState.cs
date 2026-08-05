@@ -11,85 +11,48 @@ namespace Kyle.Flooding
     /// </remarks>
     public struct FloodIngressPatchState
     {
-        /// <summary>
-        /// Gets or sets the producing connection or source identity.
-        /// </summary>
         public EntityId ProviderId;
-
-        /// <summary>
-        /// Gets or sets the world-space patch center on the presentation floor.
-        /// </summary>
         public Vector3 CenterWorld;
-
-        /// <summary>
-        /// Gets or sets the floor-aligned normal used for patch orientation.
-        /// </summary>
         public Vector3 FloorNormalWorld;
-
-        /// <summary>
-        /// Gets or sets the latest ingress travel direction into the volume.
-        /// </summary>
         public Vector3 DirectionWorld;
 
         /// <summary>
-        /// Gets or sets the current visual radius in meters.
+        /// Floor-projected spread direction used for elongated footprints.
+        /// </summary>
+        public Vector3 SpreadDirectionWorld;
+
+        /// <summary>
+        /// Scalar radius used by lifecycle growth (before directional stretch).
         /// </summary>
         public float CurrentRadius;
 
-        /// <summary>
-        /// Gets or sets the target visual radius in meters.
-        /// </summary>
         public float TargetRadius;
-
-        /// <summary>
-        /// Gets or sets the shallow visual depth scalar in meters.
-        /// </summary>
         public float VisualDepth;
-
-        /// <summary>
-        /// Gets or sets elapsed active lifetime in seconds.
-        /// </summary>
         public float AgeSeconds;
-
-        /// <summary>
-        /// Gets or sets seconds spent in the current phase.
-        /// </summary>
         public float PhaseAgeSeconds;
-
-        /// <summary>
-        /// Gets or sets the lifecycle phase.
-        /// </summary>
         public FloodIngressPatchPhase Phase;
-
-        /// <summary>
-        /// Gets or sets bulk handoff fraction (0 = fully local, 1 = fully bulk).
-        /// </summary>
         public float HandoffFraction;
-
-        /// <summary>
-        /// Gets or sets presentation-only accumulated flow impulse used to drive
-        /// spread. Not conserved water volume.
-        /// </summary>
         public float FlowImpulse;
-
-        /// <summary>
-        /// Gets or sets the latest 0–1 presentation strength from profile curves.
-        /// </summary>
         public float Strength;
-
-        /// <summary>
-        /// Gets or sets the latest sampled inflow rate in cubic meters per second.
-        /// </summary>
         public float FlowRateCubicMetersPerSecond;
 
         /// <summary>
-        /// Gets whether this slot currently owns an active presentation patch.
+        /// Current directional elongation factor (0 = round, higher = elongated).
         /// </summary>
-        public bool IsActive => Phase != FloodIngressPatchPhase.Inactive;
+        public float DirectionalStretch;
 
         /// <summary>
-        /// Gets local opacity contribution after handoff (1 - handoff).
+        /// Major-axis visual radius in meters after stretch.
         /// </summary>
+        public float MajorRadius;
+
+        /// <summary>
+        /// Minor-axis visual radius in meters after stretch.
+        /// </summary>
+        public float MinorRadius;
+
+        public bool IsActive => Phase != FloodIngressPatchPhase.Inactive;
+
         public float LocalOpacity =>
             IsActive ? Mathf.Clamp01(1f - HandoffFraction) * Strength : 0f;
     }

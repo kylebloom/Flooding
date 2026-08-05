@@ -15,8 +15,21 @@ namespace Kyle.Flooding
     [AddComponentMenu("Flooding/Flood Local Ingress Presenter")]
     public sealed class FloodLocalIngressPresenter : MonoBehaviour
     {
+        private const int VisualLobeCount = 3;
+
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int ColorId = Shader.PropertyToID("_Color");
+        private static readonly int OpacityId = Shader.PropertyToID("_Opacity");
+        private static readonly int StrengthId = Shader.PropertyToID("_Strength");
+        private static readonly int EdgeNoiseScaleId = Shader.PropertyToID("_EdgeNoiseScale");
+        private static readonly int EdgeNoiseStrengthId = Shader.PropertyToID("_EdgeNoiseStrength");
+        private static readonly int EdgeSoftnessId = Shader.PropertyToID("_EdgeSoftness");
+        private static readonly int RippleStrengthId = Shader.PropertyToID("_RippleStrength");
+        private static readonly int RippleSpeedId = Shader.PropertyToID("_RippleSpeed");
+        private static readonly int FoamStrengthId = Shader.PropertyToID("_FoamStrength");
+        private static readonly int FoamEdgeWidthId = Shader.PropertyToID("_FoamEdgeWidth");
+        private static readonly int StretchId = Shader.PropertyToID("_Stretch");
+        private static readonly int FlowDirectionId = Shader.PropertyToID("_FlowDirection");
 
         [Header("Target")]
 
@@ -374,28 +387,39 @@ namespace Kyle.Flooding
 
             for (var i = 0; i < discSlots.Length; i++)
             {
-                if (discSlots[i].Transform == null)
+                if (discSlots[i].Root == null)
                     discSlots[i] = CreateDiscSlot(i);
             }
         }
 
         private DiscSlot CreateDiscSlot(int index)
         {
-            var discObject = new GameObject($"Ingress Patch {index}");
-            discObject.transform.SetParent(transform, false);
-            discObject.SetActive(false);
+            var root = new GameObject($"Ingress Patch {index}");
+            root.transform.SetParent(transform, false);
+            root.SetActive(false);
 
-            var filter = discObject.AddComponent<MeshFilter>();
-            filter.sharedMesh = FloodIngressDiscMesh.SharedUnitDisc;
-            var renderer = discObject.AddComponent<MeshRenderer>();
-            renderer.sharedMaterial = patchMaterial;
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            renderer.receiveShadows = false;
+            var lobes = new LobeVisual[VisualLobeCount];
+            for (var lobe = 0; lobe < VisualLobeCount; lobe++)
+            {
+                var lobeObject = new GameObject($"Lobe {lobe}");
+                lobeObject.transform.SetParent(root.transform, false);
+                var filter = lobeObject.AddComponent<MeshFilter>();
+                filter.sharedMesh = FloodIngressDiscMesh.SharedUnitDisc;
+                var renderer = lobeObject.AddComponent<MeshRenderer>();
+                renderer.sharedMaterial = patchMaterial;
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+                lobes[lobe] = new LobeVisual
+                {
+                    Transform = lobeObject.transform,
+                    Renderer = renderer,
+                };
+            }
 
             return new DiscSlot
             {
-                Transform = discObject.transform,
-                Renderer = renderer,
+                Root = root.transform,
+                Lobes = lobes,
                 HasFloorProjection = false,
             };
         }
@@ -411,61 +435,135 @@ namespace Kyle.Flooding
                 ref var slot = ref discSlots[i];
                 if (i >= patches.Length || !patches[i].IsActive)
                 {
-                    if (slot.Transform != null)
-                        slot.Transform.gameObject.SetActive(false);
+                    if (slot.Root != null)
+                        slot.Root.gameObject.SetActive(false);
                     slot.HasFloorProjection = false;
                     continue;
                 }
 
                 var patch = patches[i];
-                if (slot.Transform == null)
+                if (slot.Root == null || slot.Lobes == null)
                     slot = CreateDiscSlot(i);
 
-                if (!slot.HasFloorProjection)
-                {
-                    slot.ProjectedCenter = ProjectToFloor(
-                        patch.CenterWorld,
-                        patch.FloorNormalWorld,
-                        offset,
-                        allowRaycast: raycastFloorOnPatchCreate);
-                    slot.HasFloorProjection = true;
-                }
-                else
-                {
-                    // Keep projection sticky for the provider-owned slot; update
-                    // laterally if the ingress anchor moves significantly.
-                    var planar = ProjectToFloor(
-                        patch.CenterWorld,
-                        patch.FloorNormalWorld,
-                        offset,
-                        allowRaycast: false);
-                    slot.ProjectedCenter = planar;
-                }
+                slot.ProjectedCenter = ProjectToFloor(
+                    patch.CenterWorld,
+                    patch.FloorNormalWorld,
+                    offset,
+                    allowRaycast: !slot.HasFloorProjection && raycastFloorOnPatchCreate);
+                slot.HasFloorProjection = true;
 
                 var normal = patch.FloorNormalWorld.sqrMagnitude > 0.0001f
                     ? patch.FloorNormalWorld.normalized
                     : Vector3.up;
-                slot.Transform.gameObject.SetActive(true);
-                slot.Transform.SetPositionAndRotation(
-                    slot.ProjectedCenter,
-                    Quaternion.FromToRotation(Vector3.up, normal));
+                var spread = patch.SpreadDirectionWorld.sqrMagnitude > 0.0001f
+                    ? patch.SpreadDirectionWorld.normalized
+                    : Vector3.forward;
+                var rotation = Quaternion.LookRotation(spread, normal);
 
-                var radius = Mathf.Max(0.01f, patch.CurrentRadius);
-                slot.Transform.localScale = new Vector3(radius, 1f, radius);
+                slot.Root.gameObject.SetActive(true);
+                slot.Root.SetPositionAndRotation(slot.ProjectedCenter, rotation);
 
-                if (slot.Renderer != null)
+                var seed = ProviderSeed(patch.ProviderId);
+                for (var lobe = 0; lobe < slot.Lobes.Length; lobe++)
                 {
-                    if (patchMaterial != null)
-                        slot.Renderer.sharedMaterial = patchMaterial;
-
-                    var color = patchColor;
-                    color.a *= patch.LocalOpacity;
-                    slot.Renderer.GetPropertyBlock(propertyBlock);
-                    propertyBlock.SetColor(BaseColorId, color);
-                    propertyBlock.SetColor(ColorId, color);
-                    slot.Renderer.SetPropertyBlock(propertyBlock);
-                    slot.Renderer.enabled = color.a > 0.001f;
+                    ApplyLobeVisual(
+                        ref slot.Lobes[lobe],
+                        patch,
+                        lobe,
+                        seed);
                 }
+            }
+        }
+
+        private void ApplyLobeVisual(
+            ref LobeVisual lobe,
+            in FloodIngressPatchState patch,
+            int lobeIndex,
+            float seed)
+        {
+            if (lobe.Transform == null || lobe.Renderer == null)
+                return;
+
+            var major = Mathf.Max(0.05f, patch.MajorRadius);
+            var minor = Mathf.Max(0.04f, patch.MinorRadius);
+            var opacityScale = 1f;
+            var localOffset = Vector3.zero;
+
+            if (lobeIndex == 1)
+            {
+                major *= 0.72f;
+                minor *= 0.78f;
+                opacityScale = 0.55f;
+                localOffset = new Vector3(
+                    (0.18f + (seed * 0.05f)) * major,
+                    0f,
+                    (0.22f + (seed * 0.08f)) * major);
+            }
+            else if (lobeIndex == 2)
+            {
+                major *= 0.64f;
+                minor *= 0.7f;
+                opacityScale = 0.42f;
+                localOffset = new Vector3(
+                    (-0.2f - (seed * 0.04f)) * major,
+                    0f,
+                    (0.12f + ((1f - seed) * 0.1f)) * major);
+            }
+
+            lobe.Transform.localPosition = localOffset;
+            lobe.Transform.localRotation = Quaternion.identity;
+            lobe.Transform.localScale = new Vector3(minor, 1f, major);
+
+            if (patchMaterial != null)
+                lobe.Renderer.sharedMaterial = patchMaterial;
+
+            var color = patchColor;
+            color.a *= patch.LocalOpacity * opacityScale;
+            lobe.Renderer.GetPropertyBlock(propertyBlock);
+            propertyBlock.SetColor(BaseColorId, color);
+            propertyBlock.SetColor(ColorId, color);
+            propertyBlock.SetFloat(OpacityId, color.a);
+            propertyBlock.SetFloat(StrengthId, patch.Strength * opacityScale);
+            propertyBlock.SetVector(
+                StretchId,
+                new Vector4(
+                    Mathf.Max(0.05f, major / Mathf.Max(minor, 0.05f)),
+                    1f,
+                    0f,
+                    0f));
+            propertyBlock.SetVector(
+                FlowDirectionId,
+                new Vector4(
+                    patch.SpreadDirectionWorld.x,
+                    patch.SpreadDirectionWorld.y,
+                    patch.SpreadDirectionWorld.z,
+                    0f));
+
+            if (profile != null)
+            {
+                propertyBlock.SetFloat(EdgeNoiseScaleId, profile.EdgeNoiseScale);
+                propertyBlock.SetFloat(EdgeNoiseStrengthId, profile.EdgeNoiseStrength);
+                propertyBlock.SetFloat(EdgeSoftnessId, profile.EdgeSoftness);
+                propertyBlock.SetFloat(
+                    RippleStrengthId,
+                    profile.RippleStrength * patch.Strength);
+                propertyBlock.SetFloat(RippleSpeedId, profile.RippleSpeed);
+                propertyBlock.SetFloat(
+                    FoamStrengthId,
+                    profile.FoamStrength * patch.Strength);
+                propertyBlock.SetFloat(FoamEdgeWidthId, profile.FoamEdgeWidth);
+            }
+
+            lobe.Renderer.SetPropertyBlock(propertyBlock);
+            lobe.Renderer.enabled = color.a > 0.001f;
+        }
+
+        private static float ProviderSeed(EntityId providerId)
+        {
+            unchecked
+            {
+                var hash = providerId.GetHashCode();
+                return ((hash & 0xFF) / 255f);
             }
         }
 
@@ -525,6 +623,11 @@ namespace Kyle.Flooding
                 if (stream == null)
                     continue;
 
+                if (stream.FloorPlane == null)
+                    stream.FloorPlane = floorPlane;
+                if (stream.SimulationManager == null && volume != null)
+                    stream.SimulationManager = volume.SimulationManager;
+
                 var matched = false;
                 for (var sampleIndex = 0; sampleIndex < sampleCount; sampleIndex++)
                 {
@@ -582,16 +685,16 @@ namespace Kyle.Flooding
         {
             for (var i = 0; i < discSlots.Length; i++)
             {
-                if (discSlots[i].Transform != null)
-                    discSlots[i].Transform.gameObject.SetActive(false);
+                if (discSlots[i].Root != null)
+                    discSlots[i].Root.gameObject.SetActive(false);
                 discSlots[i].HasFloorProjection = false;
             }
         }
 
         private static void DestroySlot(ref DiscSlot slot)
         {
-            if (slot.Transform != null)
-                Destroy(slot.Transform.gameObject);
+            if (slot.Root != null)
+                Destroy(slot.Root.gameObject);
 
             slot = default;
         }
@@ -639,9 +742,16 @@ namespace Kyle.Flooding
                     continue;
 
                 Gizmos.color = new Color(0.2f, 0.6f, 1f, 0.85f);
-                Gizmos.DrawWireSphere(patches[i].CenterWorld, patches[i].CurrentRadius);
+                Gizmos.DrawWireSphere(patches[i].CenterWorld, patches[i].MajorRadius);
                 Gizmos.color = new Color(0.9f, 0.9f, 0.2f, 0.5f);
-                Gizmos.DrawWireSphere(patches[i].CenterWorld, patches[i].TargetRadius);
+                Gizmos.DrawWireSphere(patches[i].CenterWorld, patches[i].MinorRadius);
+                if (patches[i].SpreadDirectionWorld.sqrMagnitude > 0.0001f)
+                {
+                    Gizmos.color = Color.cyan;
+                    Gizmos.DrawRay(
+                        patches[i].CenterWorld,
+                        patches[i].SpreadDirectionWorld * patches[i].MajorRadius);
+                }
             }
         }
 
@@ -678,10 +788,17 @@ namespace Kyle.Flooding
 
         private struct DiscSlot
         {
-            public Transform Transform;
-            public MeshRenderer Renderer;
+            public Transform Root;
+            public LobeVisual[] Lobes;
             public Vector3 ProjectedCenter;
             public bool HasFloorProjection;
         }
+
+        private struct LobeVisual
+        {
+            public Transform Transform;
+            public MeshRenderer Renderer;
+        }
     }
 }
+

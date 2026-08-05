@@ -7,6 +7,14 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Local ingress visuals: replaced the stretched cube stream with a procedural
+  ballistic tapered jet, gravity-curved trajectory, optional impact splash
+  particles, directional elongated multi-lobe floor spread, and URP ingress
+  jet/patch shaders with scrolling/noise/foam cues. Logical provider-owned patch
+  architecture is unchanged.
+
 ## [0.11.0] - 2026-08-05
 
 ### Added
