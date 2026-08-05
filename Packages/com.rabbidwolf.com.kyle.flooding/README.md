@@ -133,6 +133,12 @@ For complete step-by-step Editor setup, open the
 | Flow visuals and audio | [Scenario 7](https://github.com/kylebloom/Flooding/blob/main/Packages/com.rabbidwolf.com.kyle.flooding/Documentation/editor-workflow.md#scenario-7--flow-visuals-and-audio) |
 | Scene-view diagnostics | [Scenario 8](https://github.com/kylebloom/Flooding/blob/main/Packages/com.rabbidwolf.com.kyle.flooding/Documentation/editor-workflow.md#scenario-8--scene-view-diagnostics-while-tuning) |
 
+Presentation option guides (surface renderers, connection visual, audio,
+telemetry, diagnostics, materials):
+
+- [Presentation hub](https://github.com/kylebloom/Flooding/blob/main/Packages/com.rabbidwolf.com.kyle.flooding/Documentation/presentation/README.md)
+- [Component guides](https://github.com/kylebloom/Flooding/blob/main/Packages/com.rabbidwolf.com.kyle.flooding/Documentation/components/README.md)
+
 ## Build your own compartment
 
 1. Create a `Flood System` GameObject and attach

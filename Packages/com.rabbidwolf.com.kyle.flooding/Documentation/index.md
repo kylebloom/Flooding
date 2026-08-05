@@ -58,16 +58,21 @@ Deep per-component docs:
 - [FloodCameraTracker](components/flood-camera-tracker.md)
 - [Flood underwater URP stack](components/flood-underwater-urp.md)
 
-Camera / underwater presentation (optional):
+Presentation options (optional visuals, audio, UI, diagnostics):
 
+- [Presentation guides hub](presentation/README.md) — chooser + relationship map
+- [Surface renderers](presentation/surface-renderers.md)
+- [FloodConnectionVisual](presentation/flood-connection-visual.md)
+- [Audio](presentation/audio.md)
+- [Telemetry](presentation/telemetry.md)
+- [FloodDiagnostics](presentation/flood-diagnostics.md)
+- [Materials](presentation/materials.md)
+- [Local ingress](local-ingress.md)
 - [Track a camera](editor-workflow.md#track-a-camera-or-viewpoint-against-flood-volumes)
 - [Flood Underwater Profile](editor-workflow.md#create-an-underwater-presentation-profile)
 - [URP underwater setup](editor-workflow.md#urp-underwater-camera-effects)
 - [Tune underwater look](editor-workflow.md#tune-underwater-look-symptom--where-to-click)
-- [Underwater audio](editor-workflow.md#underwater-audio-audiomixer)
-- [Telemetry adapters](editor-workflow.md#flood-telemetry-for-ui)
 - [Scenario 9 — first-person rising flood](editor-workflow.md#scenario-9--first-person-camera-through-a-rising-flood)
-- [Local ingress presentation](local-ingress.md)
 - [Scenario 10 — local ingress vs bulk surface](editor-workflow.md#scenario-10--local-ingress-presentation-vs-instant-bulk-surface)
 
 ### Fastest smoke test
@@ -95,6 +100,7 @@ a transparent material compatible with your render pipeline.
 | First-person waterline / underwater FX | [Scenario 9](editor-workflow.md#scenario-9--first-person-camera-through-a-rising-flood)                                               |
 | Localized breach/leak ingress visuals  | [Scenario 10](editor-workflow.md#scenario-10--local-ingress-presentation-vs-instant-bulk-surface) / [Local ingress](local-ingress.md) |
 | Soften wavy underwater look            | [Tune underwater look](editor-workflow.md#tune-underwater-look-symptom--where-to-click)                                               |
+| Pick a surface renderer / audio / FX stack | [Presentation guides](presentation/README.md)                                                                                    |
 
 ## Units and ownership
 
@@ -185,7 +191,8 @@ Camera underwater presentation limitations:
   Universal RP ≥ 17 is installed).
 - `Samples~` — Mass Integration, Baked Geometry, Connected Compartments, Hull
   Breach, First Person Flooding, Local Ingress.
-- `Documentation` — this overview, Editor workflow, and local-ingress guide.
+- `Documentation` — this overview, Editor workflow, component guides,
+  presentation guides, and local-ingress guide.
 
 ## Maturity and Path to 1.0
 

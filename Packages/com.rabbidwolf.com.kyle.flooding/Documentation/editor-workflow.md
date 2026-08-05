@@ -318,6 +318,9 @@ visible water, COM markers, presets, and sample-only `SampleVesselSupport`).
 
 **Goal:** Optional presentation driven by measured diagnostics.
 
+Deep guides: [Connection visual](presentation/flood-connection-visual.md),
+[Audio](presentation/audio.md), [Presentation hub](presentation/README.md).
+
 **Connection visual:**
 
 1. Select the connection GameObject.
@@ -343,6 +346,8 @@ ship clips or particle assets.
 ### Scenario 8 — Scene-view diagnostics while tuning
 
 **Goal:** Read-only overlay for surfaces, gravity, flow, and centers of mass.
+
+Deep guide: [FloodDiagnostics](presentation/flood-diagnostics.md).
 
 1. On `Flood System`, **Add Component > Flood Diagnostics**.
 2. Enable **Discover Children**, or assign volumes/connections explicitly.
@@ -567,6 +572,11 @@ for artistic adjustments.
   with Mesh Filter and Mesh Renderer.
 - **Baked Data**: `FloodBakedSurfaceRenderer` and a child GameObject with Mesh
   Filter and Mesh Renderer.
+- **FloodRegion**: `FloodRegionSurfaceRenderer` on the region; disable member
+  surface renderers.
+
+Full field tables: [Surface renderers](presentation/surface-renderers.md).
+Materials: [Materials](presentation/materials.md).
 
 The core simulation does not depend on a render pipeline. The included
 `Materials/Floodwater.mat` requires URP; use your own transparent material with

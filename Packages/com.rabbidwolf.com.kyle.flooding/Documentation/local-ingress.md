@@ -193,3 +193,11 @@ active major ingress rather than optimizing below that at the expense of look.
 Import **Local Ingress** from Package Manager Samples, or rebuild with
 **Flooding > Internal > Build Local Ingress Sample**. See
 `Samples~/Local Ingress/README.md`.
+
+## Related presentation docs
+
+- [Presentation guides hub](presentation/README.md)
+- [Surface renderers](presentation/surface-renderers.md) (keep bulk water)
+- [Connection visual](presentation/flood-connection-visual.md)
+- [Materials / ingress shaders](presentation/materials.md)
+- [Scenario 10](editor-workflow.md#scenario-10--local-ingress-presentation-vs-instant-bulk-surface)

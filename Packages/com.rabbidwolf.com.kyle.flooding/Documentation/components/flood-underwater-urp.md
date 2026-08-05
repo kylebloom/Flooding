@@ -74,3 +74,7 @@ underwater visuals.
 
 For full tuning table, see
 [underwater look cheat sheet](../editor-workflow.md#tune-underwater-look-symptom--where-to-click).
+
+Related: [Materials](../presentation/materials.md),
+[Underwater audio](../presentation/audio.md#floodunderwateraudio),
+[Presentation hub](../presentation/README.md).

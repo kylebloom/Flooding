@@ -22,11 +22,14 @@ ocean, lake, or reservoir waterline.
    - Up vector as water-surface normal (usually world up).
 4. Set **Density** to match connected volumes (typically `1000`).
 5. Enable **Boundary Enabled**.
-6. Connect this boundary to a volume using `FloodConnection`.
+6. Connect this boundary to a `FloodVolume` using
+   [`FloodConnection`](flood-connection.md). The volume may be a
+   [`FloodRegion`](flood-region.md) member; commits resolve to the owning
+   region. Do not connect two external boundaries to each other.
 
 ## Key Inspector fields
 
-- **Density**: must match connected compartment density.
+- **Density**: must match connected compartment / region density.
 - **Boundary Enabled**: enables/disables exchange participation.
 
 ## Verification checklist

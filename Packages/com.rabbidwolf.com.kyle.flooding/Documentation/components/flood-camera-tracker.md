@@ -20,6 +20,18 @@ It does not change simulation.
    - Enter Water Threshold Meters: `-0.02`
    - Exit Water Threshold Meters: `+0.02`
 
+## Regions and overlapping volumes
+
+- Auto-discover still selects among registered `FloodVolume`s (including region
+  members). Selection uses each volume’s `QueryPoint` (member geometry
+  containment + that volume’s active surface plane).
+- For a composed [`FloodRegion`](flood-region.md), member volumes share one
+  surface plane, so crossing an unrestricted doorway inside the region should
+  keep a consistent waterline as long as presentation uses
+  `FloodRegionSurfaceRenderer`.
+- Independent overlapping volumes that are **not** in a region remain ambiguous
+  and are **not** physically merged. Sticky selection still applies.
+
 ## Key Inspector fields
 
 - **Viewpoint**: optional transform override.
@@ -32,12 +44,17 @@ It does not change simulation.
 1. Enter Play Mode in a rising-flood scene.
 2. Confirm transitions occur once near the surface without rapid toggling.
 3. Confirm `IsUnderwater` and `SubmersionDepthMeters` track camera motion.
+4. In a two-room `FloodRegion`, walk through the doorway and confirm underwater
+   state does not pop due to mismatched member planes.
 
 ## Common mistakes
 
 - Tracker on camera but wrong volume selected in explicit mode.
 - Auto mode without accessible manager/registered volumes.
-- Overlapping volumes creating ambiguous expectations (sticky selection applies).
+- Overlapping **standalone** volumes creating ambiguous expectations (sticky
+  selection applies; use a `FloodRegion` if they should be one water body).
+- Region members still using per-volume surface renderers, so the tracker plane
+  and visible mesh disagree.
 
 ## Runtime API notes
 
@@ -45,3 +62,10 @@ It does not change simulation.
   `SurfaceSignedDistanceMeters`, `SubmersionDepthMeters`, `CurrentQuery`.
 - Events: `EnteredFloodVolume`, `ExitedFloodVolume`, `EnteredWater`,
   `ExitedWater`, `ActiveVolumeChanged`.
+
+## Related presentation consumers
+
+- [Underwater URP](flood-underwater-urp.md)
+- [Underwater audio](../presentation/audio.md#floodunderwateraudio)
+- [Camera telemetry](../presentation/telemetry.md#floodcameratelemetry)
+- [Presentation hub](../presentation/README.md)
