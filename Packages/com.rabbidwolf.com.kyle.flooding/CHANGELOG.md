@@ -7,6 +7,13 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Documented the Path to 1.0 publishing roadmap in repository
+  `docs/IMPLEMENTATION_PLAN.md` (0.14 stress sample → 0.15 authoring UX →
+  0.16 performance → 0.9x RC → 1.0), with links from package README and docs
+  index.
+
 ## [0.13.0] - 2026-08-05
 
 ### Added

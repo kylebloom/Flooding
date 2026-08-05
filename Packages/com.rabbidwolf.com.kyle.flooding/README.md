@@ -267,9 +267,11 @@ See:
   troubleshooting.
 - [Package model and technical overview](https://github.com/kylebloom/Flooding/blob/main/Packages/com.rabbidwolf.com.kyle.flooding/Documentation/index.md).
 - Repository-level
-  [specification, architecture, and implementation plans](https://github.com/kylebloom/Flooding/tree/main/docs)
+  [specification, architecture, and implementation plans](https://github.com/kylebloom/Flooding/tree/main/docs),
+  including the
+  [Path to 1.0 publishing roadmap](https://github.com/kylebloom/Flooding/blob/main/docs/IMPLEMENTATION_PLAN.md#path-to-10--gameplay-ready-package)
+  (stress sample → authoring UX → performance → RC → 1.0).
 
 ## License
 
 This package is licensed under the [MIT License](https://github.com/kylebloom/Flooding/blob/main/LICENSE).
-  for behavior, boundaries, delivery status, and refinement verification.

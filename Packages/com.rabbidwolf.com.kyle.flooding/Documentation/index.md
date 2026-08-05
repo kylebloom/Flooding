@@ -171,8 +171,26 @@ Camera underwater presentation limitations:
 - `Runtime.URP` — optional underwater renderer feature (compiled only when
   Universal RP ≥ 17 is installed).
 - `Samples~` — Mass Integration, Baked Geometry, Connected Compartments, Hull
-  Breach, First Person Flooding.
-- `Documentation` — this overview and the Editor workflow guide.
+  Breach, First Person Flooding, Local Ingress.
+- `Documentation` — this overview, Editor workflow, and local-ingress guide.
+
+## Maturity and Path to 1.0
+
+The package is a pre-1.0 gameplay prototype. The flooding vocabulary through
+`0.13.0` is in place (`FloodSource` / `FloodConnection` / `FloodSink` /
+`FloodVolume` plus presentation). Remaining publish milestones:
+
+| Milestone | Goal |
+| --- | --- |
+| **0.14** | Complex multi-compartment stress sample |
+| **0.15** | Authoring / debug UX pass |
+| **0.16** | Performance / profiling pass |
+| **0.9x / RC** | API stabilization + docs |
+| **1.0** | Stable gameplay-ready package |
+
+Full checklists and 1.0 non-goals live in the repository
+[Path to 1.0](https://github.com/kylebloom/Flooding/blob/main/docs/IMPLEMENTATION_PLAN.md#path-to-10--gameplay-ready-package)
+section of `docs/IMPLEMENTATION_PLAN.md`.
 
 ## License
 

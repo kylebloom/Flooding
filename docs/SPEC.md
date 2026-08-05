@@ -18,9 +18,12 @@ acceleration or rotation.
 ## Version and compatibility
 
 - Target Unity version: `6000.5.6f1`.
-- Current package maturity: pre-1.0 prototype.
+- Current package maturity: pre-1.0 gameplay prototype (`0.13.0` vocabulary
+  complete: source / connection / sink / volume + presentation).
 - Public APIs may evolve before `1.0.0`, but changes should preserve serialized
-  scene and prefab data when practical.
+  scene and prefab data when practical. The formal compatibility policy lands
+  in the 0.9x / RC milestone (see repository
+  `docs/IMPLEMENTATION_PLAN.md` → Path to 1.0).
 - SI units are used throughout the API.
 
 ## Units
