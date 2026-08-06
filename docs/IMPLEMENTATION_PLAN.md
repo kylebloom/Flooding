@@ -44,18 +44,21 @@ This document remains authoritative for feature-phase delivery.
 
 ## Current status
 
-- Current milestone: **Phase 17 / 0.14 complex multi-compartment stress sample
-  next** (Phase 16S FloodRegionData occupancy bake landed)
+- Current milestone: **Phase 17 / 0.14.3 Region Stress sample implemented —
+  verify in Editor Play Mode** (Phase 16T region presentation-boundary bake
+  landed)
 - Overall package status: **Gameplay-consumable simulation prototype**
 - Simulation vocabulary complete for v1 flooding gameplay:
   `FloodSource` (add), `FloodConnection` (transfer + `OpenFraction`),
   `FloodSink` (remove), `FloodVolume` (store/query), `FloodRegion`
-  (composition + optional occupancy bake), plus presentation layers
+  (composition + occupancy bake with presentation boundary), plus presentation
+  layers
 - Current supported geometry: **Rotated prism, Editor-baked volume data, and
   region unions via FloodRegionData bake or two-box analytic**
-- Current presentation: **Clipped prism volume, baked free-surface patches,
-  region surface renderer (two-box + occupancy), connection visuals, optional
-  flow/fill audio, camera/underwater, and local ingress**
+- Current presentation: **Clipped prism volume, baked/region free-surface from
+  presentation boundary (occupancy exterior faces) or voxel fallback, region
+  surface renderer, connection visuals, optional flow/fill audio,
+  camera/underwater, and local ingress**
 - Current flow model: **Configured inflow/outflow sinks, finite connections with open-fraction aperture control, and external boundaries**
 - Current query surface: **Live read-only point queries over authoritative state**
 - Path to publish: see [Path to 1.0](#path-to-10--gameplay-ready-package)
@@ -638,6 +641,43 @@ Out of scope for 16S:
 - Dynamic region merge when a door opens.
 - Auto-discovery of region membership.
 - Replacing per-volume `FloodVolumeData` baking.
+- Emitting a presentation-boundary mesh from region bake (schema + consumer
+  only in 16S; bake emission is **Phase 16T**).
+
+## Phase 16T — Region occupancy presentation boundary (0.14.2)
+
+Goal: make **Bake Region** write format-2 presentation-boundary data from the
+exterior faces of the deduplicated occupancy union so free-surface contours use
+plane ∩ one coherent boundary instead of per-cell voxel patches.
+
+Checklist:
+
+- [x] `OccupancyPresentationBoundaryBuilder` (exposed faces; weld cell corners;
+  omit internal shared faces).
+- [x] `FloodRegionBaker` passes verts/tris into `FloodRegionData.Initialize`
+  (format 2).
+- [x] Ear-clip triangulation for occupancy free-surface contours
+  (`FloodPlanarPolygonTriangulation` in region + baked surface renderers).
+- [x] Edit Mode tests: format 2 bake, no internal faces, L-shape concave
+  contour, capacity unchanged vs occupancy-only.
+- [x] Docs: SPEC / ARCHITECTURE / design / package guides / CHANGELOG.
+- [x] Package version `0.14.2`.
+
+Acceptance criteria:
+
+- [x] Region bake assets report `HasPresentationBoundary` and format 2.
+- [x] Face-adjacent / overlapping members do not keep shared internal faces in
+  the presentation mesh.
+- [x] Occupancy presentation remains a free-surface sheet (not a closed solid).
+- [x] Simulation capacity / volume-below-plane unchanged by the boundary mesh.
+- [x] Unity Edit Mode suite for new tests (verified in open Editor via Test
+  Runner API: focused 31 pass; full `Kyle.Flooding.Tests.Editor` 140 pass).
+
+Out of scope for 16T:
+
+- Source-derived smooth member-mesh merge / CSG.
+- Closed submerged volume mesh for occupancy regions.
+- Hole-loop (parent/child) triangulation.
 
 ## Path to 1.0 — gameplay-ready package
 
@@ -651,7 +691,8 @@ mark delivery sequence; SemVer may insert patch releases between milestones.
 | **0.13** | Pumps / drains / sinks (`FloodSink`) | [x] Phase 16 complete |
 | **0.14.x** | FloodRegion composition (two-box analytic prototype) | [x] Phase 16R |
 | **0.14.1** | FloodRegionData / region occupancy bake (N-member unions) | [x] Phase 16S |
-| **0.14** | Complex multi-compartment stress sample | [ ] Phase 17 **NEXT** |
+| **0.14.2** | Region occupancy presentation-boundary bake | [x] Phase 16T |
+| **0.14.3** | Complex multi-compartment stress sample | [~] Phase 17 **NEXT** |
 | **0.15** | Authoring / debug UX pass | [ ] Phase 18 |
 | **0.16** | Performance / profiling pass | [ ] Phase 19 |
 | **0.9x / RC** | API stabilization + docs freeze candidate | [ ] Phase 20 |
@@ -671,51 +712,75 @@ real-time arbitrary mesh fluid occupancy beyond the baked/analytic approach.
 Future work after 1.0 is optional fidelity and tooling, not fundamental
 capability gaps.
 
-## Phase 17 — Complex multi-compartment stress sample (0.14) **NEXT**
+## Phase 17 — Region Stress sample (0.14.3) **NEXT**
 
-Depends on Phase 16S so multi-room open geometry can use `FloodRegion` +
-`FloodRegionData` instead of only two-box analytic unions.
+Depends on Phase 16S/16T so multi-room open geometry can use `FloodRegion` +
+`FloodRegionData` (with presentation boundary) instead of only two-box analytic
+unions.
 
-Goal: prove the full vocabulary together in a moderately complex network, not
-isolated features.
+Goal: prove the full vocabulary together in a representative multi-compartment
+first-person scenario before further geometry fidelity work.
 
-Target shape (example, not a fixed topology):
+> Prove that multiple `FloodRegion`s, mixed member geometry, a multi-level
+> continuous region, controllable inter-region connections, exterior flooding,
+> pumping, first-person immersion, and region presentation compose correctly in
+> one representative scenario.
+
+Lean greybox (architectural stress, not entity-count benchmarking):
 
 ```text
-Deck A: Room1 ── Door ── Corridor ── Door ── Room2
-                 │                    │
-               breach              Stairwell
-                                      │
-Deck B: Engine Room ── Hatch ── Boiler Room
+Exterior ocean
+      │ breach (OpenFraction)
+      ▼
+Region A (RoomA + alcove) ── door ── Corridor/Stair (ONE multi-deck region)
+                                          │ hatch
+                                          ▼
+                               Region B (RoomB + irregular baked niche + pump)
 ```
 
-Suggested scale:
+Scale targets:
 
-- 10–20 `FloodVolume` compartments
-- 15–30 `FloodConnection` openings (doors, hatches, vents as metaphors)
-- 2 external breaches
-- several runtime-controllable doors (`IsOpen` / `OpenFraction`)
-- at least one `FloodSink` pump and optional `FloodSource` leak
-- player or camera moving between compartments for 15–30 minutes of Play Mode
+- 3 `FloodRegion`s / ~6–10 member `FloodVolume`s / ~3–5 `FloodConnection`s
+- Corridor + stair + landings = **one** continuous region (shared surface plane)
+- Controllable hatch into Compartment B (connection-controlled boundary)
+- One meaningfully irregular/sloped baked niche (presentation-boundary teeth)
+- First-person player; sample HUD only (no Phase 18 Editor tooling; no invasive
+  Phase 19 timing hooks)
 
 Checklist:
 
-- [ ] Author the stress sample (Package Manager sample + builder if needed).
-- [ ] Exercise breach → propagation → door/hatch control → pump mitigation.
-- [ ] Observe volume conservation / `FloodTickMetrics.ConservationError`.
-- [ ] Watch for unstable oscillation, weird reverse-flow, event churn,
-  presentation popping, overlapping volumes, and authoring pain.
-- [ ] Note CPU cost qualitatively; detailed budgets belong in Phase 19.
-- [ ] Document setup, controls, expected behavior, and known limits.
-- [ ] Package version `0.14.0`.
+- [x] Author the stress sample (Package Manager sample + builder).
+- [x] Defaults exercise breach 60% → door 25% → hatch 100% → pump off.
+- [x] Sample HUD: region fills, apertures, bake cell counts,
+  `FloodTickMetrics.ConservationError`, closed-system baseline (`C`).
+- [x] Document setup, controls, partial-aperture / conservation scenarios, and
+  evaluation checklist (correctness, composition, authoring friction; smoke
+  performance only).
+- [x] Package version `0.14.3`.
+- [x] Fixed `FloodConnection` region endpoint validation/snapshot resolution
+  (InvalidCastException on ocean→region; region↔region doors).
+- [ ] Verify long Play Mode session in open Unity Editor (user).
+- [ ] File Phase 18 / 19 follow-ups from observed failures / sharp edges.
 
 Acceptance criteria:
 
 - Network runs stably for a long Play Mode session without NaNs, negative
   volumes, or unbounded conservation drift.
-- Gameplay controls (open/close aperture, pump on/off) visibly change outcomes.
-- Failures and authoring sharp edges are filed as Phase 18 / 19 follow-ups,
-  not silently ignored.
+- Gameplay controls (partial apertures under unequal head, pump on/off) visibly
+  change outcomes.
+- Closed-system mode (breach closed + pump off) keeps total finite volume
+  approximately constant while water redistributes.
+- Sample either demonstrates the architecture holds **or** exposes specific
+  failures that determine Phase 18/19 / fidelity priorities.
+- Failures and authoring sharp edges are filed as follow-ups, not silently
+  ignored.
+
+Out of scope for 17:
+
+- Source-derived smooth presentation boundaries
+- Hole-loop triangulation / closed occupancy volume meshes
+- Package Editor authoring/debug UX (Phase 18)
+- Formal timing instrumentation or performance budgets (Phase 19)
 
 ## Phase 18 — Authoring / debug UX pass (0.15)
 
@@ -884,6 +949,8 @@ phase begins:
   (`RegionOccupancyUnionStrategy`, Bake Region Editor UX, N-member / mixed-mode
   unions, region surface occupancy presentation).
 - Verified Phase 16S: full Unity Edit Mode, Play Mode, and Player suites pass.
+- Completed Phase 16T / 0.14.2 region occupancy presentation-boundary bake
+  (exterior faces → format 2; ear-clip free-surface triangulation).
 - Documented the Path to 1.0 publishing roadmap (Phases 17–21: stress sample,
   authoring UX, performance, RC API freeze, 1.0 release) with explicit 1.0
   non-goals.

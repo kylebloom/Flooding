@@ -1,7 +1,7 @@
 # Flooding
 
 Flooding is a reusable, gameplay-focused flooding simulation package for Unity
-6.5. The current `0.14.1` prototype models gravity-aligned water volume inside
+6.5. The current `0.14.3` prototype models gravity-aligned water volume inside
 rotated rectangular, extruded-polygon, or Editor-baked complex compartments,
 including composed `FloodRegion` unions via optional region occupancy bake.
 
@@ -14,8 +14,10 @@ including composed `FloodRegion` unions via optional region occupancy bake.
 - Editor-baked geometry data for closed meshes with sloped, curved, or uneven
   interiors; runtime performs no source-mesh analysis.
 - `FloodRegion` composition with optional Editor **Bake Region**
-  (`FloodRegionData`) for N-member and mixed-geometry unions; two rectangular
-  members can still use exact analytic inclusion-exclusion without baking.
+  (`FloodRegionData`) for N-member and mixed-geometry unions; bake writes a
+  format-2 exterior occupancy presentation boundary for free-surface contours.
+  Two rectangular members can still use exact analytic inclusion-exclusion
+  without baking.
 - Gravity-aligned surfaces solved from authoritative volume.
 - Global or manager-specific gravity with documented zero-gravity fallback.
 - Immutable state snapshots with surface, mass, and center-of-mass data.
@@ -264,6 +266,13 @@ transient simulation or presentation state.
   mist / foam impact layers, and irregular shallow spread with edge foam.
   Toggle local ingress with **I** to compare against instant bulk equilibrium
   visuals. Details: `Documentation/local-ingress.md`.
+- **Region Stress** imports to `Assets/Samples/Flooding/0.14.3/Region Stress`.
+  Open `RegionStress.unity` (rebuild via **Flooding > Internal > Build Region
+  Stress Sample**). Multi-region first-person stress layout: exterior breach,
+  door/hatch `OpenFraction`s, one multi-deck corridor/stair `FloodRegion`,
+  irregular sloped baked niche, bilge pump, and a conservation HUD. Use this
+  sample to decide Phase 18/19 / fidelity priorities. Details: the sample
+  `README.md` evaluation checklist.
 
 The package folders under `Samples~` are the authoritative sample sources.
 Package Manager copies them into `Assets/Samples` rather than synchronizing

@@ -1,6 +1,7 @@
 # FloodRegion occupancy / bake design (Phase 16S)
 
-**Roadmap status:** delivered in Phase 16S / package `0.14.1` — see
+**Roadmap status:** occupancy bake delivered in Phase 16S / `0.14.1`; exterior
+presentation-boundary bake in Phase 16T / `0.14.2` — see
 [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md).
 
 Design reference for the shipped bake. Do not implement runtime mesh CSG. Do not
@@ -43,7 +44,7 @@ Immutable ScriptableObject (Editor-baked), analogous to `FloodVolumeData`:
 | `occupiedCellIndices` | Sorted unique flattened indices (union) |
 | `capacity` | `cellVolume × count` |
 | `centroid` | Mean occupied cell centers |
-| optional presentation boundary | Merged or source-combined mesh in region space |
+| optional presentation boundary | Exterior occupancy-face mesh in region space (format 2; stepped). Source-smooth merge is deferred. |
 
 ## Bake inputs
 
@@ -58,6 +59,15 @@ Immutable ScriptableObject (Editor-baked), analogous to `FloodVolumeData`:
 
 Authors opt in via an explicit **Bake Region** Editor action — never as a
 hidden conversion of every analytic volume.
+
+## Presentation boundary (Phase 16T)
+
+After the occupied set is final, the baker builds a welded triangle mesh of
+**exposed faces** of occupied cells (no occupied neighbor / grid exterior) and
+passes it into `FloodRegionData.Initialize`. Runtime
+`BakedFloodGeometry` prefers plane ∩ that boundary for free-surface contours.
+Quantity/capacity remain occupancy-only. No runtime mesh CSG; no member-mesh
+boolean union.
 
 ## Runtime strategy
 

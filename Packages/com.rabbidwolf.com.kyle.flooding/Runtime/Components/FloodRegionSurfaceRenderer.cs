@@ -135,6 +135,18 @@ namespace Kyle.Flooding
 
         private void HandleStateChanged(FloodState state)
         {
+            // Occupancy free-surface rebuilds are relatively expensive; snap
+            // instead of interpolating so mesh work stays on publish ticks.
+            if (floodRegion != null
+                && floodRegion.Geometry is BakedFloodGeometry)
+            {
+                SetDisplayedState(state);
+                interpolationStart = state;
+                targetState = state;
+                interpolationElapsed = interpolationDuration;
+                return;
+            }
+
             if (!hasDisplayedState || interpolationDuration <= 0f)
             {
                 SetDisplayedState(state);
@@ -307,29 +319,42 @@ namespace Kyle.Flooding
             IFloodVolumeGeometry geometry,
             Plane localSurfacePlane)
         {
-            var intersection =
-                geometry.EvaluateSubmersion(localSurfacePlane)
+            FloodSurfaceIntersection intersection;
+            if (geometry is BakedFloodGeometry baked)
+            {
+                intersection = baked.EvaluateFreeSurface(localSurfacePlane);
+            }
+            else
+            {
+                intersection = geometry.EvaluateSubmersion(localSurfacePlane)
                     .SurfaceIntersection;
+            }
+
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
+
+            var planeNormal = localSurfacePlane.normal;
+            if (floodRegion != null && waterVisual != null
+                && floodRegion.transform != waterVisual)
+            {
+                planeNormal = waterVisual.InverseTransformDirection(
+                    floodRegion.transform.TransformDirection(planeNormal));
+            }
 
             foreach (var contour in intersection.Contours)
             {
                 if (contour.Vertices.Count < 3)
                     continue;
 
-                var offset = vertices.Count;
+                var visualContour = new List<Vector3>(contour.Vertices.Count);
                 foreach (var point in contour.Vertices)
-                    vertices.Add(ConvertToWaterVisualLocal(point));
+                    visualContour.Add(ConvertToWaterVisualLocal(point));
 
-                for (var index = 1;
-                     index < contour.Vertices.Count - 1;
-                     index++)
-                {
-                    triangles.Add(offset);
-                    triangles.Add(offset + index);
-                    triangles.Add(offset + index + 1);
-                }
+                FloodPlanarPolygonTriangulation.AppendContour(
+                    visualContour,
+                    planeNormal,
+                    vertices,
+                    triangles);
             }
 
             runtimeMesh.Clear();

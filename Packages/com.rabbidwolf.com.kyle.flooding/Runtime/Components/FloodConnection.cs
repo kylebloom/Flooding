@@ -22,11 +22,11 @@ namespace Kyle.Flooding
         [Header("Connected Boundaries")]
 
         [SerializeField]
-        [Tooltip("Fluid boundary on side A. Assign a FloodVolume or External Fluid Body. Positive flow travels from A to B.")]
+        [Tooltip("Fluid boundary on side A. Assign a FloodVolume, FloodRegion, or External Fluid Body. Positive flow travels from A to B.")]
         private FluidBoundaryReference sideA;
 
         [SerializeField]
-        [Tooltip("Fluid boundary on side B. Assign a FloodVolume or External Fluid Body. Negative flow travels from B to A.")]
+        [Tooltip("Fluid boundary on side B. Assign a FloodVolume, FloodRegion, or External Fluid Body. Negative flow travels from B to A.")]
         private FluidBoundaryReference sideB;
 
         [SerializeField]
@@ -424,33 +424,44 @@ namespace Kyle.Flooding
 
             if (!sideA.TryGet(out var boundaryA))
             {
-                message = "Side A must reference a FloodVolume or External Fluid Body.";
+                message =
+                    "Side A must reference a FloodVolume, FloodRegion, or "
+                    + "External Fluid Body.";
                 return false;
             }
 
             if (!sideB.TryGet(out var boundaryB))
             {
-                message = "Side B must reference a FloodVolume or External Fluid Body.";
+                message =
+                    "Side B must reference a FloodVolume, FloodRegion, or "
+                    + "External Fluid Body.";
                 return false;
             }
 
-            if (boundaryA.BoundaryId == boundaryB.BoundaryId)
-            {
-                message = "Both endpoints resolve to the same fluid boundary.";
-                return false;
-            }
-
-            var regionA = EffectiveFluidBoundary.ResolveRegion(
-                boundaryA as FloodVolume);
-            var regionB = EffectiveFluidBoundary.ResolveRegion(
-                boundaryB as FloodVolume);
-
-            if (regionA != null && regionA == regionB)
+            if (!IsSupportedEndpoint(boundaryA) || !IsSupportedEndpoint(boundaryB))
             {
                 message =
+                    "Each endpoint must be a FloodVolume, FloodRegion, or "
+                    + "External Fluid Body.";
+                return false;
+            }
+
+            var effectiveA = EffectiveFluidBoundary.Resolve(boundaryA);
+            var effectiveB = EffectiveFluidBoundary.Resolve(boundaryB);
+
+            if (
+                effectiveA != null
+                && effectiveB != null
+                && effectiveA.BoundaryId == effectiveB.BoundaryId)
+            {
+                var regionLabel = effectiveA is FloodRegion region
+                    ? $"FloodRegion \"{region.name}\""
+                    : $"boundary \"{effectiveA}\"";
+                message =
                     $"FloodConnection \"{name}\" resolves both endpoints to "
-                    + $"FloodRegion \"{regionA.name}\".\n\n"
-                    + "FloodConnection may only connect independently simulated regions.";
+                    + $"{regionLabel}.\n\n"
+                    + "FloodConnection may only connect independently simulated "
+                    + "regions.";
                 return false;
             }
 
@@ -461,13 +472,6 @@ namespace Kyle.Flooding
             {
                 message =
                     "Connecting two external fluid boundaries is unsupported.";
-                return false;
-            }
-
-            if (!externalA && !externalB && (boundaryA is not FloodVolume || boundaryB is not FloodVolume))
-            {
-                message =
-                    "Each endpoint must be a FloodVolume or External Fluid Body.";
                 return false;
             }
 
@@ -495,12 +499,11 @@ namespace Kyle.Flooding
                 return false;
             }
 
-            var densityA = boundaryA is FloodVolume volumeA
-                ? volumeA.WaterDensity
-                : ((ExternalFluidBoundary)boundaryA).Density;
-            var densityB = boundaryB is FloodVolume volumeB
-                ? volumeB.WaterDensity
-                : ((ExternalFluidBoundary)boundaryB).Density;
+            if (!TryGetEndpointDensity(boundaryA, out var densityA, out message)
+                || !TryGetEndpointDensity(boundaryB, out var densityB, out message))
+            {
+                return false;
+            }
 
             if (!FloodFluidTolerances.DensitiesMatch(densityA, densityB))
             {
@@ -560,23 +563,63 @@ namespace Kyle.Flooding
                 return false;
             }
 
-            finiteA = EffectiveFluidBoundary.ResolveCommitVolume(
-                boundaryA as FloodVolume);
-            finiteB = EffectiveFluidBoundary.ResolveCommitVolume(
-                boundaryB as FloodVolume);
+            finiteA = ResolveFiniteEndpoint(boundaryA);
+            finiteB = ResolveFiniteEndpoint(boundaryB);
             return true;
         }
 
         private static FluidBoundaryId ResolveSnapshotBoundaryId(
             IFluidBoundary boundary)
         {
-            if (boundary is FloodVolume volume)
-            {
-                var commit = EffectiveFluidBoundary.ResolveCommitVolume(volume);
-                return commit != null ? commit.BoundaryId : boundary.BoundaryId;
-            }
+            var finite = ResolveFiniteEndpoint(boundary);
+            return finite != null ? finite.BoundaryId : boundary.BoundaryId;
+        }
 
-            return boundary.BoundaryId;
+        private static FloodVolume ResolveFiniteEndpoint(IFluidBoundary boundary)
+        {
+            return boundary switch
+            {
+                FloodVolume volume =>
+                    EffectiveFluidBoundary.ResolveCommitVolume(volume),
+                FloodRegion region =>
+                    region.BoundMembers.Count > 0 ? region.BoundMembers[0] : null,
+                _ => null,
+            };
+        }
+
+        private static bool IsSupportedEndpoint(IFluidBoundary boundary)
+        {
+            return boundary is FloodVolume
+                || boundary is FloodRegion
+                || boundary is ExternalFluidBoundary;
+        }
+
+        private static bool TryGetEndpointDensity(
+            IFluidBoundary boundary,
+            out float density,
+            out string message)
+        {
+            switch (boundary)
+            {
+                case FloodVolume volume:
+                    density = volume.WaterDensity;
+                    message = null;
+                    return true;
+                case FloodRegion region:
+                    density = region.WaterDensity;
+                    message = null;
+                    return true;
+                case ExternalFluidBoundary external:
+                    density = external.Density;
+                    message = null;
+                    return true;
+                default:
+                    density = 0f;
+                    message =
+                        "Each endpoint must be a FloodVolume, FloodRegion, or "
+                        + "External Fluid Body.";
+                    return false;
+            }
         }
 
         private void MigrateLegacyEndpoints()

@@ -85,28 +85,38 @@ namespace Kyle.Flooding
             var localPlane = FloodPlaneUtility.WorldToLocal(
                 SourceVolume.transform,
                 state.SurfacePlane);
-            var intersection =
-                geometry.EvaluateSubmersion(localPlane).SurfaceIntersection;
+            FloodSurfaceIntersection intersection;
+            if (geometry is BakedFloodGeometry baked)
+                intersection = baked.EvaluateFreeSurface(localPlane);
+            else
+                intersection = geometry.EvaluateSubmersion(localPlane)
+                    .SurfaceIntersection;
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
+
+            var planeNormal = localPlane.normal;
+            if (SourceVolume != null
+                && waterMeshFilter != null
+                && SourceVolume.transform != waterMeshFilter.transform)
+            {
+                planeNormal = waterMeshFilter.transform.InverseTransformDirection(
+                    SourceVolume.transform.TransformDirection(planeNormal));
+            }
 
             foreach (var contour in intersection.Contours)
             {
                 if (contour.Vertices.Count < 3)
                     continue;
 
-                var offset = vertices.Count;
+                var visualContour = new List<Vector3>(contour.Vertices.Count);
                 foreach (var point in contour.Vertices)
-                    vertices.Add(ConvertToTargetLocal(point));
+                    visualContour.Add(ConvertToTargetLocal(point));
 
-                for (var index = 1;
-                     index < contour.Vertices.Count - 1;
-                     index++)
-                {
-                    triangles.Add(offset);
-                    triangles.Add(offset + index);
-                    triangles.Add(offset + index + 1);
-                }
+                FloodPlanarPolygonTriangulation.AppendContour(
+                    visualContour,
+                    planeNormal,
+                    vertices,
+                    triangles);
             }
 
             EnsureMesh();

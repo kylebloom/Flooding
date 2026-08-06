@@ -7,8 +7,58 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Occupancy presentation no longer re-evaluates every occupied cell tetrahedron
+  when rebuilding free-surface meshes: region/baked surface renderers use
+  presentation-boundary plane ∩ mesh (`EvaluateFreeSurface`), snap instead of
+  per-frame interpolation for baked geometry, and the surface solver quantity
+  pass skips contour extraction (`EvaluateQuantities`). Region Stress sample
+  bake resolution and tick rate were also coarsened for Play Mode usability.
+
+## [0.14.3] - 2026-08-06
+
+### Added
+
+- **Phase 17:** Package Manager sample **Region Stress** — lean multi-compartment
+  first-person integration scene with three `FloodRegion`s (Compartment A,
+  multi-deck corridor/stair, Compartment B + irregular sloped baked niche),
+  exterior breach, controllable door/hatch `OpenFraction`s, bilge `FloodSink`,
+  region occupancy presentation-boundary bakes, and a sample HUD for fills,
+  apertures, `FloodTickMetrics.ConservationError`, and closed-system conservation.
+- Editor menu **Flooding > Internal > Build Region Stress Sample**.
+
+### Fixed
+
+- `FloodConnection` endpoint validation and snapshot resolution now support
+  `FloodRegion` sides (not only `FloodVolume` / `ExternalFluidBoundary`). Fixes
+  `InvalidCastException` when an ocean breach targets a region, and allows the
+  documented region↔region door/hatch pattern.
+
+### Notes
+
+- Phase 17 proves composition (correctness / authoring friction / smoke
+  presentation). Formal performance budgets remain Phase 19; Editor authoring
+  UX remains Phase 18. Source-derived smooth boundaries are deferred until the
+  sample shows they are necessary.
+
+## [0.14.2] - 2026-08-06
+
+### Added
+
+- **Phase 16T:** `FloodRegionBaker` writes a format-2 occupancy **presentation
+  boundary** from exterior faces of the deduplicated region cell union (internal
+  shared faces omitted). `BakedFloodGeometry` uses plane ∩ that boundary for
+  free-surface contours instead of per-cell voxel patches.
+- `OccupancyPresentationBoundaryBuilder` and shared
+  `FloodPlanarPolygonTriangulation` (ear clipping) for region and baked surface
+  renderers. Hole loops remain unsupported; fan is a last-resort fallback.
+
 ### Changed
 
+- Occupancy-backed region/baked presentation remains a **free-surface sheet**
+  (not a closed submerged volume). Analytic extruded regions still use clipped
+  solid meshes.
 - `FloodRegion.QueryPoint` / `SurfacePlane` lazily initialize composite
   geometry when the region is active but not yet built, so edit-mode and
   early tooling queries match Play Mode once membership validates. Failed

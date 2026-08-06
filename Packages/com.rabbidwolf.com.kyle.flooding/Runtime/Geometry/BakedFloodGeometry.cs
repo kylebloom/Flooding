@@ -144,6 +144,45 @@ namespace Kyle.Flooding
             return Evaluate(localSurfacePlane, includeSurface: true);
         }
 
+        /// <summary>
+        /// Volume and centroid only — skips free-surface contour extraction.
+        /// Used by the surface solver so quantity solves stay cheaper than
+        /// presentation mesh rebuilds.
+        /// </summary>
+        internal FloodSubmersionResult EvaluateQuantities(
+            Plane localSurfacePlane)
+        {
+            return Evaluate(localSurfacePlane, includeSurface: false);
+        }
+
+        /// <summary>
+        /// Free-surface contours only. Prefer presentation-boundary plane ∩
+        /// mesh when available so presentation does not re-walk every occupied
+        /// cell tetrahedron.
+        /// </summary>
+        internal FloodSurfaceIntersection EvaluateFreeSurface(
+            Plane localSurfacePlane)
+        {
+            if (!SupportsPlane(localSurfacePlane))
+            {
+                throw new ArgumentException(
+                    "Surface plane must have a finite non-zero normal and finite distance.",
+                    nameof(localSurfacePlane));
+            }
+
+            if (data.HasPresentationBoundary)
+            {
+                return FloodMeshPlaneIntersection.IntersectMesh(
+                    data.PresentationBoundaryVertices,
+                    data.PresentationBoundaryTriangles,
+                    localSurfacePlane);
+            }
+
+            // Legacy format-1 fallback: voxel contours require the full cell walk.
+            return Evaluate(localSurfacePlane, includeSurface: true)
+                .SurfaceIntersection;
+        }
+
         private FloodSubmersionResult Evaluate(
             Plane plane,
             bool includeSurface)

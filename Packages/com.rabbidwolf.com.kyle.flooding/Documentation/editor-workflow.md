@@ -70,6 +70,7 @@ Best when you want a complete authored hierarchy to inspect and edit.
 | Hull Breach            | Ocean waterline exchanging water with one compartment                                                                                       |
 | First Person Flooding  | Rising flood from first person with waterline / URP FX; see [Scenario 9](#scenario-9--first-person-camera-through-a-rising-flood)           |
 | Local Ingress          | Localized breach stream/spread vs instant bulk surface; see [Scenario 10](#scenario-10--local-ingress-presentation-vs-instant-bulk-surface) |
+| Region Stress          | Multi-region FP composition stress (breach/door/hatch, multi-deck corridor region, baked niche, pump, conservation HUD) |
 
 Re-importing a sample can overwrite your copy under `Assets/Samples`. Duplicate
 customized copies first.
@@ -662,6 +663,12 @@ regenerate the authored hierarchy.
   converges to the authoritative surface. Press **I** to toggle local ingress.
   See [Scenario 10](#scenario-10--local-ingress-presentation-vs-instant-bulk-surface)
   and [local-ingress.md](local-ingress.md).
+- **Region Stress**: Unity copies it to
+  `Assets/Samples/Flooding/0.14.3/Region Stress`. Open `RegionStress.unity`
+  there (or rebuild with **Flooding > Internal > Build Region Stress Sample**).
+  Exercises three `FloodRegion`s, a multi-deck corridor/stair continuous region,
+  partial apertures, an irregular baked niche, pump, and closed-system
+  conservation. Use the sample README checklist to drive Phase 18/19 priorities.
 
 The package's `Samples~` folders are authoritative. Package Manager import
 creates a writable copy under `Assets/Samples` but does not synchronize that
@@ -958,8 +965,11 @@ still use the analytic two-box path without baking.
 Rectangular and extruded members are sampled through containment in region
 space. Baked members contribute by remapping occupied cell centers into the
 region grid. Overlapping cells are stored once. Disconnected members fail the
-bake. The bake is marked stale when members, transforms, geometry, or Cell
-Resolution change — re-bake before Play Mode.
+bake. Successful bakes also write a format-2 **presentation boundary** from
+exterior occupancy faces (no internal walls between face-adjacent cells). The
+region surface renderer intersects that boundary with the shared water plane;
+edges remain voxel-stepped at Cell Resolution. Re-bake when members,
+transforms, geometry, or Cell Resolution change (stale fingerprint).
 
 Per-volume `FloodVolumeData` baking is unchanged and separate. See
 [FloodRegion](components/flood-region.md#bake-region-floodregiondata).

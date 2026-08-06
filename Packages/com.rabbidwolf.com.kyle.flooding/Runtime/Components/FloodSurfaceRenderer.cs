@@ -152,6 +152,18 @@ namespace Kyle.Flooding
 
         private void HandleStateChanged(FloodState state)
         {
+            // Occupancy free-surface rebuilds are expensive; keep them on tick
+            // publishes rather than every interpolated frame.
+            if (floodVolume != null
+                && floodVolume.Geometry is BakedFloodGeometry)
+            {
+                SetDisplayedState(state);
+                interpolationStart = state;
+                targetState = state;
+                interpolationElapsed = interpolationDuration;
+                return;
+            }
+
             if (!hasDisplayedState || interpolationDuration <= 0f)
             {
                 SetDisplayedState(state);

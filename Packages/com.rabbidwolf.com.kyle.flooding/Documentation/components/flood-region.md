@@ -81,6 +81,9 @@ After a successful bake:
   approximate vs source solids).
 - Continuity requires one face-connected occupied component (overlap or
   face-touch within the region grid).
+- Format 2 stores an exterior **presentation-boundary** mesh from exposed
+  occupancy faces (internal shared faces omitted). Free-surface contours use
+  plane ∩ that boundary; the silhouette remains stepped at cell resolution.
 - Stale diagnostics fire when members, transforms, geometry, or Cell Resolution
   change.
 
@@ -108,9 +111,11 @@ and reintroduce seams.
 Supported presentation sources:
 
 - Two-box presentation footprint when using the analytic strategy
-- Extruded composite footprints
-- Occupancy bake (voxel free-surface contours; optional presentation boundary
-  when present on the asset)
+- Extruded composite footprints (clipped submerged volume mesh)
+- Occupancy bake: free-surface sheet from plane ∩ **exterior occupancy
+  presentation boundary** written by **Bake Region** (format 2; stepped at
+  cell resolution). Legacy format-1 assets without a boundary fall back to
+  per-cell voxel contours. Occupancy presentation is not a closed water solid.
 
 ## Key Inspector fields
 

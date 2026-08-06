@@ -117,6 +117,21 @@ namespace Kyle.Flooding.Editor
             occupiedSet.CopyTo(occupied);
             Array.Sort(occupied);
 
+            if (!OccupancyPresentationBoundaryBuilder.TryBuild(
+                    bounds,
+                    cellSize,
+                    gridSize,
+                    occupied,
+                    out var presentationVertices,
+                    out var presentationTriangles,
+                    out var boundaryMessage))
+            {
+                message =
+                    "Failed to build occupancy presentation boundary: "
+                    + boundaryMessage;
+                return false;
+            }
+
             var fingerprint = CreateFingerprint(region);
             data = region.BakedRegionData;
 
@@ -153,7 +168,9 @@ namespace Kyle.Flooding.Editor
                 gridSize,
                 occupied,
                 boundaryCellCount,
-                fingerprint);
+                fingerprint,
+                presentationVertices,
+                presentationTriangles);
 
             if (promptForAssetPath)
             {
@@ -169,12 +186,14 @@ namespace Kyle.Flooding.Editor
                 AssetDatabase.SaveAssets();
             }
 
+            var triangleCount = presentationTriangles.Length / 3;
             message =
                 $"Baked {occupied.Length:N0} occupied region cells "
                 + $"({data.Capacity:0.###} m³) from "
                 + $"{totalGridCells:N0} inspected cells across "
-                + $"{region.Members.Count} members. Presentation uses voxel "
-                + "free-surface fallback (no merged presentation boundary).";
+                + $"{region.Members.Count} members. Presentation boundary: "
+                + $"{triangleCount:N0} exterior occupancy triangles "
+                + "(format 2; stepped at cell resolution).";
             return true;
         }
 

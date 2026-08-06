@@ -155,6 +155,8 @@ In **Window > Package Management > Package Manager**, select **Flooding**, open
 | Connected Compartments | `Assets/Samples/Flooding/0.10.0/Connected Compartments` | Conserved doorway equalization                                        |
 | Hull Breach            | `Assets/Samples/Flooding/0.10.0/Hull Breach`            | Ocean waterline ↔ compartment exchange                                |
 | First Person Flooding  | `Assets/Samples/Flooding/0.10.0/First Person Flooding`  | Rising flood, waterline crossing, URP underwater FX                   |
+| Local Ingress          | `Assets/Samples/Flooding/0.12.0/Local Ingress`          | Local ingress jet/spread vs bulk free surface                         |
+| Region Stress          | `Assets/Samples/Flooding/0.14.3/Region Stress`          | Multi-region FP stress: apertures, multi-deck region, baked niche     |
 
 Each imported scene is authored and editable before Play Mode. `Samples~` in
 the package is authoritative; re-import can overwrite `Assets/Samples` copies.
@@ -195,20 +197,21 @@ Camera underwater presentation limitations:
 - `Runtime.URP` — optional underwater renderer feature (compiled only when
   Universal RP ≥ 17 is installed).
 - `Samples~` — Mass Integration, Baked Geometry, Connected Compartments, Hull
-  Breach, First Person Flooding, Local Ingress.
+  Breach, First Person Flooding, Local Ingress, Region Stress.
 - `Documentation` — this overview, Editor workflow, component guides,
   presentation guides, and local-ingress guide.
 
 ## Maturity and Path to 1.0
 
 The package is a pre-1.0 gameplay prototype. The flooding vocabulary through
-`0.14.1` is in place (`FloodSource` / `FloodConnection` / `FloodSink` /
-`FloodVolume` / `FloodRegion` with optional occupancy bake, plus presentation).
+`0.14.3` is in place (`FloodSource` / `FloodConnection` / `FloodSink` /
+`FloodVolume` / `FloodRegion` with occupancy bake + presentation boundary, plus
+presentation and the Region Stress integration sample).
 Remaining publish milestones:
 
 | Milestone     | Goal                                    |
 | ------------- | --------------------------------------- |
-| **0.14**      | Complex multi-compartment stress sample |
+| **0.14.3**    | Complex multi-compartment stress sample |
 | **0.15**      | Authoring / debug UX pass               |
 | **0.16**      | Performance / profiling pass            |
 | **0.9x / RC** | API stabilization + docs                |

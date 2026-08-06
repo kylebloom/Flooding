@@ -463,8 +463,13 @@ intersection helper. Occupancy voxels still determine capacity, submerged
 volume, and the solved surface plane. Therefore the visible footprint can be
 more accurate than the voxel volume approximation. Format `1` assets without a
 presentation boundary fall back to one ordered contour per intersected occupied
-cell. `FloodBakedSurfaceRenderer` consumes those contours as focused free-surface
-patches. Hole loops (inner contours) are a known triangulation limitation.
+cell. `FloodRegionBaker` writes format `2` presentation boundaries from exterior
+occupancy faces (internal shared faces omitted; silhouette remains stepped at
+cell resolution). Volume bake may instead copy an authored closed source mesh.
+`FloodBakedSurfaceRenderer` and occupancy-backed `FloodRegionSurfaceRenderer`
+consume those contours as a free-surface sheet (ear-clipped; not a closed
+submerged solid). Hole loops (inner contours) are a known triangulation
+limitation.
 
 ## Presentation
 

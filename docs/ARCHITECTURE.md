@@ -105,7 +105,10 @@ union strategies:
   bake (exact inclusion-exclusion)
 
 Do not silently voxelize analytic volumes; region bake is an explicit Editor
-action. See `docs/FLOOD_REGION_OCCUPANCY_DESIGN.md`.
+action. **Bake Region** also writes a format-2 presentation-boundary mesh from
+exterior occupancy faces so free-surface presentation uses plane ∩ one coherent
+boundary (still stepped at cell resolution). Quantity remains occupancy-only.
+See `docs/FLOOD_REGION_OCCUPANCY_DESIGN.md`.
 
 ### Shared caching and queries
 

@@ -250,6 +250,242 @@ namespace Kyle.Flooding.Tests
             Object.DestroyImmediate(data);
         }
 
+        [Test]
+        public void BakeRegion_WritesFormat2OccupancyPresentationBoundary()
+        {
+            using var fixture = new RegionBakeFixture(
+                new Vector3(-0.5f, 0f, 0f),
+                new Vector3(0.5f, 0f, 0f),
+                null,
+                width: 2f,
+                length: 2f,
+                height: 2f,
+                cellResolution: 0.25f);
+
+            Assert.That(fixture.BakeSucceeded, Is.True, fixture.BakeMessage);
+            Assert.That(fixture.Data.HasPresentationBoundary, Is.True);
+            Assert.That(
+                fixture.Data.FormatVersion,
+                Is.EqualTo(FloodRegionData.CurrentFormatVersion));
+            Assert.That(
+                fixture.Data.PresentationBoundaryTriangleCount,
+                Is.GreaterThan(0));
+            Assert.That(
+                fixture.BakeMessage,
+                Does.Contain("Presentation boundary").IgnoreCase);
+        }
+
+        [Test]
+        public void BakeRegion_PresentationBoundary_OmitsInternalSharedFaces()
+        {
+            using var fixture = new RegionBakeFixture(
+                new Vector3(-1f, 0f, 0f),
+                new Vector3(1f, 0f, 0f),
+                null,
+                width: 2f,
+                length: 2f,
+                height: 2f,
+                cellResolution: 0.5f);
+
+            Assert.That(fixture.BakeSucceeded, Is.True, fixture.BakeMessage);
+            Assert.That(fixture.Data.HasPresentationBoundary, Is.True);
+
+            // Two face-adjacent solid boxes: exterior faces only — no shared
+            // mid-plane waterline when a horizontal plane cuts the union.
+            var geometry = new BakedFloodGeometry(fixture.Data);
+            var plane = new Plane(Vector3.up, new Vector3(0f, 1f, 0f));
+            var result = geometry.EvaluateSubmersion(plane);
+
+            Assert.That(result.SurfaceIntersection.HasSurface, Is.True);
+            Assert.That(
+                result.SurfaceIntersection.Contours.Count,
+                Is.EqualTo(1));
+
+            // Format-1 voxel fallback would emit many per-cell patches.
+            var occupancyOnly = ScriptableObject.CreateInstance<FloodRegionData>();
+            occupancyOnly.Initialize(
+                fixture.Data.LocalBounds,
+                fixture.Data.CellSize,
+                fixture.Data.GridSize,
+                CopyOccupied(fixture.Data),
+                fixture.Data.BoundaryCellCount,
+                "occupancy-only");
+            var fallback = new BakedFloodGeometry(occupancyOnly)
+                .EvaluateSubmersion(plane);
+            Assert.That(occupancyOnly.HasPresentationBoundary, Is.False);
+            Assert.That(
+                fallback.SurfaceIntersection.Contours.Count,
+                Is.GreaterThan(result.SurfaceIntersection.Contours.Count));
+
+            Object.DestroyImmediate(occupancyOnly);
+        }
+
+        [Test]
+        public void BakeRegion_LShape_ConcaveContourTriangulatesInsideFootprint()
+        {
+            // L made of three boxes: two along X, one extending in +Z from the
+            // left box — produces a concave union footprint.
+            var regionRoot = new GameObject("LRegion");
+            regionRoot.SetActive(false);
+            var region = regionRoot.AddComponent<FloodRegion>();
+            var members = new List<FloodVolume>
+            {
+                CreateRectangularMember(
+                    regionRoot.transform,
+                    new Vector3(-1f, 0f, 0f),
+                    2f,
+                    2f,
+                    2f),
+                CreateRectangularMember(
+                    regionRoot.transform,
+                    new Vector3(1f, 0f, 0f),
+                    2f,
+                    2f,
+                    2f),
+                CreateRectangularMember(
+                    regionRoot.transform,
+                    new Vector3(-1f, 0f, 2f),
+                    2f,
+                    2f,
+                    2f),
+            };
+            region.SetMembers(members);
+            region.ConfigureBakeSettings(0.25f, 1000000);
+
+            Assert.That(
+                FloodRegionBaker.TryBake(
+                    region,
+                    out var data,
+                    out var message,
+                    promptForAssetPath: false),
+                Is.True,
+                message);
+            Assert.That(data.HasPresentationBoundary, Is.True);
+
+            var geometry = new BakedFloodGeometry(data);
+            var plane = new Plane(Vector3.up, new Vector3(0f, 1f, 0f));
+            var result = geometry.EvaluateSubmersion(plane);
+
+            Assert.That(result.SurfaceIntersection.HasSurface, Is.True);
+            Assert.That(
+                result.SurfaceIntersection.Contours.Count,
+                Is.EqualTo(1));
+            Assert.That(
+                result.SurfaceIntersection.Contours[0].Vertices.Count,
+                Is.GreaterThan(4));
+
+            var vertices = new List<Vector3>();
+            var triangles = new List<int>();
+            FloodPlanarPolygonTriangulation.AppendContour(
+                result.SurfaceIntersection.Contours[0].Vertices,
+                Vector3.up,
+                vertices,
+                triangles);
+
+            Assert.That(triangles.Count, Is.GreaterThanOrEqualTo(3));
+            Assert.That(
+                AllTriangleCentroidsNearUnion(vertices, triangles, data),
+                Is.True);
+
+            Object.DestroyImmediate(data);
+            Object.DestroyImmediate(regionRoot);
+        }
+
+        [Test]
+        public void BakeRegion_CapacityUnchangedByPresentationBoundary()
+        {
+            using var fixture = new RegionBakeFixture(
+                new Vector3(-0.5f, 0f, 0f),
+                new Vector3(0.5f, 0f, 0f),
+                null,
+                width: 2f,
+                length: 2f,
+                height: 2f,
+                cellResolution: 0.25f);
+
+            Assert.That(fixture.BakeSucceeded, Is.True, fixture.BakeMessage);
+
+            var withoutBoundary =
+                ScriptableObject.CreateInstance<FloodRegionData>();
+            withoutBoundary.Initialize(
+                fixture.Data.LocalBounds,
+                fixture.Data.CellSize,
+                fixture.Data.GridSize,
+                CopyOccupied(fixture.Data),
+                fixture.Data.BoundaryCellCount,
+                "no-boundary");
+
+            Assert.That(
+                fixture.Data.Capacity,
+                Is.EqualTo(withoutBoundary.Capacity));
+            Assert.That(
+                new BakedFloodGeometry(fixture.Data).Capacity,
+                Is.EqualTo(new BakedFloodGeometry(withoutBoundary).Capacity));
+
+            Object.DestroyImmediate(withoutBoundary);
+        }
+
+        private static int[] CopyOccupied(FloodRegionData data)
+        {
+            var copy = new int[data.OccupiedCellIndices.Count];
+            for (var index = 0; index < copy.Length; index++)
+                copy[index] = data.OccupiedCellIndices[index];
+            return copy;
+        }
+
+        private static bool AllTriangleCentroidsNearUnion(
+            List<Vector3> vertices,
+            List<int> triangles,
+            FloodRegionData data)
+        {
+            var geometry = new BakedFloodGeometry(data);
+            var pad = Mathf.Max(
+                data.CellSize.x,
+                data.CellSize.y,
+                data.CellSize.z) * 0.75f;
+
+            for (var index = 0; index < triangles.Count; index += 3)
+            {
+                var centroid =
+                    (vertices[triangles[index]]
+                        + vertices[triangles[index + 1]]
+                        + vertices[triangles[index + 2]])
+                    / 3f;
+                if (!geometry.ContainsLocalPoint(centroid)
+                    && !IsWithinOccupiedCellPad(data, centroid, pad))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool IsWithinOccupiedCellPad(
+            FloodRegionData data,
+            Vector3 point,
+            float pad)
+        {
+            foreach (var flattened in data.OccupiedCellIndices)
+            {
+                var center = data.GetCellCenter(flattened);
+                var half = data.CellSize * 0.5f;
+                var min = center - half - Vector3.one * pad;
+                var max = center + half + Vector3.one * pad;
+                if (point.x >= min.x
+                    && point.x <= max.x
+                    && point.y >= min.y
+                    && point.y <= max.y
+                    && point.z >= min.z
+                    && point.z <= max.z)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private static FloodVolume CreateRectangularMember(
             Transform region,
             Vector3 localPosition,

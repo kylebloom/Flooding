@@ -112,7 +112,12 @@ namespace Kyle.Flooding
             int iterations)
         {
             var plane = CreatePlane(normal, offset);
-            var submersion = geometry.EvaluateSubmersion(plane);
+
+            // Occupancy quantity solves do not need free-surface contours; those
+            // are rebuilt by presentation components when they apply state.
+            var submersion = geometry is BakedFloodGeometry baked
+                ? baked.EvaluateQuantities(plane)
+                : geometry.EvaluateSubmersion(plane);
 
             return new FloodSurfaceSolution(
                 plane,

@@ -3,9 +3,11 @@
 `FloodConnection` is pressure-driven exchange through a rectangular opening
 between two independently simulated fluid boundaries.
 
-Endpoints are authored as `FloodVolume` or `ExternalFluidBoundary`. When a
-`FloodVolume` is a [`FloodRegion`](flood-region.md) member, hydraulic evaluation
-and commits resolve to that region via `EffectiveFluidBoundary`.
+Endpoints are authored as `FloodVolume`, `FloodRegion`, or
+`ExternalFluidBoundary`. When a `FloodVolume` is a [`FloodRegion`](flood-region.md)
+member, hydraulic evaluation and commits resolve to that region via
+`EffectiveFluidBoundary`. Assigning the `FloodRegion` component directly is also
+supported (same commit participant / snapshot path).
 
 Conceptual role:
 

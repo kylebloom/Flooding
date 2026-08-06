@@ -1,7 +1,7 @@
 {
   "name": "com.rabbidwolf.com.kyle.flooding",
   "displayName": "Flooding",
-  "version": "0.14.1",
+  "version": "0.14.3",
   "unity": "6000.5",
   "unityRelease": "6f1",
   "description": "Gameplay-focused, volume-based flooding simulation for Unity.",
@@ -39,6 +39,11 @@
       "displayName": "Local Ingress",
       "description": "Compares instant bulk free-surface visuals with local ingress stream/spread presentation that converges to the authoritative surface.",
       "path": "Samples~/Local Ingress"
+    },
+    {
+      "displayName": "Region Stress",
+      "description": "Multi-region first-person stress sample: breach, door/hatch apertures, multi-deck corridor/stair FloodRegion, irregular baked niche, pump, and conservation HUD.",
+      "path": "Samples~/Region Stress"
     }
   ],
   "author": {
