@@ -20,7 +20,9 @@ including composed `FloodRegion` unions via optional region occupancy bake.
 - Global or manager-specific gravity with documented zero-gravity fallback.
 - Immutable state snapshots with surface, mass, and center-of-mass data.
 - Read-only gameplay point queries (`ContainsPoint`, `IsPointSubmerged`,
-  `QueryPoint`) over live authoritative volume and surface state.
+  `QueryPoint`) over live authoritative volume/region and surface state.
+  For multi-room `FloodRegion` layouts, query the **region** (composite union
+  + shared fill/plane), not individual member volumes.
 - Aggregate child-compartment flood mass and optional owned-baseline Rigidbody
   mass and center-of-mass integration.
 - Infinite exterior exchange through `ExternalFluidBoundary` (**External Fluid

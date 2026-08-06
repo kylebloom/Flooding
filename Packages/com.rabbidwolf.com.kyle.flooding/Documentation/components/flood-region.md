@@ -134,6 +134,17 @@ region.ContainsPoint(p);  // inside the composite union
 region.QueryPoint(p);     // union containment + region water state
 ```
 
+For multi-room gameplay (movement slowdown, depth HUD, etc.), query the
+**region**, not each member. A point in Room B is outside Room A's member
+geometry even when both share one region water surface.
+
+`QueryPoint` / `ContainsPoint` / `IsPointSubmerged` lazily initialize composite
+geometry when the region is active but has not built yet (for example edit-mode
+tooling before Play Mode `Awake`). If geometry validation fails (disconnected
+members, bake required, etc.), queries report outside rather than inventing
+membership. Check `ValidationMessage` / the Console when region queries always
+return outside.
+
 ## Connections / sources / sinks
 
 Gameplay and Inspector targets may still reference a member `FloodVolume`

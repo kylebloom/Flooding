@@ -81,6 +81,7 @@ namespace Kyle.Flooding
         private bool hasLastValidSurfaceNormal;
         private string validationMessage;
         private readonly List<FloodVolume> boundMembers = new();
+        private bool hasAttemptedInitialize;
 
         /// <summary>
         /// Gets or sets the manager that advances this region.
@@ -189,12 +190,18 @@ namespace Kyle.Flooding
         /// <summary>
         /// Gets the current world-space water surface plane.
         /// </summary>
-        public Plane SurfacePlane =>
-            geometry == null
-                ? new Plane(transform.up, transform.position)
-                : FloodPlaneUtility.LocalToWorld(
-                    transform,
-                    ResolveSurfaceSolution().LocalSurfacePlane);
+        public Plane SurfacePlane
+        {
+            get
+            {
+                EnsureInitialized();
+                return geometry == null
+                    ? new Plane(transform.up, transform.position)
+                    : FloodPlaneUtility.LocalToWorld(
+                        transform,
+                        ResolveSurfaceSolution().LocalSurfacePlane);
+            }
+        }
 
         /// <summary>
         /// Gets the solved water surface plane in region-local space.
@@ -260,8 +267,16 @@ namespace Kyle.Flooding
         /// Queries submersion using composite-union containment and this
         /// region's shared water state.
         /// </summary>
+        /// <remarks>
+        /// Lazily initializes composite geometry when needed so edit-mode and
+        /// pre-Awake tooling queries match Play Mode behavior. Prefer querying
+        /// the region for multi-room containment; member <see cref="FloodVolume"/>
+        /// queries only test that member's authored footprint.
+        /// </remarks>
         public FloodQueryResult QueryPoint(Vector3 worldPoint)
         {
+            EnsureInitialized();
+
             var activeGeometry = geometry;
             var isInsideVolume = activeGeometry != null
                 && activeGeometry.ContainsLocalPoint(
@@ -352,6 +367,7 @@ namespace Kyle.Flooding
             geometry = null;
             hasCachedSurfaceSolution = false;
             hasPreviousState = false;
+            hasAttemptedInitialize = false;
             return TryInitializeRegion();
         }
 
@@ -362,8 +378,12 @@ namespace Kyle.Flooding
 
         private void OnEnable()
         {
-            if (simulation == null)
+            // Awake already attempts init once; skip a second failure log on the
+            // same enable cycle. OnDisable clears the attempt flag for retries.
+            if (simulation == null && !hasAttemptedInitialize)
                 TryInitializeRegion();
+            else if (simulation != null && boundMembers.Count == 0)
+                BindMembers();
 
             ResolveManagerRegistration();
         }
@@ -372,6 +392,37 @@ namespace Kyle.Flooding
         {
             UnbindMembers();
             simulationManager?.Unregister(this);
+            hasAttemptedInitialize = false;
+        }
+
+        /// <summary>
+        /// Builds composite geometry/simulation once when queries run before
+        /// Awake (edit mode) or after a rebuild cleared state.
+        /// </summary>
+        private bool EnsureInitialized()
+        {
+            if (geometry != null)
+                return true;
+
+            if (!isActiveAndEnabled || hasAttemptedInitialize)
+                return false;
+
+            return TryInitializeRegion();
+        }
+
+        /// <summary>
+        /// Clears runtime geometry/simulation so the next query must
+        /// lazy-initialize. Test helper only.
+        /// </summary>
+        internal void ClearRuntimeStateForTests()
+        {
+            UnbindMembers();
+            simulation = null;
+            geometry = null;
+            hasCachedSurfaceSolution = false;
+            hasPreviousState = false;
+            hasAttemptedInitialize = false;
+            validationMessage = null;
         }
 
         private void OnTransformParentChanged()
@@ -571,6 +622,8 @@ namespace Kyle.Flooding
 
         private bool TryInitializeRegion()
         {
+            hasAttemptedInitialize = true;
+
             if (members == null || members.Count == 0)
                 return false;
 

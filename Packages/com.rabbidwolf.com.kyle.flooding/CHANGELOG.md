@@ -9,6 +9,14 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `FloodRegion.QueryPoint` / `SurfacePlane` lazily initialize composite
+  geometry when the region is active but not yet built, so edit-mode and
+  early tooling queries match Play Mode once membership validates. Failed
+  init still reports outside (no silent OR over raw members).
+- Documented multi-room gameplay guidance: prefer `FloodRegion.QueryPoint` /
+  `FillPercentage` over iterating member `FloodVolume`s
+  (`Documentation/components/flood-region.md`,
+  `Documentation/editor-workflow.md`, package README / docs index).
 - Documented the Path to 1.0 publishing roadmap in repository
   `docs/IMPLEMENTATION_PLAN.md` (0.14 stress sample → 0.15 authoring UX →
   0.16 performance → 0.9x RC → 1.0), with links from package README and docs

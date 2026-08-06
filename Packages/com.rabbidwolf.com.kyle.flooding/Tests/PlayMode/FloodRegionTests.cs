@@ -131,6 +131,63 @@ namespace Kyle.Flooding.Tests
         }
 
         [UnityTest]
+        public IEnumerator TwoMemberRegion_QueryPoint_CoversBothMemberInteriors()
+        {
+            var root = new GameObject("TwoMemberQueryRegion");
+            root.SetActive(false);
+            var manager = root.AddComponent<FloodSimulationManager>();
+            manager.SimulateAutomatically = false;
+
+            var region = root.AddComponent<FloodRegion>();
+            var roomA = CreateChildVolume(
+                root.transform,
+                "RoomA",
+                new Vector3(-0.5f, 0f, 0f),
+                2f,
+                2f,
+                2f);
+            var roomB = CreateChildVolume(
+                root.transform,
+                "RoomB",
+                new Vector3(0.5f, 0f, 0f),
+                2f,
+                2f,
+                2f);
+
+            region.SetMembers(new List<FloodVolume> { roomA, roomB });
+            region.ConfigureInitialVolume(6f);
+            root.SetActive(true);
+            yield return null;
+
+            var pointInA = new Vector3(-1f, 0.25f, 0f);
+            var pointInB = new Vector3(1f, 0.25f, 0f);
+            var pointOutside = new Vector3(0f, 0.25f, 3f);
+
+            Assert.That(roomA.ContainsPoint(pointInA), Is.True);
+            Assert.That(roomA.ContainsPoint(pointInB), Is.False);
+            Assert.That(roomB.ContainsPoint(pointInB), Is.True);
+            Assert.That(roomB.ContainsPoint(pointInA), Is.False);
+
+            var regionQueryA = region.QueryPoint(pointInA);
+            var regionQueryB = region.QueryPoint(pointInB);
+            var regionQueryOutside = region.QueryPoint(pointOutside);
+
+            Assert.That(regionQueryA.IsInsideVolume, Is.True);
+            Assert.That(regionQueryA.IsSubmerged, Is.True);
+            Assert.That(regionQueryB.IsInsideVolume, Is.True);
+            Assert.That(regionQueryB.IsSubmerged, Is.True);
+            Assert.That(regionQueryOutside.IsInsideVolume, Is.False);
+            Assert.That(regionQueryOutside.IsSubmerged, Is.False);
+
+            Assert.That(
+                regionQueryA.SubmersionDepthMeters,
+                Is.EqualTo(regionQueryB.SubmersionDepthMeters).Within(1e-4f));
+
+            Object.Destroy(root);
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator SameRegionConnection_IsAuthoringError()
         {
             var root = new GameObject("SameRegionConnection");

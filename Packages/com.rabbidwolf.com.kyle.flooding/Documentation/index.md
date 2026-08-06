@@ -123,6 +123,11 @@ finite volume deltas, then publishes state.
 - `FloodVolume` — finite compartment (`IFluidBoundary`) with live state reads
   and read-only point queries (`ContainsPoint`, `IsPointSubmerged`,
   `QueryPoint`).
+- `FloodRegion` — composed equilibrium body from one or more member volumes
+  (shared `CurrentVolume` / `FillPercentage` / surface). For multi-room
+  gameplay, call `FloodRegion.QueryPoint` / read region fill — not each
+  member. See [FloodRegion](components/flood-region.md) and
+  [Query points for gameplay](editor-workflow.md#query-points-for-gameplay).
 - `ExternalFluidBoundary` — infinite exterior (**External Fluid Body**).
 - `FloodConnection` — pressure-driven opening between two boundaries, with
   `IsOpen` hard gate and `OpenFraction` effective-aperture control.

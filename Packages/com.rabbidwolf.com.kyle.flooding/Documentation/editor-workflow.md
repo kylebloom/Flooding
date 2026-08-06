@@ -1345,8 +1345,23 @@ public sealed class FloodStateDisplay : MonoBehaviour
 
 ## Query points for gameplay
 
-Use `FloodVolume` point queries when other systems need to know whether a
-world-space sample is inside a compartment or underwater:
+Use point queries when other systems need to know whether a world-space sample
+is inside floodable geometry or underwater.
+
+**Choose the right target:**
+
+| Scenario | Query / read |
+| --- | --- |
+| Standalone single compartment | `FloodVolume.QueryPoint` / `FillPercentage` |
+| Multi-room continuous body (`FloodRegion`) | **`FloodRegion.QueryPoint`** / **`FloodRegion.FillPercentage`** |
+| Point must be inside one specific room only | That member `FloodVolume.ContainsPoint` / `QueryPoint` |
+
+For multi-room gameplay (movement slowdown, flood HUD, lose-on-fill), prefer the
+**region**. A point in Room B is outside Room A's member geometry even when both
+share one region water surface — do not iterate `FloodRegion.Members` unless you
+intentionally need per-room containment.
+
+Standalone volume:
 
 ```csharp
 FloodQueryResult result = volume.QueryPoint(player.transform.position);
@@ -1357,9 +1372,22 @@ if (result.IsSubmerged)
 }
 ```
 
+Composed region (recommended for open multi-room layouts):
+
+```csharp
+FloodQueryResult result = region.QueryPoint(player.transform.position);
+
+if (result.IsSubmerged)
+{
+    Debug.Log($"Submersion depth: {result.SubmersionDepthMeters:F2} m");
+}
+
+float flooded = region.FillPercentage; // shared body of water
+```
+
 | API                                  | Meaning                                                                                                                      |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| `ContainsPoint(worldPoint)`          | Inside floodable geometry                                                                                                    |
+| `ContainsPoint(worldPoint)`          | Inside floodable geometry (member footprint, or region composite union)                                                      |
 | `IsPointSubmerged(worldPoint)`       | Inside geometry and below the current surface plane                                                                          |
 | `QueryPoint(worldPoint)`             | Combined result: inside, submerged, submersion depth (m), signed surface distance (m), closest surface point, surface normal |
 | `CurrentVolume`                      | Authoritative water volume (m³)                                                                                              |
@@ -1368,14 +1396,15 @@ if (result.IsSubmerged)
 
 Contract:
 
-- Queries derive values from the volume's **current authoritative state** at
-  the call moment.
+- Queries derive values from the target's **current authoritative state** at
+  the call moment (volume standalone state, or owning region state when a
+  member is bound / when querying the region).
 - Queries are **read-only**: they never advance, reconcile, or publish
   simulation state.
 - `IsSubmerged` requires both containment and a positive plane depth
   (`max(0, -SurfacePlane.GetDistanceToPoint(point))`). A point outside the
-  compartment is never submerged, even if it lies below the infinite surface
-  plane.
+  compartment / union is never submerged, even if it lies below the infinite
+  surface plane.
 - `SubmersionDepthMeters` is zero when the point is not submerged. Its
   meaning is unchanged when signed distance is also present.
 - `SurfaceSignedDistanceMeters` uses the same authoritative world-space
@@ -1387,8 +1416,13 @@ Contract:
   (`FloodContainmentPrecision.Exact`).
 - Baked geometry containment uses occupied bake cells
   (`FloodContainmentPrecision.BakeApproximation`) and depends on
-  `FloodVolumeData.SampleResolution`. Inspect precision via
-  `volume.Geometry.ContainmentPrecision`.
+  `FloodVolumeData.SampleResolution` (or region bake cell size). Inspect
+  precision via `Geometry.ContainmentPrecision`.
+- `FloodRegion` queries lazily initialize composite geometry when the region is
+  active but not yet built (for example edit-mode tooling before Play Mode
+  `Awake`). Failed geometry validation still reports outside — check
+  `ValidationMessage` / the Console. See
+  [FloodRegion query semantics](components/flood-region.md#query-semantics).
 
 ## Track a camera or viewpoint against flood volumes
 

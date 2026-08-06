@@ -274,11 +274,17 @@ the next manager tick.
 
 ## Gameplay point queries
 
-`FloodVolume` exposes read-only world-space queries:
+`FloodVolume` and `FloodRegion` expose read-only world-space queries:
 
 - `ContainsPoint(Vector3 worldPoint)`
 - `IsPointSubmerged(Vector3 worldPoint)`
 - `QueryPoint(Vector3 worldPoint)` → `FloodQueryResult`
+
+`FloodVolume` containment uses that volume's authored geometry.
+`FloodRegion` containment uses the composite union. Prefer region queries for
+gameplay that must work across every member of a composed water body.
+`FloodRegion` queries lazily initialize composite geometry when the region is
+active but not yet built; failed init reports outside (no silent member OR).
 
 `FloodQueryResult` contains:
 

@@ -124,6 +124,13 @@ without changing `SubmersionDepthMeters`. Containment for analytic prisms is
 exact; baked geometry containment uses occupancy cells and exposes
 `FloodContainmentPrecision.BakeApproximation` on the geometry contract.
 
+Multi-room consumers should call `FloodRegion.QueryPoint` (composite-union
+containment + shared region water). Member `FloodVolume.QueryPoint` only tests
+that member's footprint. `FloodRegion` query APIs lazily initialize composite
+geometry when the component is active but not yet built, so edit-mode / early
+tooling queries match Play Mode once membership validates. Failed geometry
+init still returns outside; it does not fall back to OR-ing raw members.
+
 ## Mutation contract
 
 Every core volume mutation returns `VolumeChangeResult`. The result uses signed
